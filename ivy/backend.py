@@ -18,13 +18,16 @@ Created on Mar 18, 2014
 author: jakeret
 '''
 from __future__ import print_function, division, absolute_import, unicode_literals
-from multiprocessing import Pool
+
 import time
+from multiprocessing import Pool
+
 from ivy.context import getContextProvider
 from ivy.utils.timing import SimpleTiming
 from ivy.utils.timing import TimingCollection
 
-class SimpleMapPlugin(object):
+
+class SimpleMapPlugin:
     
     def __init__(self, ctx):
         self.ctx = ctx
@@ -34,7 +37,7 @@ class SimpleMapPlugin(object):
     
 
 
-class SequentialBackend(object):
+class SequentialBackend:
     """
     Simple implementation of a backend executing the plugins in a sequential order
     """
@@ -47,7 +50,7 @@ class SequentialBackend(object):
         
         return map(LoopWrapper(loop), mapPlugin.getWorkload())
 
-class MultiprocessingBackend(object):
+class MultiprocessingBackend:
     """
     Backend based on Python's multiprocessing. 
     Will instantiate a multiprocessing pool with ``ctx.params.cpu_count`` processes.
@@ -69,7 +72,7 @@ class MultiprocessingBackend(object):
         finally:
             pool.close()
         
-class IpClusterBackend(object):
+class IpClusterBackend:
     """
     Backend based on IPython cluster. 
     Will distribute the workload among the available engines.
@@ -89,7 +92,7 @@ class IpClusterBackend(object):
             pass
 #             view.close()
 
-class JoblibBackend(object):
+class JoblibBackend:
     """
     Backend based on the joblib package 
     Will instantiate a multiprocessing pool with ``ctx.params.cpu_count`` processes.
@@ -111,7 +114,7 @@ class JoblibBackend(object):
         
 
 
-class LoopWrapper(object):
+class LoopWrapper:
     """
     Callable wrapper for the loop execution
     """

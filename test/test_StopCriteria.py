@@ -20,14 +20,14 @@ author: jakeret
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 import pytest
-from ivy.utils.stop_criteria import RangeStopCriteria
+
+from ivy.context import loopCtx
 from ivy.exceptions.exceptions import InvalidAttributeException
 from ivy.loop import Loop
-from ivy.context import loopCtx
+from ivy.utils.stop_criteria import RangeStopCriteria
 
 
-
-class TestStopCriteria(object):
+class TestStopCriteria:
 
     def test_RangeStopCriteria(self):
         try:

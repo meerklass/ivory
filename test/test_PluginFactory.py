@@ -21,15 +21,14 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import pytest
 
+from ivy.context import ctx
 from ivy.exceptions.exceptions import UnsupportedPluginTypeException
 from ivy.plugin.plugin_factory import PluginFactory
-from ivy.context import ctx
 from test.plugin import simple_plugin
-
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
-class TestPluginFactory(object):
+class TestPluginFactory:
 
 
     def test_simple(self):

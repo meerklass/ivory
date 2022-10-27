@@ -29,7 +29,8 @@ from ivy.utils.stop_criteria import SimpleStopCriteria
 from ivy.utils.struct import WorkflowState
 from ivy.utils.utils import ListIter
 
-class Loop(object):
+
+class Loop:
     '''
     Implementation of a loop. 
     

@@ -26,7 +26,7 @@ from ivy.utils.struct import ImmutableStruct
 from ivy.utils.struct import Struct
 
 
-class TestStruct(object):
+class TestStruct:
 
     def test_struct(self):
         

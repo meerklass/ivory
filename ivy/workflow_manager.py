@@ -19,22 +19,22 @@ author: jakeret
 '''
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-from getopt import getopt
 import importlib
 import types
+from getopt import getopt
 
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.context import ctx
-from ivy.utils.utils import TYPE_MAP
-from ivy.loop import Loop
 from ivy import context
-from ivy.utils.struct import Struct
 from ivy.backend import SequentialBackend
+from ivy.context import ctx
+from ivy.exceptions.exceptions import InvalidAttributeException
+from ivy.loop import Loop
+from ivy.utils.struct import Struct
+from ivy.utils.utils import TYPE_MAP
 
 PLUGINS_KEY = "plugins"
 CONTEXT_PROVIDER_KEY = "context_provider"
 
-class WorkflowManager(object):
+class WorkflowManager:
     '''
     Manages the workflow process by loading the passed config and 
     parsing the passed arguments and then iterating thru the plugins.

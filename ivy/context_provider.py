@@ -19,13 +19,14 @@ author: jakeret
 '''
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-from ivy.utils.struct import Struct
 import pickle
+
 from ivy.context import ctx
 from ivy.utils.struct import ImmutableStruct
+from ivy.utils.struct import Struct
 
 
-class DefaultContextProvider(object):
+class DefaultContextProvider:
     """
     Default implementation of a context provider.
     Creates a simple mutable struct as ctx and doesn't

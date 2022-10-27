@@ -20,9 +20,11 @@ author: jakeret
 from __future__ import print_function, division, absolute_import
 
 from abc import ABCMeta
+
 from ivy.exceptions.exceptions import NotImplementedException
 
-class BasePlugin(object):
+
+class BasePlugin:
     '''
     Abstract base class for all the plugins providing standardized
     interfaces

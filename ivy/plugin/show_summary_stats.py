@@ -20,10 +20,10 @@ Created on Jan 12, 2014
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 from collections import OrderedDict
-from ivy.utils.timing import TimingCollection
 
 from ivy.plugin.base_plugin import BasePlugin
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
+from ivy.utils.timing import TimingCollection
 
 
 class Plugin(BasePlugin):
@@ -55,18 +55,18 @@ class Plugin(BasePlugin):
     
     def _join_timings(self, timing):
         s = ""
-        if(len(timing.timings.values()[0])==1):
-            s+= "{0!s:30}: {1:>7.3f} s".format(timing.name, timing.duration)
-        else:    
-            summary_list = []
-            for name, durations in timing.timings.items():
-                summary_list.append("{0!s:24}({1:>4d}): {3:>7.3f} s (mean: {2:>7.5f}s min: {4:>7.5f}s max: {5:>7.5f}s)".format(name,
-                                                                                                             len(durations), 
-                                                                                                              sum(durations)/len(durations), 
-                                                                                                              sum(durations), 
-                                                                                                              min(durations), 
-                                                                                                              max(durations)))
-            s += "\n".join(summary_list)
+        summary_list = []
+        for name, durations in timing.timings.items():
+            if (len(durations) == 1):
+                s += "{0!s:30}: {1:>7.3f} s".format(timing.name, timing.duration)
+                break
+            summary_list.append("{0!s:24}({1:>4d}): {3:>7.3f} s (mean: {2:>7.5f}s min: {4:>7.5f}s max: {5:>7.5f}s)".format(name,
+                                                                                                         len(durations),
+                                                                                                          sum(durations)/len(durations),
+                                                                                                          sum(durations),
+                                                                                                          min(durations),
+                                                                                                          max(durations)))
+        s += "\n".join(summary_list)
         return s
 
     def __str__(self):

@@ -23,17 +23,16 @@ from pickle import dumps
 from pickle import loads
 
 from ivy import context
+from ivy.context import ctx
+from ivy.loop import ListIter
 from ivy.loop import Loop
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
 from ivy.utils.struct import Struct
-from ivy.context import ctx
 from ivy.workflow_manager import WorkflowManager
-from ivy.loop import ListIter
-
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
-class TestPickle(object):
+class TestPickle:
  
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])

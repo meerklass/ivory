@@ -104,7 +104,7 @@ class Enum(frozenset):
             raise SyntaxError("Cannot delete enumeration values.")
 
 
-class ListIter(object):
+class ListIter:
     """
     Simple list iterator which can be pickled
     
