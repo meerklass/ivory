@@ -17,18 +17,14 @@ Created on Mar 4, 2014
 
 author: jakeret
 '''
-from __future__ import print_function, division, absolute_import, unicode_literals
 
-import UserDict
+from collections import abc
+
 from ivy.exceptions.exceptions import IllegalAccessException
 from ivy.utils.utils import Enum
 
-# In Python 2.7 still, `DictMixin` is an old-style class; thus, we need
-# to make `Struct` inherit from `object` otherwise we loose properties
-# when setting/pickling/unpickling
 
-
-class ImmutableStruct(object, UserDict.DictMixin):
+class ImmutableStruct(abc.MutableMapping):
     """
     A `dict`-like object, whose keys can be accessed with the usual
     '[...]' lookup syntax, or with the '.' get attribute syntax.
@@ -60,6 +56,7 @@ class ImmutableStruct(object, UserDict.DictMixin):
       3
 
     """
+
     def __init__(self, initializer=None, **extra_args):
         if initializer is not None:
             try:
@@ -73,43 +70,54 @@ class ImmutableStruct(object, UserDict.DictMixin):
         for name, value in extra_args.items():
             self.__dict__[name] = value
 
+    def __setitem__(self, name, val):
+        raise IllegalAccessException("Trying to modify immutable struct with: %s=%s" % (str(name), str(val)))
+
+    def __getitem__(self, name):
+        return self.__dict__[name]
+
+    def __delitem__(self, name):
+        raise IllegalAccessException("Trying to delete entry in immutable struct.")
+
+    def __len__(self):
+        return len(self.__dict__)
+
+    def __iter__(self):
+        for i in self.__dict__:
+            yield i
+
+    def __str__(self):
+        str = "{\n"
+        for name, value in self.items():
+            str += ("%s='%s'\n" % (name, value))
+        str += "}"
+        return str
+
     def copy(self):
         """Return a (shallow) copy of this `Struct` instance."""
         return ImmutableStruct(self)
 
-    # the `DictMixin` class defines all std `dict` methods, provided
-    # that `__getitem__`, `__setitem__` and `keys` are defined.
-    def __setitem__(self, name, val):
-        raise IllegalAccessException("Trying to modify immutable struct with: %s=%s"%(str(name), str(val)))
-        
-    def __getitem__(self, name):
-        return self.__dict__[name]
-    
     def keys(self):
         return self.__dict__.keys()
-    
-    def __str__(self):
-        str = "{\n"
-        for name, value in self.items():
-            str += ("%s='%s'\n" %(name, value))
-        str += "}"
-        return str
+
 
 class Struct(ImmutableStruct):
     """
     Mutable implementation of a Strcut
     """
-    
-    
+
     def __setitem__(self, name, val):
         self.__dict__[name] = val
-        
+
+    def __delitem__(self, name):
+        del self.__dict__[name]
+
     def copy(self):
         """Return a (shallow) copy of this `Struct` instance."""
-        return Struct(self)        
+        return Struct(self)
 
-WorkflowState = Enum(
-                     "RUN",
+
+WorkflowState = Enum("RUN",
                      "STOP",
                      "EXIT",
                      "RESUME")
@@ -119,11 +127,11 @@ class WorkflowStruct(ImmutableStruct):
     '''
     Struct representing the internal state of a workflow loop
     '''
-    
+
     iter = 0
-    
+
     state = WorkflowState.RUN
-    
+
     def increment(self):
         self.iter += 1
 
@@ -133,9 +141,9 @@ class WorkflowStruct(ImmutableStruct):
 
     def stop(self):
         self.state = WorkflowState.STOP
-    
+
     def exit(self):
         self.state = WorkflowState.EXIT
-    
+
     def resume(self):
         self.state = WorkflowState.RESUME
