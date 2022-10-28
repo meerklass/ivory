@@ -1,10 +1,10 @@
 plugin Package
 ==============
 
-:mod:`base_plugin` Module
+:mod:`abstract_plugin` Module
 -------------------------
 
-.. automodule:: ivy.plugin.base_plugin
+.. automodule:: ivy.plugin.abstract_plugin
     :members:
     :undoc-members:
     :show-inheritance:

@@ -103,7 +103,7 @@ class ImmutableStruct(abc.MutableMapping):
 
 class Struct(ImmutableStruct):
     """
-    Mutable implementation of a Strcut
+    Mutable implementation of a Struct
     """
 
     def __setitem__(self, name, val):

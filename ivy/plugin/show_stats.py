@@ -19,10 +19,10 @@ Created on Oct 7, 2013
 
 '''
 
-from ivy.plugin.base_plugin import BasePlugin
+from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
-class Plugin(BasePlugin):
+class Plugin(AbstractPlugin):
     """
     Show statistics of time.
     """

@@ -45,7 +45,7 @@ class TestPluginFactory:
             assert True
 
     def test_invalid_module(self):
-        pluginName = "ivy.plugin.BasePlugin"
+        pluginName = "ivy.plugin.AbstractPlugin"
         try:
             plugin = PluginFactory.createInstance(pluginName, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)

@@ -18,19 +18,17 @@ Created on Mar 4, 2014
 author: jakeret
 '''
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, ABC
 
 from ivy.context import loopCtx
 from ivy.exceptions.exceptions import InvalidAttributeException
 from ivy.utils.struct import WorkflowState
 
 
-class StopCriteria:
+class AbstractStopCriteria(ABC):
     """
     Abstract implementation of stopping criteria
     """
-
-    __metaclass__ = ABCMeta
 
     parent = None
 
@@ -39,7 +37,7 @@ class StopCriteria:
         pass
 
 
-class RangeStopCriteria(StopCriteria):
+class RangeStopCriteria(AbstractStopCriteria):
     """
     Stopping criteria which stops after `maxIter` iterations
     """
