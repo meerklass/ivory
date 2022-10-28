@@ -28,7 +28,7 @@ class Plugin(AbstractPlugin):
     def __str__(self):
         return __name__
 
-    def __call__(self):
+    def run(self):
         self.ctx.value = self.ctx.value ** 2
         s = 0
         for i in range(10 ** 4):

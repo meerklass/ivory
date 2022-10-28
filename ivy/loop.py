@@ -115,13 +115,6 @@ class Loop:
             else:
                 return self.__next__()
 
-    def __call__(self):
-        """
-        Executes all the plugins sequentially in the loop
-        """
-        for plugin in self:
-            plugin()
-
     def __setstate__(self, state):
         self.__dict__ = state
         context.register(self)

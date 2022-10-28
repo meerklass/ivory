@@ -36,5 +36,5 @@ class AbstractPlugin(ABC):
         pass
 
     @abstractmethod
-    def __call__(self):
+    def run(self):
         pass

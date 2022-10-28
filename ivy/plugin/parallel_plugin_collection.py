@@ -64,7 +64,7 @@ class ParallelPluginCollection(AbstractPlugin):
     def __str__(self):
         return "ParallelPluginCollection"
 
-    def __call__(self):
+    def run(self):
         force = None
         if not self.parallel:
             force = "sequential"

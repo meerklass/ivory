@@ -32,6 +32,6 @@ class Plugin(AbstractPlugin):
     def __str__(self):
         return __name__
 
-    def __call__(self):
+    def run(self):
         if self.value is not None:
             print(self.value)

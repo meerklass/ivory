@@ -60,7 +60,7 @@ class TestParallelPluginCollection(ContextSensitiveTest):
         reduce_plugin = sum_reduce_plugin.Plugin(ctx)
 
         parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
-        parallelPluginCollection()
+        parallelPluginCollection.run()
         assert ctx.valuesSum == 285
 
     def test_multiprocessing(self):
@@ -76,7 +76,7 @@ class TestParallelPluginCollection(ContextSensitiveTest):
         reduce_plugin = sum_reduce_plugin.Plugin(ctx)
 
         parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
-        parallelPluginCollection()
+        parallelPluginCollection.run()
         assert ctx.valuesSum == 285
 
     #

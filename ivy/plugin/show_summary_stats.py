@@ -29,7 +29,7 @@ class Plugin(AbstractPlugin):
     Show statistics of time.
     """
 
-    def __call__(self):
+    def run(self):
         keyword = ParallelPluginCollection([], 0, None).__str__()
 
         total = sum((timing.duration for timing in self.ctx.timings if timing.name is not keyword))

@@ -27,7 +27,7 @@ class Plugin(AbstractPlugin):
     Show statistics of time.
     """
 
-    def __call__(self):
+    def run(self):
         total = sum((timing.duration for timing in self.ctx.timings))
         print("== Ivy run took: {0:>7.3f} s ===".format(total))
         for timing in self.ctx.timings:
