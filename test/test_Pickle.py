@@ -34,7 +34,7 @@ PLUGIN_NAME = "test.plugin.simple_plugin"
 class TestPickle:
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
-        p = loop.__next__()
+        p = next(loop)
 
         dumps_loop = dumps(loop)
         loop2 = loads(dumps_loop)

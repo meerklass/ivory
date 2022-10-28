@@ -80,7 +80,7 @@ class Loop:
                 raise StopIteration
 
             if self._current_plugin is None:
-                self._current_plugin = self.plugin_list_itr.__next__()
+                self._current_plugin = next(self.plugin_list_itr)
 
                 plugin = self._current_plugin
                 if isinstance(plugin, AbstractPlugin):
@@ -95,7 +95,7 @@ class Loop:
             if isinstance(self._current_plugin, Loop):
                 inner_loop = self._current_plugin
                 try:
-                    plugin = inner_loop.__next__()
+                    plugin = next(inner_loop)
                     return plugin
                 except StopIteration:
                     if (loop_ctx(inner_loop).state == WorkflowState.EXIT):

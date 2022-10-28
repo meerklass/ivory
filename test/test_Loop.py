@@ -48,11 +48,11 @@ class TestLoop(ContextSensitiveTest):
         plugin = Plugin(ctx())
         loop = Loop(plugin)
 
-        p = loop.__next__()
+        p = next(loop)
         assert p == plugin
 
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except StopIteration:
             assert True
@@ -62,13 +62,13 @@ class TestLoop(ContextSensitiveTest):
         plugin2 = Plugin(ctx())
         loop = Loop([plugin1, plugin2])
 
-        p = loop.__next__()
+        p = next(loop)
         assert p == plugin1
-        p = loop.__next__()
+        p = next(loop)
         assert p == plugin2
 
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except StopIteration:
             assert True
@@ -76,13 +76,13 @@ class TestLoop(ContextSensitiveTest):
     def test_plugin_names(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
 
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
 
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except StopIteration:
             assert True
@@ -93,13 +93,13 @@ class TestLoop(ContextSensitiveTest):
                   PLUGIN_NAME])
         )
 
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
 
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except StopIteration:
             assert True
@@ -110,17 +110,17 @@ class TestLoop(ContextSensitiveTest):
                            PLUGIN_NAME]),
                      PLUGIN_NAME])
 
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
-        p = loop.__next__()
+        p = next(loop)
         assert isinstance(p, Plugin)
 
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except StopIteration:
             assert True
@@ -175,7 +175,7 @@ class TestLoop(ContextSensitiveTest):
         plugin = "unknown.plugin.invalid"
         loop = Loop(plugin)
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except UnsupportedPluginTypeException as ex:
             print(ex)
@@ -184,7 +184,7 @@ class TestLoop(ContextSensitiveTest):
         plugin = {}
         loop = Loop(plugin)
         try:
-            loop.__next__()
+            next(loop)
             assert False
         except UnsupportedPluginTypeException as ex:
             print(ex)
