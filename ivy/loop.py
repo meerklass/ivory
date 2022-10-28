@@ -26,7 +26,6 @@ from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.plugin_factory import PluginFactory
 from ivy.utils.stop_criteria import SimpleStopCriteria
 from ivy.utils.struct import WorkflowState
-from ivy.utils.utils import ListIter
 
 
 class Loop:
@@ -65,7 +64,7 @@ class Loop:
         Resets the internal state of the loop
         """
 
-        self.plugin_list_itr = ListIter(self.plugin_list)
+        self.plugin_list_itr = iter(self.plugin_list)
         loop_ctx(self).reset()
 
     def __iter__(self):
@@ -139,4 +138,4 @@ class Loop:
             self._create_iter()
 
     def _create_iter(self):
-        self.plugin_list_itr = ListIter(self.plugin_list)
+        self.plugin_list_itr = iter(self.plugin_list)

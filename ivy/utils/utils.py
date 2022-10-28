@@ -17,10 +17,10 @@ Created on Mar 5, 2014
 
 author: jakeret
 '''
+
 TYPE_MAP = {
     'bool': lambda x: boolify(x),
     'int': lambda x: int(x),
-    'long': lambda x: long(x),
     'float': lambda x: float(x),
     'str': lambda x: x,
     'unicode': lambda x: x,
@@ -108,26 +108,3 @@ class Enum(frozenset):
 
     def __delattr__(self, name):
         raise SyntaxError("Cannot delete enumeration values.")
-
-
-class ListIter:
-    """
-    Simple list iterator which can be pickled
-    
-    :param list: the list over which should be iterated
-    """
-
-    def __init__(self, list):
-        self.list = list
-        self.idx = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if (self.idx < len(self.list)):
-            item = self.list[self.idx]
-            self.idx += 1
-            return item
-
-        raise StopIteration
