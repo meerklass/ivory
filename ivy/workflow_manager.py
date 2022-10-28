@@ -57,8 +57,8 @@ class WorkflowManager:
             def get_context_provider_wrapper():
                 # todo load class not module
                 clazz = config[CONTEXT_PROVIDER_KEY]
-                moduleName = ".".join(clazz.split(".")[:-1])
-                module = importlib.import_module(moduleName)
+                module_name = ".".join(clazz.split(".")[:-1])
+                module = importlib.import_module(module_name)
                 return getattr(module, clazz.split(".")[-1])
 
             context.get_context_provider = get_context_provider_wrapper
@@ -66,9 +66,7 @@ class WorkflowManager:
         if not isinstance(config[PLUGINS_KEY], Loop):
             config[PLUGINS_KEY] = Loop(config[PLUGINS_KEY])
 
-        ctx().params = context._create_immutable_ctx(**config)
-        # just to maintain backward compatibility
-        ctx().parameters = ctx().params
+        ctx().params = context.create_immutable_ctx(**config)
         ctx().plugins = ctx().params.plugins
 
     def _parse_args(self, argv):
