@@ -20,7 +20,7 @@ author: jakeret
 import time
 from multiprocessing import Pool
 
-from ivy.context import getContextProvider
+from ivy.context import get_context_provider
 from ivy.utils.timing import SimpleTiming
 from ivy.utils.timing import TimingCollection
 
@@ -29,7 +29,7 @@ class SimpleMapPlugin:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def getWorkload(self):
+    def get_workload(self):
         return [self.ctx]
 
 
@@ -41,10 +41,10 @@ class SequentialBackend:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def run(self, loop, mapPlugin=None):
-        if mapPlugin is None: mapPlugin = SimpleMapPlugin(self.ctx)
+    def run(self, loop, map_plugin=None):
+        if map_plugin is None: map_plugin = SimpleMapPlugin(self.ctx)
 
-        return list(map(LoopWrapper(loop), mapPlugin.getWorkload()))
+        return list(map(LoopWrapper(loop), map_plugin.get_workload()))
 
 
 class MultiprocessingBackend:
@@ -56,16 +56,16 @@ class MultiprocessingBackend:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def run(self, loop, mapPlugin):
+    def run(self, loop, map_plugin):
         pool = Pool(self.ctx.params.cpu_count)
         try:
-            ctxList = pool.map(LoopWrapper(loop, True), mapPlugin.getWorkload())
-            timingCollection = TimingCollection(str(loop))
-            for ctx in ctxList:
+            ctx_list = pool.map(LoopWrapper(loop, True), map_plugin.get_workload())
+            timing_collection = TimingCollection(str(loop))
+            for ctx in ctx_list:
                 for timing in ctx.timings:
-                    timingCollection.addTiming(timing)
-            self.ctx.timings.append(timingCollection)
-            return ctxList
+                    timing_collection.add_timing(timing)
+            self.ctx.timings.append(timing_collection)
+            return ctx_list
         finally:
             pool.close()
 
@@ -79,13 +79,14 @@ class IpClusterBackend:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def run(self, loop, mapPlugin):
-        from IPython import parallel
+    @staticmethod
+    def run(loop, map_plugin):
+        import ipyparallel
 
-        client = parallel.Client()
+        client = ipyparallel.Client()
         view = client.load_balanced_view()
         try:
-            return view.map_sync(LoopWrapper(loop), mapPlugin.getWorkload())
+            return view.map_sync(LoopWrapper(loop), map_plugin.get_workload())
         finally:
             pass
 
@@ -101,16 +102,17 @@ class JoblibBackend:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def run(self, loop, mapPlugin):
+    def run(self, loop, map_plugin):
         import joblib
         with joblib.Parallel(n_jobs=self.ctx.params.cpu_count) as parallel:
-            ctxList = parallel(joblib.delayed(LoopWrapper(loop, True), False)(ctx) for ctx in mapPlugin.getWorkload())
-            timingCollection = TimingCollection(str(loop))
-            for ctx in ctxList:
+            ctx_list = parallel(joblib.delayed(LoopWrapper(loop, True))(ctx)
+                                for ctx in map_plugin.get_workload())
+            timing_collection = TimingCollection(str(loop))
+            for ctx in ctx_list:
                 for timing in ctx.timings:
-                    timingCollection.addTiming(timing)
-            self.ctx.timings.append(timingCollection)
-            return ctxList
+                    timing_collection.add_timing(timing)
+            self.ctx.timings.append(timing_collection)
+            return ctx_list
 
 
 class LoopWrapper:
@@ -124,7 +126,8 @@ class LoopWrapper:
 
     def __call__(self, ctx):
         #         print("working pid:%s" %(os.getpid()))
-        if self.parallel: ctx.timings = []
+        if self.parallel:
+            ctx.timings = []
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
@@ -133,7 +136,7 @@ class LoopWrapper:
             #             time.sleep(5)
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
 
-            getContextProvider().storeContext()
+            get_context_provider().store_context()
 
         #         self.loop()
         self.loop.reset()

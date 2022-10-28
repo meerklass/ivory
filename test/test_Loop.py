@@ -20,7 +20,7 @@ author: jakeret
 import pytest
 
 from ivy.context import ctx
-from ivy.context import loopCtx
+from ivy.context import loop_ctx
 from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.exceptions.exceptions import UnsupportedPluginTypeException
 from ivy.loop import Loop
@@ -137,26 +137,26 @@ class TestLoop(ContextSensitiveTest):
         assert cnt == len(pList)
 
     def test_loop_max_iter(self):
-        maxIter = 3
+        max_iter = 3
         pList = [PLUGIN_NAME, PLUGIN_NAME]
 
-        loop = Loop(pList, stop=RangeStopCriteria(maxIter=maxIter))
+        loop = Loop(pList, stop=RangeStopCriteria(max_iter=max_iter))
 
         cnt = 0
         for p in loop:
             assert isinstance(p, Plugin)
             cnt += 1
 
-        assert cnt == len(pList) * maxIter
+        assert cnt == len(pList) * max_iter
 
     def test_loop_max_iter_nested(self):
-        maxIter = 3
+        max_iter = 3
         pList = [Plugin(ctx()), Plugin(ctx())]
 
         loop = Loop(
             Loop(pList,
-                 stop=RangeStopCriteria(maxIter=maxIter)),
-            stop=RangeStopCriteria(maxIter=maxIter))
+                 stop=RangeStopCriteria(max_iter=max_iter)),
+            stop=RangeStopCriteria(max_iter=max_iter))
 
         cnt = 0
         for p in loop:
@@ -164,11 +164,11 @@ class TestLoop(ContextSensitiveTest):
             p()
             cnt += 1
 
-        assert cnt == len(pList) * maxIter * maxIter
+        assert cnt == len(pList) * max_iter * max_iter
 
     def test_loop_ctx(self):
         loop = Loop(PLUGIN_NAME)
-        ctx = loopCtx(loop)
+        ctx = loop_ctx(loop)
         assert ctx is not None
 
     def test_unknown_plugin(self):

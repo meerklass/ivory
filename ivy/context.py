@@ -2,9 +2,10 @@
 from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.utils.struct import WorkflowStruct
 
-__all__ = ["ctx", "loopCtx"]
+__all__ = ["ctx", "loop_ctx", "get_context_provider"]
 
 global_ctx = None
+
 
 def ctx():
     """
@@ -14,10 +15,11 @@ def ctx():
     
     """
     global global_ctx
-    if(global_ctx is None):
-        global_ctx = _createCtx()
-        
+    if (global_ctx is None):
+        global_ctx = _create_ctx()
+
     return global_ctx
+
 
 def register(loop):
     try:
@@ -26,16 +28,19 @@ def register(loop):
     except KeyError or AttributeError:
         ctx()[loop] = WorkflowStruct()
 
-def loopCtx(loop):
+
+def loop_ctx(loop):
     return ctx()[loop]
 
-def _createCtx(**args):
-    return getContextProvider().createContext(**args)
 
-def _createImmutableCtx(**args):
-    return getContextProvider().createImmutableContext(**args)
+def _create_ctx(**args):
+    return get_context_provider().create_context(**args)
 
-def getContextProvider():
+
+def _create_immutable_ctx(**args):
+    return get_context_provider().create_immutable_context(**args)
+
+
+def get_context_provider():
     from ivy.context_provider import DefaultContextProvider
     return DefaultContextProvider
-

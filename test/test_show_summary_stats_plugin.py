@@ -31,7 +31,7 @@ class TestShowSummaryStatsPlugin:
         timing = SimpleTiming("Test", 100)
         timings = TimingCollection(timing.name)
         timings.duration = timing.duration
-        timings.addTiming(timing)
+        timings.add_timing(timing)
 
         plugin = show_summary_stats.Plugin(ctx)
         str_timing = plugin._join_timings(timings)
@@ -43,8 +43,8 @@ class TestShowSummaryStatsPlugin:
         timing = SimpleTiming("Test", 100)
         timings = TimingCollection(timing.name)
         timings.duration = timing.duration
-        timings.addTiming(timing)
-        timings.addTiming(timing)
+        timings.add_timing(timing)
+        timings.add_timing(timing)
 
         plugin = show_summary_stats.Plugin(ctx)
         str_timing = plugin._join_timings(timings)

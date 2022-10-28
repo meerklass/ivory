@@ -51,31 +51,31 @@ class TestParallelPluginCollection(ContextSensitiveTest):
     def test_sequential(self):
         ctx = context.ctx()
         ctx.timings = []
-        ctx.params = context._createImmutableCtx(backend="sequential",
-                                                 valuesMin=1,
-                                                 valuesMax=10)
+        ctx.params = context._create_immutable_ctx(backend="sequential",
+                                                   valuesMin=1,
+                                                   valuesMax=10)
 
-        mapPlugin = range_map_plugin.Plugin(ctx)
-        pluginList = [PLUGIN_NAME]
-        reducePlugin = sum_reduce_plugin.Plugin(ctx)
+        map_plugin = range_map_plugin.Plugin(ctx)
+        plugin_list = [PLUGIN_NAME]
+        reduce_plugin = sum_reduce_plugin.Plugin(ctx)
 
-        parallelPluginCollection = ParallelPluginCollection(pluginList, mapPlugin, reducePlugin)
+        parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
         parallelPluginCollection()
         assert ctx.valuesSum == 285
 
     def test_multiprocessing(self):
         ctx = context.ctx()
         ctx.timings = []
-        ctx.params = context._createImmutableCtx(backend="multiprocessing",
-                                                 cpu_count=8,
-                                                 valuesMin=1,
-                                                 valuesMax=10)
+        ctx.params = context._create_immutable_ctx(backend="multiprocessing",
+                                                   cpu_count=8,
+                                                   valuesMin=1,
+                                                   valuesMax=10)
 
-        mapPlugin = range_map_plugin.Plugin(ctx)
-        pluginList = [PLUGIN_NAME]
-        reducePlugin = sum_reduce_plugin.Plugin(ctx)
+        map_plugin = range_map_plugin.Plugin(ctx)
+        plugin_list = [PLUGIN_NAME]
+        reduce_plugin = sum_reduce_plugin.Plugin(ctx)
 
-        parallelPluginCollection = ParallelPluginCollection(pluginList, mapPlugin, reducePlugin)
+        parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
         parallelPluginCollection()
         assert ctx.valuesSum == 285
 

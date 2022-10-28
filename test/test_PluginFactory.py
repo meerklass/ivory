@@ -36,18 +36,18 @@ class TestPluginFactory:
         assert isinstance(plugin, simple_plugin.Plugin)
 
     def test_unknown_module(self):
-        pluginName = "unknown.plugin.invalid"
+        plugin_name = "unknown.plugin.invalid"
         try:
-            plugin = PluginFactory.createInstance(pluginName, ctx())
+            plugin = PluginFactory.createInstance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
         except UnsupportedPluginTypeException as ex:
             assert True
 
     def test_invalid_module(self):
-        pluginName = "ivy.plugin.AbstractPlugin"
+        plugin_name = "ivy.plugin.AbstractPlugin"
         try:
-            plugin = PluginFactory.createInstance(pluginName, ctx())
+            plugin = PluginFactory.createInstance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
         except UnsupportedPluginTypeException as ex:

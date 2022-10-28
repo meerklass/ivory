@@ -40,7 +40,7 @@ class TimingCollection(SimpleTiming):
         super(TimingCollection, self).__init__(parent, 0)
         self.timings = OrderedDict()
 
-    def addTiming(self, timing):
+    def add_timing(self, timing):
         try:
             self.timings[timing.name].append(timing.duration)
         except KeyError:
