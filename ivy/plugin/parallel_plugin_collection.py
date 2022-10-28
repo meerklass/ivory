@@ -21,11 +21,11 @@ from ivy import backend
 from ivy import context
 from ivy.exceptions.exceptions import InvalidAttributeException
 from ivy.loop import Loop
-from ivy.plugin.base_plugin import BasePlugin
+from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.plugin_factory import PluginFactory
 
 
-class ParallelPluginCollection(BasePlugin):
+class ParallelPluginCollection(AbstractPlugin):
     """
     Collection that allows for executing plugins in parallel by using
     a MapReduce aprach. The implementation therefore requires a

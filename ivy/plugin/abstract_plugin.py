@@ -18,24 +18,23 @@ Created on Mar 4, 2014
 author: jakeret
 '''
 
-from abc import ABCMeta
-
-from ivy.exceptions.exceptions import NotImplementedException
+from abc import ABC, abstractmethod
 
 
-class BasePlugin:
+class AbstractPlugin(ABC):
     '''
     Abstract base class for all the plugins providing standardized
     interfaces
     '''
-    __metaclass__ = ABCMeta
 
     def __init__(self, ctx, **kwargs):
         self.ctx = ctx
         self.ctx.update(kwargs)
 
+    @abstractmethod
     def __str__(self):
-        raise NotImplementedException()
+        pass
 
+    @abstractmethod
     def __call__(self):
-        raise NotImplementedException()
+        pass

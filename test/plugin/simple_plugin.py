@@ -17,12 +17,12 @@ Created on Mar 5, 2014
 
 author: jakeret
 '''
-from ivy.plugin.base_plugin import BasePlugin
+from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
-class Plugin(BasePlugin):
+class Plugin(AbstractPlugin):
     '''
-    Simple implementation of the BasePlugin
+    Simple implementation of the AbstractPlugin
     '''
 
     def __init__(self, ctx, **kwargs):

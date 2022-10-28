@@ -19,12 +19,12 @@ Created on Jan 12, 2014
 
 from collections import OrderedDict
 
-from ivy.plugin.base_plugin import BasePlugin
+from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
 from ivy.utils.timing import TimingCollection
 
 
-class Plugin(BasePlugin):
+class Plugin(AbstractPlugin):
     """
     Show statistics of time.
     """

@@ -22,7 +22,7 @@ from ivy import context
 from ivy.context import loopCtx
 from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.exceptions.exceptions import UnsupportedPluginTypeException
-from ivy.plugin.base_plugin import BasePlugin
+from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.plugin_factory import PluginFactory
 from ivy.utils.stop_criteria import SimpleStopCriteria
 from ivy.utils.struct import WorkflowState
@@ -84,7 +84,7 @@ class Loop:
                 self._currentPlugin = self.pluginListItr.__next__()
 
                 plugin = self._currentPlugin
-                if isinstance(plugin, BasePlugin):
+                if isinstance(plugin, AbstractPlugin):
                     self._currentPlugin = None
                     plugin.ctx = self.ctx
                     return plugin
