@@ -19,9 +19,9 @@ author: jakeret
 '''
 
 from collections import abc
+from enum import Enum
 
 from ivy.exceptions.exceptions import IllegalAccessException
-from ivy.utils.utils import Enum
 
 
 class ImmutableStruct(abc.MutableMapping):
@@ -117,10 +117,11 @@ class Struct(ImmutableStruct):
         return Struct(self)
 
 
-WorkflowState = Enum("RUN",
-                     "STOP",
-                     "EXIT",
-                     "RESUME")
+class WorkflowState(Enum):
+    RUN = 'RUN'
+    STOP = 'STOP'
+    EXIT = 'EXIT'
+    RESUME = 'RESUME'
 
 
 class WorkflowStruct(ImmutableStruct):
