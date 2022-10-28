@@ -24,6 +24,13 @@ from enum import Enum
 from ivy.exceptions.exceptions import IllegalAccessException
 
 
+class WorkflowState(Enum):
+    RUN = 'RUN'
+    STOP = 'STOP'
+    EXIT = 'EXIT'
+    RESUME = 'RESUME'
+
+
 class ImmutableStruct(abc.MutableMapping):
     """
     A `dict`-like object, whose keys can be accessed with the usual
@@ -115,13 +122,6 @@ class Struct(ImmutableStruct):
     def copy(self):
         """Return a (shallow) copy of this `Struct` instance."""
         return Struct(self)
-
-
-class WorkflowState(Enum):
-    RUN = 'RUN'
-    STOP = 'STOP'
-    EXIT = 'EXIT'
-    RESUME = 'RESUME'
 
 
 class WorkflowStruct(ImmutableStruct):
