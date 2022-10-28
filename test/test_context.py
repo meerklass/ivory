@@ -56,14 +56,14 @@ class TestContext(ContextSensitiveTest):
         assert ctx.a == 3
 
     def test_create_immu_ctx(self):
-        ctx = context._create_immutable_ctx()
+        ctx = context.create_immutable_ctx()
         assert isinstance(ctx, ImmutableStruct)
 
-        ctx = context._create_immutable_ctx(a=3)
+        ctx = context.create_immutable_ctx(a=3)
         assert isinstance(ctx, ImmutableStruct)
         assert ctx.a == 3
 
         args = {"a": 3}
-        ctx = context._create_immutable_ctx(**args)
+        ctx = context.create_immutable_ctx(**args)
         assert isinstance(ctx, ImmutableStruct)
         assert ctx.a == 3

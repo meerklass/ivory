@@ -15,7 +15,7 @@ def ctx():
     
     """
     global global_ctx
-    if (global_ctx is None):
+    if global_ctx is None:
         global_ctx = _create_ctx()
 
     return global_ctx
@@ -33,12 +33,12 @@ def loop_ctx(loop):
     return ctx()[loop]
 
 
+def create_immutable_ctx(**args):
+    return get_context_provider().create_immutable_context(**args)
+
+
 def _create_ctx(**args):
     return get_context_provider().create_context(**args)
-
-
-def _create_immutable_ctx(**args):
-    return get_context_provider().create_immutable_context(**args)
 
 
 def get_context_provider():

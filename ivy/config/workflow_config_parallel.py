@@ -12,10 +12,10 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 
 author: jakeret
-'''
+"""
 # from ivy.config import base_config
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
 

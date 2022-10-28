@@ -12,15 +12,19 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 18, 2014
 
 author: jakeret
-'''
+"""
 import time
 from multiprocessing import Pool
+from typing import Optional
 
 from ivy.context import get_context_provider
+from ivy.loop import Loop
+from ivy.plugin.abstract_plugin import AbstractPlugin
+from ivy.utils.struct import Struct
 from ivy.utils.timing import SimpleTiming
 from ivy.utils.timing import TimingCollection
 
@@ -41,10 +45,10 @@ class SequentialBackend:
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def run(self, loop, map_plugin=None):
+    def run(self, loop: Loop, map_plugin: Optional[AbstractPlugin] = None) -> list[Struct]:
         if map_plugin is None: map_plugin = SimpleMapPlugin(self.ctx)
 
-        return list(map(LoopWrapper(loop), map_plugin.get_workload()))
+        return list(map(CallableLoop(loop), map_plugin.get_workload()))
 
 
 class MultiprocessingBackend:
@@ -59,7 +63,7 @@ class MultiprocessingBackend:
     def run(self, loop, map_plugin):
         pool = Pool(self.ctx.params.cpu_count)
         try:
-            ctx_list = pool.map(LoopWrapper(loop, True), map_plugin.get_workload())
+            ctx_list = pool.map(CallableLoop(loop, True), map_plugin.get_workload())
             timing_collection = TimingCollection(str(loop))
             for ctx in ctx_list:
                 for timing in ctx.timings:
@@ -86,7 +90,7 @@ class IpClusterBackend:
         client = ipyparallel.Client()
         view = client.load_balanced_view()
         try:
-            return view.map_sync(LoopWrapper(loop), map_plugin.get_workload())
+            return view.map_sync(CallableLoop(loop), map_plugin.get_workload())
         finally:
             pass
 
@@ -105,7 +109,7 @@ class JoblibBackend:
     def run(self, loop, map_plugin):
         import joblib
         with joblib.Parallel(n_jobs=self.ctx.params.cpu_count) as parallel:
-            ctx_list = parallel(joblib.delayed(LoopWrapper(loop, True))(ctx)
+            ctx_list = parallel(joblib.delayed(CallableLoop(loop, True))(ctx)
                                 for ctx in map_plugin.get_workload())
             timing_collection = TimingCollection(str(loop))
             for ctx in ctx_list:
@@ -115,7 +119,7 @@ class JoblibBackend:
             return ctx_list
 
 
-class LoopWrapper:
+class CallableLoop:
     """
     Callable wrapper for the loop execution
     """
@@ -125,20 +129,16 @@ class LoopWrapper:
         self.parallel = parallel
 
     def __call__(self, ctx):
-        #         print("working pid:%s" %(os.getpid()))
         if self.parallel:
             ctx.timings = []
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
-            #             print("(%s, '%s'),"%(time.time(), plugin))
-            plugin()
-            #             time.sleep(5)
+            plugin.run()
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
 
             get_context_provider().store_context()
 
-        #         self.loop()
         self.loop.reset()
         return ctx
 
@@ -151,8 +151,8 @@ BACKEND_NAME_MAP = {"sequential": SequentialBackend,
 
 
 def create(ctx, force=None):
-    '''
+    """
     Simple factory instantiating backends for the given name in ``ctx.params.backend``
-    '''
+    """
     backend_name = ctx.params.backend if force is None else force
     return BACKEND_NAME_MAP[backend_name](ctx)

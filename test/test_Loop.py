@@ -159,9 +159,9 @@ class TestLoop(ContextSensitiveTest):
             stop=RangeStopCriteria(max_iter=max_iter))
 
         cnt = 0
-        for p in loop:
-            assert isinstance(p, Plugin)
-            p()
+        for plugin in loop:
+            assert isinstance(plugin, Plugin)
+            plugin.run()
             cnt += 1
 
         assert cnt == len(pList) * max_iter * max_iter

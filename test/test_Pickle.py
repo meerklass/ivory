@@ -34,21 +34,21 @@ PLUGIN_NAME = "test.plugin.simple_plugin"
 class TestPickle:
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
-        p = next(loop)
+        plugin = next(loop)
 
         dumps_loop = dumps(loop)
         loop2 = loads(dumps_loop)
 
-        for p in loop2:
-            p()
+        for plugin in loop2:
+            plugin.run()
 
         loop.reset()
 
         dumps_loop = dumps(loop)
         loop2 = loads(dumps_loop)
 
-        for p in loop2:
-            p()
+        for plugin in loop2:
+            plugin.run()
 
     def test_struct_pickle(self):
         struct = Struct(value1=1)

@@ -12,18 +12,18 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 5, 2014
 
 author: jakeret
-'''
+"""
 from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
 class Plugin(AbstractPlugin):
-    '''
+    """
     Simple implementation of the AbstractPlugin
-    '''
+    """
 
     def __init__(self, ctx, **kwargs):
         self.value = kwargs.pop("value", None)
@@ -32,6 +32,6 @@ class Plugin(AbstractPlugin):
     def __str__(self):
         return __name__
 
-    def __call__(self):
+    def run(self):
         if self.value is not None:
             print(self.value)

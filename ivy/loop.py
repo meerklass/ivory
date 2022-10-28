@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 
 from ivy import context
 from ivy.context import loop_ctx
@@ -29,12 +29,12 @@ from ivy.utils.struct import WorkflowState
 
 
 class Loop:
-    '''
+    """
     Implementation of a loop. 
     
     :param plugin_list: List of plugin or inner :class:`Loop`
     :param stop: (optional) stop criteria
-    '''
+    """
 
     _current_plugin = None
 
@@ -114,13 +114,6 @@ class Loop:
                 raise StopIteration
             else:
                 return self.__next__()
-
-    def __call__(self):
-        """
-        Executes all the plugins sequentially in the loop
-        """
-        for plugin in self:
-            plugin()
 
     def __setstate__(self, state):
         self.__dict__ = state

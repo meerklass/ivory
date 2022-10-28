@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Tests for `ivy.utils` module.
 
 author: jakeret
-'''
+"""
 
 import pytest
 

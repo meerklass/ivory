@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 import importlib
 import types
 from getopt import getopt
@@ -34,17 +34,17 @@ CONTEXT_PROVIDER_KEY = "context_provider"
 
 
 class WorkflowManager:
-    '''
+    """
     Manages the workflow process by loading the passed config and 
     parsing the passed arguments and then iterating thru the plugins.
     
     :param argv: arguments to use
-    '''
+    """
 
     def __init__(self, argv):
-        '''
+        """
         Constructor
-        '''
+        """
         self._setup(argv)
 
     def _setup(self, argv):
@@ -57,8 +57,8 @@ class WorkflowManager:
             def get_context_provider_wrapper():
                 # todo load class not module
                 clazz = config[CONTEXT_PROVIDER_KEY]
-                moduleName = ".".join(clazz.split(".")[:-1])
-                module = importlib.import_module(moduleName)
+                module_name = ".".join(clazz.split(".")[:-1])
+                module = importlib.import_module(module_name)
                 return getattr(module, clazz.split(".")[-1])
 
             context.get_context_provider = get_context_provider_wrapper
@@ -66,9 +66,7 @@ class WorkflowManager:
         if not isinstance(config[PLUGINS_KEY], Loop):
             config[PLUGINS_KEY] = Loop(config[PLUGINS_KEY])
 
-        ctx().params = context._create_immutable_ctx(**config)
-        # just to maintain backward compatibility
-        ctx().parameters = ctx().params
+        ctx().params = context.create_immutable_ctx(**config)
         ctx().plugins = ctx().params.plugins
 
     def _parse_args(self, argv):

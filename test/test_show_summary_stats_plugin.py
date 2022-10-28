@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Jan 12, 2015
 
 author: jakeret
-'''
+"""
 
 from ivy.plugin import show_summary_stats
 from ivy.utils.struct import Struct

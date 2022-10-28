@@ -12,22 +12,22 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 18, 2014
 
 author: jakeret
-'''
+"""
 
 
 class Plugin:
-    '''
+    """
     classdocs
-    '''
+    """
 
     def __init__(self, ctx):
-        '''
+        """
         Constructor
-        '''
+        """
         self.ctx = ctx
 
     def get_workload(self):

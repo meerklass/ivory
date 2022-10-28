@@ -12,16 +12,23 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 
 from collections import abc
 from enum import Enum
 
 from ivy.exceptions.exceptions import IllegalAccessException
+
+
+class WorkflowState(Enum):
+    RUN = 'RUN'
+    STOP = 'STOP'
+    EXIT = 'EXIT'
+    RESUME = 'RESUME'
 
 
 class ImmutableStruct(abc.MutableMapping):
@@ -117,17 +124,10 @@ class Struct(ImmutableStruct):
         return Struct(self)
 
 
-class WorkflowState(Enum):
-    RUN = 'RUN'
-    STOP = 'STOP'
-    EXIT = 'EXIT'
-    RESUME = 'RESUME'
-
-
 class WorkflowStruct(ImmutableStruct):
-    '''
+    """
     Struct representing the internal state of a workflow loop
-    '''
+    """
 
     iter = 0
 

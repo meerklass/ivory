@@ -12,20 +12,20 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 
 from abc import ABC, abstractmethod
 
 
 class AbstractPlugin(ABC):
-    '''
+    """
     Abstract base class for all the plugins providing standardized
     interfaces
-    '''
+    """
 
     def __init__(self, ctx, **kwargs):
         self.ctx = ctx
@@ -36,5 +36,5 @@ class AbstractPlugin(ABC):
         pass
 
     @abstractmethod
-    def __call__(self):
+    def run(self):
         pass
