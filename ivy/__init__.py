@@ -9,7 +9,7 @@ import types
 
 from ivy import context
 from ivy.workflow_manager import WorkflowManager
-from ivy.workflow_manager import loadConfigs
+from ivy.workflow_manager import load_configs
 
 
 def reduce_method(m):

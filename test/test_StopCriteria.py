@@ -20,7 +20,7 @@ author: jakeret
 
 import pytest
 
-from ivy.context import loopCtx
+from ivy.context import loop_ctx
 from ivy.exceptions.exceptions import InvalidAttributeException
 from ivy.loop import Loop
 from ivy.utils.stop_criteria import RangeStopCriteria
@@ -28,16 +28,16 @@ from ivy.utils.stop_criteria import RangeStopCriteria
 
 class TestStopCriteria:
 
-    def test_RangeStopCriteria(self):
+    def test_range_stop_criteria(self):
         try:
-            stopCriteria = RangeStopCriteria(0)
+            RangeStopCriteria(0)
             pytest.fail("0 iterations not allowed")
         except InvalidAttributeException:
             assert True
 
-        stopCriteria = RangeStopCriteria(1)
-        loop = Loop("", stopCriteria)
-        assert False == stopCriteria.isStop()
+        stop_criteria = RangeStopCriteria(1)
+        loop = Loop("", stop_criteria)
+        assert not stop_criteria.is_stop()
 
-        loopCtx(loop).increment()
-        assert True == stopCriteria.isStop()
+        loop_ctx(loop).increment()
+        assert stop_criteria.is_stop()

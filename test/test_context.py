@@ -20,7 +20,7 @@ author: jakeret
 import pytest
 
 from ivy import context
-from ivy.context import loopCtx
+from ivy.context import loop_ctx
 from ivy.context import register
 from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.loop import Loop
@@ -39,31 +39,31 @@ class TestContext(ContextSensitiveTest):
         except InvalidLoopException as ex:
             assert True
 
-        lctx = loopCtx(loop)
+        lctx = loop_ctx(loop)
         assert lctx is not None
 
     def test_create_ctx(self):
-        ctx = context._createCtx()
+        ctx = context._create_ctx()
         assert isinstance(ctx, Struct)
 
-        ctx = context._createCtx(a=3)
+        ctx = context._create_ctx(a=3)
         assert isinstance(ctx, Struct)
         assert ctx.a == 3
 
         args = {"a": 3}
-        ctx = context._createCtx(**args)
+        ctx = context._create_ctx(**args)
         assert isinstance(ctx, Struct)
         assert ctx.a == 3
 
     def test_create_immu_ctx(self):
-        ctx = context._createImmutableCtx()
+        ctx = context._create_immutable_ctx()
         assert isinstance(ctx, ImmutableStruct)
 
-        ctx = context._createImmutableCtx(a=3)
+        ctx = context._create_immutable_ctx(a=3)
         assert isinstance(ctx, ImmutableStruct)
         assert ctx.a == 3
 
         args = {"a": 3}
-        ctx = context._createImmutableCtx(**args)
+        ctx = context._create_immutable_ctx(**args)
         assert isinstance(ctx, ImmutableStruct)
         assert ctx.a == 3

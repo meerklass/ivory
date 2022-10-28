@@ -136,29 +136,23 @@ class TestWorkflowManager(ContextSensitiveTest):
         except GetoptError:
             assert True
 
-    #     def test_loop(self):
-    #         args = ["test.workflow_config"]
-    #         mgr = WorkflowManager(args)
-    #         mgr.launch()
-    #         assert len(ctx().timings) == 2
-
     def test_load_configs_invalid(self):
         try:
-            _ = workflow_manager.loadConfigs(None)
+            _ = workflow_manager.load_configs(None)
             pytest.fail("No config name not allowed", True)
         except InvalidAttributeException:
             assert True
 
     def test_load_configs_one_arg(self):
-        config = workflow_manager.loadConfigs("test.config.workflow_config_args")
+        config = workflow_manager.load_configs("test.config.workflow_config_args")
         assert config is not None
         assert config.conf_arg_int == 1
         assert config.conf_arg_float == 1.0
         assert config.conf_arg_str == "1"
 
     def test_load_configs_multiple_arg(self):
-        config = workflow_manager.loadConfigs(["test.config.workflow_config_args",
-                                               "test.config.workflow_config"])
+        config = workflow_manager.load_configs(["test.config.workflow_config_args",
+                                                "test.config.workflow_config"])
         assert config is not None
 
         # from workflow_config_args
@@ -171,7 +165,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert config.b == None
 
     def test_load_configs_overwrite(self):
-        config = workflow_manager.loadConfigs("test.config.workflow_config_args")
+        config = workflow_manager.load_configs("test.config.workflow_config_args")
         assert config is not None
         assert config.conf_arg_int == 1
 

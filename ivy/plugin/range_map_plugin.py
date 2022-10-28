@@ -30,7 +30,7 @@ class Plugin:
         '''
         self.ctx = ctx
 
-    def getWorkload(self):
+    def get_workload(self):
         values = [i for i in range(self.ctx.params.valuesMin, self.ctx.params.valuesMax)]
 
         for value in values:

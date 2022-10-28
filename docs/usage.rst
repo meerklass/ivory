@@ -42,9 +42,9 @@ A slightly more complex use case would look something like::
 	plugins = Loop(["test.plugin.simple_plugin",
 			Loop(["test.plugin.simple_plugin",
 			      "test.plugin.simple_plugin"], 
-			      stop=RangeStopCriteria(maxIter=5)),
+			      stop=RangeStopCriteria(max_iter=5)),
 			"test.plugin.simple_plugin"], 
-			stop=RangeStopCriteria(maxIter=2))
+			stop=RangeStopCriteria(max_iter=2))
 
 	a=1.5
 	b=["omega", "lambda", "gamma"]

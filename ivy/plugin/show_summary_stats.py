@@ -45,11 +45,11 @@ class Plugin(AbstractPlugin):
         for timing in timings:
             if timing.name is not keyword:
                 try:
-                    timing_map[timing.name].addTiming(timing)
+                    timing_map[timing.name].add_timing(timing)
                 except KeyError:
                     timing_map[timing.name] = TimingCollection(timing.name)
                     timing_map[timing.name].duration = timing.duration
-                    timing_map[timing.name].addTiming(timing)
+                    timing_map[timing.name].add_timing(timing)
         return timing_map
 
     def _join_timings(self, timing):

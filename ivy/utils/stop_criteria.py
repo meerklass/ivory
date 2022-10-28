@@ -20,7 +20,7 @@ author: jakeret
 
 from abc import abstractmethod, ABC
 
-from ivy.context import loopCtx
+from ivy.context import loop_ctx
 from ivy.exceptions.exceptions import InvalidAttributeException
 from ivy.utils.struct import WorkflowState
 
@@ -33,24 +33,24 @@ class AbstractStopCriteria(ABC):
     parent = None
 
     @abstractmethod
-    def isStop(self):
+    def is_stop(self):
         pass
 
 
 class RangeStopCriteria(AbstractStopCriteria):
     """
-    Stopping criteria which stops after `maxIter` iterations
+    Stopping criteria which stops after `max_iter` iterations
     """
 
-    def __init__(self, maxIter):
-        if maxIter < 1:
+    def __init__(self, max_iter):
+        if max_iter < 1:
             raise InvalidAttributeException("Minimum iteration is 1")
 
-        self.maxIter = maxIter
+        self.max_iter = max_iter
 
-    def isStop(self):
-        ctx = loopCtx(self.parent)
-        if (ctx.iter >= self.maxIter):
+    def is_stop(self):
+        ctx = loop_ctx(self.parent)
+        if (ctx.iter >= self.max_iter):
             ctx.stop()
 
         return ctx.state == WorkflowState.STOP
@@ -62,4 +62,4 @@ class SimpleStopCriteria(RangeStopCriteria):
     """
 
     def __init__(self):
-        super(SimpleStopCriteria, self).__init__(maxIter=1)
+        super(SimpleStopCriteria, self).__init__(max_iter=1)

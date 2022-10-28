@@ -29,32 +29,25 @@ class PluginFactory:
     """
 
     @staticmethod
-    def createInstance(pluginName, ctx):
+    def createInstance(plugin_name, ctx):
         """
         Instantiates the given plugin. Expects that the given module contains a class
         
         with the name 'Plugin'
         
-        :param pluginName: name of the plugin to instanciate
+        :param plugin_name: name of the plugin to instanciate
         
         :return plugin: an instance of the plugin
         
         :raises: UnsupportedPluginTypeException
         """
         try:
-            module = importlib.import_module(pluginName)
+            module = importlib.import_module(plugin_name)
             plugin = module.Plugin(ctx)
             return plugin
         except ImportError as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be loaded" % pluginName, ex)
+            raise UnsupportedPluginTypeException("Module '%s' could not be loaded" % plugin_name, ex)
         except AttributeError as ex:
-            #             print("Module '%s' has no class definition 'Plugin'" % pluginName)
-            #             print("Old skool 'plugin' is deprecated! Adapt your implementation")
-            #             try:
-            #                 plugin = module.plugin()
-            #                 return plugin
-            #             except AttributeError:
-            raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % pluginName)
-
+            raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % plugin_name)
         except Exception as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % pluginName, ex)
+            raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % plugin_name, ex)

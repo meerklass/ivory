@@ -23,7 +23,6 @@ from pickle import loads
 
 from ivy import context
 from ivy.context import ctx
-from ivy.loop import ListIter
 from ivy.loop import Loop
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
 from ivy.utils.struct import Struct
@@ -35,18 +34,18 @@ PLUGIN_NAME = "test.plugin.simple_plugin"
 class TestPickle:
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
-        p = loop.__next__()
+        p = next(loop)
 
-        sLoop = dumps(loop)
-        loop2 = loads(sLoop)
+        dumps_loop = dumps(loop)
+        loop2 = loads(dumps_loop)
 
         for p in loop2:
             p()
 
         loop.reset()
 
-        sLoop = dumps(loop)
-        loop2 = loads(sLoop)
+        dumps_loop = dumps(loop)
+        loop2 = loads(dumps_loop)
 
         for p in loop2:
             p()
@@ -55,8 +54,8 @@ class TestPickle:
         struct = Struct(value1=1)
         struct.params = Struct(backend="multiprocessing")
 
-        sStruct = dumps(struct)
-        struct2 = loads(sStruct)
+        dumps_struct = dumps(struct)
+        struct2 = loads(dumps_struct)
 
     def test_parallel_plugin_collection_pickle(self):
         ctx = context.ctx()
@@ -70,9 +69,9 @@ class TestPickle:
         parallelPluginCollectio2 = loads(sParallelPluginCollection)
 
     def test_context_pickle(self):
-        lCtx = ctx()
-        sLCtx = dumps(lCtx)
-        lCtx2 = loads(sLCtx)
+        l_ctx = ctx()
+        s_l_ctx = dumps(l_ctx)
+        l_ctx2 = loads(s_l_ctx)
 
     def test_workflow_context_pickle(self):
         args = ["--backend=multiprocessing",
@@ -81,19 +80,19 @@ class TestPickle:
 
         mgr = WorkflowManager(args)
 
-        lCtx = ctx()
-        sLCtx = dumps(lCtx)
-        lCtx2 = loads(sLCtx)
+        l_ctx = ctx()
+        s_l_ctx = dumps(l_ctx)
+        l_ctx2 = loads(s_l_ctx)
 
-    def test_ListIter_pickle(self):
-        listIter = ListIter(["a", "b", "c"])
-        item = listIter.__next__()
+    def test_iter_list_can_pickle(self):
+        list_iter_expect = iter(["a", "b", "c"])
+        next(list_iter_expect)
 
-        sListIter = dumps(listIter)
-        listIter2 = loads(sListIter)
+        dumps_list_iter = dumps(list_iter_expect)
+        load_list_iter = loads(dumps_list_iter)
 
-        for p in listIter2:
-            pass
+        for expect, value in zip(list_iter_expect, load_list_iter):
+            assert expect == value
 
 
 if __name__ == '__main__':

@@ -32,21 +32,21 @@ class DefaultContextProvider:
     """
 
     @staticmethod
-    def createContext(**args):
+    def create_context(**args):
         """
         Returns a Struct
         """
         return Struct(**args)
 
     @staticmethod
-    def createImmutableContext(**args):
+    def create_immutable_context(**args):
         """
         Returns a Struct
         """
         return ImmutableStruct(**args)
 
     @staticmethod
-    def storeContext():
+    def store_context():
         """
         Dummy method. Nothing is stored
         """
@@ -61,10 +61,10 @@ class PickleContextProvider(DefaultContextProvider):
     """
 
     @staticmethod
-    def storeContext():
+    def store_context():
         """
         Writes the current ctx to the disk
         """
-        fileName = ctx().ctx_file_name
-        with open(fileName, "wb") as ctxFile:
+        file_name = ctx().ctx_file_name
+        with open(file_name, "wb") as ctxFile:
             pickle.dump(ctx(), ctxFile)

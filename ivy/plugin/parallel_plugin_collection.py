@@ -32,13 +32,13 @@ class ParallelPluginCollection(AbstractPlugin):
     list of plugins to execute, a map plugin creating the workload and 
     (optionally) a reduce plugin reducing the data from the parallel task exection
     
-    :param pluginList: List of plugins (or a Loop) which should be executed in parallel
-    :param mapPlugin: 
-    :param reducePlugin: (optional)
+    :param plugin_list: List of plugins (or a Loop) which should be executed in parallel
+    :param map_plugin:
+    :param reduce_plugin: (optional)
     :param ctx: (optional) 
     """
 
-    def __init__(self, pluginList, mapPlugin, reducePlugin=None, ctx=None, parallel=True):
+    def __init__(self, plugin_list, map_plugin, reduce_plugin=None, ctx=None, parallel=True):
 
         '''
         Constructor
@@ -49,16 +49,16 @@ class ParallelPluginCollection(AbstractPlugin):
 
         super(ParallelPluginCollection, self).__init__(self.ctx)
 
-        if not isinstance(pluginList, Loop):
-            pluginList = Loop(pluginList)
+        if not isinstance(plugin_list, Loop):
+            plugin_list = Loop(plugin_list)
 
-        self.pluginList = pluginList
+        self.plugin_list = plugin_list
 
-        if mapPlugin is None:
+        if map_plugin is None:
             raise InvalidAttributeException("No map plugin provided")
 
-        self.mapPlugin = mapPlugin
-        self.reducePlugin = reducePlugin
+        self.map_plugin = map_plugin
+        self.reduce_plugin = reduce_plugin
         self.parallel = parallel
 
     def __str__(self):
@@ -69,17 +69,17 @@ class ParallelPluginCollection(AbstractPlugin):
         if not self.parallel:
             force = "sequential"
 
-        backendImpl = backend.create(self.ctx, force)
+        backend_impl = backend.create(self.ctx, force)
 
-        mapPlugin = self.mapPlugin
-        if isinstance(self.mapPlugin, str):
-            mapPlugin = PluginFactory.createInstance(mapPlugin, self.ctx)
+        map_plugin = self.map_plugin
+        if isinstance(self.map_plugin, str):
+            map_plugin = PluginFactory.createInstance(map_plugin, self.ctx)
 
-        ctxList = backendImpl.run(self.pluginList, mapPlugin)
+        ctx_list = backend_impl.run(self.plugin_list, map_plugin)
 
-        if self.reducePlugin is not None:
-            reducePlugin = self.reducePlugin
-            if isinstance(self.reducePlugin, str):
-                reducePlugin = PluginFactory.createInstance(reducePlugin, self.ctx)
+        if self.reduce_plugin is not None:
+            reduce_plugin = self.reduce_plugin
+            if isinstance(self.reduce_plugin, str):
+                reduce_plugin = PluginFactory.createInstance(reduce_plugin, self.ctx)
 
-            reducePlugin.reduce(ctxList)
+            reduce_plugin.reduce(ctx_list)

@@ -19,42 +19,41 @@ author: jakeret
 '''
 
 from ivy import context
-from ivy.context import loopCtx
+from ivy.context import loop_ctx
 from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.exceptions.exceptions import UnsupportedPluginTypeException
 from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.plugin_factory import PluginFactory
 from ivy.utils.stop_criteria import SimpleStopCriteria
 from ivy.utils.struct import WorkflowState
-from ivy.utils.utils import ListIter
 
 
 class Loop:
     '''
     Implementation of a loop. 
     
-    :param pluginList: List of plugin or inner :class:`Loop`
+    :param plugin_list: List of plugin or inner :class:`Loop`
     :param stop: (optional) stop criteria
     '''
 
-    _currentPlugin = None
+    _current_plugin = None
 
-    def __init__(self, pluginList, stop=None, ctx=None):
+    def __init__(self, plugin_list, stop=None, ctx=None):
 
-        if pluginList is None:
+        if plugin_list is None:
             raise InvalidLoopException("Plugin list is None")
 
-        if not isinstance(pluginList, list):
-            pluginList = [pluginList]
+        if not isinstance(plugin_list, list):
+            plugin_list = [plugin_list]
 
-        self.pluginList = pluginList
-        self._createIter()
+        self.plugin_list = plugin_list
+        self._create_iter()
 
         if stop is None:
-            stop = self._createStopCriteria()
+            stop = self._create_stop_criteria()
 
         stop.parent = self
-        self._stopCriteria = stop
+        self._stop_criteria = stop
         context.register(self)
         if ctx is None:
             ctx = context.ctx()
@@ -65,8 +64,8 @@ class Loop:
         Resets the internal state of the loop
         """
 
-        self.pluginListItr = ListIter(self.pluginList)
-        loopCtx(self).reset()
+        self.plugin_list_itr = iter(self.plugin_list)
+        loop_ctx(self).reset()
 
     def __iter__(self):
         return self
@@ -77,41 +76,41 @@ class Loop:
         """
 
         try:
-            if (self._stopCriteria.isStop()):
+            if (self._stop_criteria.is_stop()):
                 raise StopIteration
 
-            if self._currentPlugin is None:
-                self._currentPlugin = self.pluginListItr.__next__()
+            if self._current_plugin is None:
+                self._current_plugin = next(self.plugin_list_itr)
 
-                plugin = self._currentPlugin
+                plugin = self._current_plugin
                 if isinstance(plugin, AbstractPlugin):
-                    self._currentPlugin = None
+                    self._current_plugin = None
                     plugin.ctx = self.ctx
                     return plugin
 
                 if isinstance(plugin, str):
-                    self._currentPlugin = None
+                    self._current_plugin = None
                     return self._instantiate(plugin)
 
-            if isinstance(self._currentPlugin, Loop):
-                innerLoop = self._currentPlugin
+            if isinstance(self._current_plugin, Loop):
+                inner_loop = self._current_plugin
                 try:
-                    plugin = innerLoop.__next__()
+                    plugin = next(inner_loop)
                     return plugin
                 except StopIteration:
-                    if (loopCtx(innerLoop).state == WorkflowState.EXIT):
+                    if (loop_ctx(inner_loop).state == WorkflowState.EXIT):
                         raise StopIteration
                     # inner
-                    loopCtx(innerLoop).reset()
-                    self._currentPlugin = None
+                    loop_ctx(inner_loop).reset()
+                    self._current_plugin = None
                     return self.__next__()
             else:
                 raise UnsupportedPluginTypeException()
         except StopIteration:
-            loopCtx(self).increment()
-            self._createIter()
+            loop_ctx(self).increment()
+            self._create_iter()
 
-            if (self._stopCriteria.isStop()):
+            if self._stop_criteria.is_stop():
                 raise StopIteration
             else:
                 return self.__next__()
@@ -127,15 +126,16 @@ class Loop:
         self.__dict__ = state
         context.register(self)
 
-    def _createStopCriteria(self):
+    @staticmethod
+    def _create_stop_criteria():
         return SimpleStopCriteria()
 
-    def _instantiate(self, pluginName):
-        return PluginFactory.createInstance(pluginName, self.ctx)
+    def _instantiate(self, plugin_name):
+        return PluginFactory.createInstance(plugin_name, self.ctx)
 
-    def _loadIter(self):
-        if self.pluginListItr is None:
-            self._createIter()
+    def _load_iter(self):
+        if self.plugin_list_itr is None:
+            self._create_iter()
 
-    def _createIter(self):
-        self.pluginListItr = ListIter(self.pluginList)
+    def _create_iter(self):
+        self.plugin_list_itr = iter(self.plugin_list)

@@ -48,37 +48,37 @@ class WorkflowManager:
         self._setup(argv)
 
     def _setup(self, argv):
-        config = self._parseArgs(argv)
+        config = self._parse_args(argv)
 
         if PLUGINS_KEY not in config.keys():
             raise InvalidAttributeException("plugins definition is missing")
 
         if CONTEXT_PROVIDER_KEY in config.keys():
-            def getContextProviderWrapper():
+            def get_context_provider_wrapper():
                 # todo load class not module
                 clazz = config[CONTEXT_PROVIDER_KEY]
                 moduleName = ".".join(clazz.split(".")[:-1])
                 module = importlib.import_module(moduleName)
                 return getattr(module, clazz.split(".")[-1])
 
-            context.getContextProvider = getContextProviderWrapper
+            context.get_context_provider = get_context_provider_wrapper
 
         if not isinstance(config[PLUGINS_KEY], Loop):
             config[PLUGINS_KEY] = Loop(config[PLUGINS_KEY])
 
-        ctx().params = context._createImmutableCtx(**config)
+        ctx().params = context._create_immutable_ctx(**config)
         # just to maintain backward compatibility
         ctx().parameters = ctx().params
         ctx().plugins = ctx().params.plugins
 
-    def _parseArgs(self, argv):
+    def _parse_args(self, argv):
         if (argv is None or len(argv) < 1):
             raise InvalidAttributeException()
 
         if isinstance(argv, dict):
             return Struct(**argv)
         else:
-            config = loadConfigs(argv[-1])
+            config = load_configs(argv[-1])
 
         # overwrite parameters by command line options
         optlist, positional = getopt(argv, '', [name.replace('_', '-') + '=' for name in config.keys()])
@@ -105,7 +105,7 @@ class WorkflowManager:
         executor.run(ctx().params.plugins)
 
 
-def loadConfigs(configs):
+def load_configs(configs):  # TODO(amadeus): replace this with a config parser
     """
     Loads key-value configurations from Python modules.
     
@@ -123,8 +123,8 @@ def loadConfigs(configs):
         raise InvalidAttributeException('Invalid configuration passed')
 
     args = {}
-    for configName in configs:
-        config = importlib.import_module(configName)
+    for config_name in configs:
+        config = importlib.import_module(config_name)
 
         attrs = []
         for name in dir(config):
