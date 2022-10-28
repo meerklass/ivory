@@ -7,17 +7,16 @@ __credits__ = 'ETH Zurich, Institute for Astronomy'
 import copyreg
 import types
 
+from ivy import context
+from ivy.workflow_manager import WorkflowManager
+from ivy.workflow_manager import loadConfigs
+
 
 def reduce_method(m):
     return (getattr, (m.__self__, m.__func__.__name__))
 
 
 copyreg.pickle(types.MethodType, reduce_method)
-
-from ivy import context
-from ivy.workflow_manager import WorkflowManager
-
-from ivy.workflow_manager import loadConfigs
 
 
 def execute(args):
