@@ -21,10 +21,11 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 
 import pytest
 
-from test.plugin.simple_plugin import Plugin
 from ivy.context import ctx
+from test.plugin.simple_plugin import Plugin
 
-class TestSimplePlugin(object):
+
+class TestSimplePlugin:
 
 
     def test_simple(self):

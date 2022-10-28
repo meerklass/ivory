@@ -20,11 +20,13 @@ author: jakeret
 from __future__ import print_function, division, absolute_import, unicode_literals
 
 from abc import ABCMeta, abstractmethod
-from ivy.context import loopCtx
-from ivy.utils.struct import WorkflowState
-from ivy.exceptions.exceptions import InvalidAttributeException
 
-class StopCriteria(object):
+from ivy.context import loopCtx
+from ivy.exceptions.exceptions import InvalidAttributeException
+from ivy.utils.struct import WorkflowState
+
+
+class StopCriteria:
     """
     Abstract implementation of stopping criteria
     """

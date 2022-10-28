@@ -24,7 +24,7 @@ from ivy.utils.struct import ImmutableStruct
 from ivy.utils.struct import Struct
 
 
-class DefaultContextProvider(object):
+class DefaultContextProvider:
     """
     Default implementation of a context provider.
     Creates a simple mutable struct as ctx and doesn't

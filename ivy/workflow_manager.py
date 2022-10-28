@@ -33,7 +33,7 @@ PLUGINS_KEY = "plugins"
 CONTEXT_PROVIDER_KEY = "context_provider"
 
 
-class WorkflowManager(object):
+class WorkflowManager:
     '''
     Manages the workflow process by loading the passed config and 
     parsing the passed arguments and then iterating thru the plugins.

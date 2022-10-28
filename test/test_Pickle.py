@@ -33,8 +33,7 @@ from ivy.workflow_manager import WorkflowManager
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
 
-class TestPickle(object):
-
+class TestPickle:
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
         p = loop.__next__()

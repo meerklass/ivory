@@ -18,11 +18,13 @@ Created on Mar 5, 2014
 author: jakeret
 '''
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ivy.exceptions.exceptions import UnsupportedPluginTypeException
+
 import importlib
 
+from ivy.exceptions.exceptions import UnsupportedPluginTypeException
 
-class PluginFactory(object):
+
+class PluginFactory:
     """
     Simple factory creating instances of plugins
     """

@@ -24,7 +24,8 @@ from ivy.utils.struct import Struct
 from ivy.utils.timing import SimpleTiming
 from ivy.utils.timing import TimingCollection
 
-class TestShowSummaryStatsPlugin(object):
+
+class TestShowSummaryStatsPlugin:
     
     def test_join_timings_one_element(self):
         ctx = Struct()
