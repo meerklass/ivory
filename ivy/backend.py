@@ -17,8 +17,6 @@ Created on Mar 18, 2014
 
 author: jakeret
 '''
-from __future__ import print_function, division, absolute_import, unicode_literals
-
 import time
 from multiprocessing import Pool
 
@@ -28,37 +26,36 @@ from ivy.utils.timing import TimingCollection
 
 
 class SimpleMapPlugin:
-    
     def __init__(self, ctx):
         self.ctx = ctx
-        
+
     def getWorkload(self):
         return [self.ctx]
-    
 
 
 class SequentialBackend:
     """
     Simple implementation of a backend executing the plugins in a sequential order
     """
-    
+
     def __init__(self, ctx):
         self.ctx = ctx
-    
+
     def run(self, loop, mapPlugin=None):
-        if mapPlugin is None: mapPlugin=SimpleMapPlugin(self.ctx)
-        
-        return map(LoopWrapper(loop), mapPlugin.getWorkload())
+        if mapPlugin is None: mapPlugin = SimpleMapPlugin(self.ctx)
+
+        return list(map(LoopWrapper(loop), mapPlugin.getWorkload()))
+
 
 class MultiprocessingBackend:
     """
     Backend based on Python's multiprocessing. 
     Will instantiate a multiprocessing pool with ``ctx.params.cpu_count`` processes.
     """
-    
+
     def __init__(self, ctx):
         self.ctx = ctx
-    
+
     def run(self, loop, mapPlugin):
         pool = Pool(self.ctx.params.cpu_count)
         try:
@@ -71,16 +68,17 @@ class MultiprocessingBackend:
             return ctxList
         finally:
             pool.close()
-        
+
+
 class IpClusterBackend:
     """
     Backend based on IPython cluster. 
     Will distribute the workload among the available engines.
     """
-    
+
     def __init__(self, ctx):
         self.ctx = ctx
-    
+
     def run(self, loop, mapPlugin):
         from IPython import parallel
 
@@ -90,6 +88,8 @@ class IpClusterBackend:
             return view.map_sync(LoopWrapper(loop), mapPlugin.getWorkload())
         finally:
             pass
+
+
 #             view.close()
 
 class JoblibBackend:
@@ -97,10 +97,10 @@ class JoblibBackend:
     Backend based on the joblib package 
     Will instantiate a multiprocessing pool with ``ctx.params.cpu_count`` processes.
     """
-    
+
     def __init__(self, ctx):
         self.ctx = ctx
-    
+
     def run(self, loop, mapPlugin):
         import joblib
         with joblib.Parallel(n_jobs=self.ctx.params.cpu_count) as parallel:
@@ -111,40 +111,41 @@ class JoblibBackend:
                     timingCollection.addTiming(timing)
             self.ctx.timings.append(timingCollection)
             return ctxList
-        
 
 
 class LoopWrapper:
     """
     Callable wrapper for the loop execution
     """
+
     def __init__(self, loop, parallel=False):
         self.loop = loop
         self.parallel = parallel
-    
+
     def __call__(self, ctx):
-#         print("working pid:%s" %(os.getpid()))
+        #         print("working pid:%s" %(os.getpid()))
         if self.parallel: ctx.timings = []
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
-#             print("(%s, '%s'),"%(time.time(), plugin))
+            #             print("(%s, '%s'),"%(time.time(), plugin))
             plugin()
-#             time.sleep(5)
+            #             time.sleep(5)
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
-                
+
             getContextProvider().storeContext()
 
-#         self.loop()
+        #         self.loop()
         self.loop.reset()
         return ctx
-            
+
 
 BACKEND_NAME_MAP = {"sequential": SequentialBackend,
                     "multiprocessing": MultiprocessingBackend,
                     "ipcluster": IpClusterBackend,
                     "joblib": JoblibBackend,
                     }
+
 
 def create(ctx, force=None):
     '''
