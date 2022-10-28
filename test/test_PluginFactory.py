@@ -17,7 +17,6 @@ Tests for `ivy.plugin.plugin_factory ` module.
 
 author: jakeret
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 import pytest
 
@@ -28,8 +27,8 @@ from test.plugin import simple_plugin
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
-class TestPluginFactory:
 
+class TestPluginFactory:
 
     def test_simple(self):
         plugin = PluginFactory.createInstance(PLUGIN_NAME, ctx())
@@ -44,7 +43,7 @@ class TestPluginFactory:
             assert False
         except UnsupportedPluginTypeException as ex:
             assert True
-        
+
     def test_invalid_module(self):
         pluginName = "ivy.plugin.BasePlugin"
         try:
@@ -53,12 +52,12 @@ class TestPluginFactory:
             assert False
         except UnsupportedPluginTypeException as ex:
             assert True
-        
+
     def teardown(self):
-        #tidy up
+        # tidy up
         print("tearing down " + __name__)
         pass
-    
-    
+
+
 if __name__ == '__main__':
     pytest.main()
