@@ -17,7 +17,6 @@ Created on Mar 4, 2014
 
 author: jakeret
 '''
-from __future__ import print_function, division, absolute_import
 
 from abc import ABCMeta
 
@@ -34,7 +33,7 @@ class BasePlugin:
     def __init__(self, ctx, **kwargs):
         self.ctx = ctx
         self.ctx.update(kwargs)
-        
+
     def __str__(self):
         raise NotImplementedException()
 

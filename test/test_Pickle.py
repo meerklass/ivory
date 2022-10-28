@@ -17,7 +17,6 @@ Tests for `ivy.loop ` module.
 
 author: jakeret
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 from pickle import dumps
 from pickle import loads

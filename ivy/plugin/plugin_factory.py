@@ -17,7 +17,6 @@ Created on Mar 5, 2014
 
 author: jakeret
 '''
-from __future__ import print_function, division, absolute_import, unicode_literals
 
 import importlib
 
@@ -49,14 +48,13 @@ class PluginFactory:
         except ImportError as ex:
             raise UnsupportedPluginTypeException("Module '%s' could not be loaded" % pluginName, ex)
         except AttributeError as ex:
-#             print("Module '%s' has no class definition 'Plugin'" % pluginName)
-#             print("Old skool 'plugin' is deprecated! Adapt your implementation")
-#             try:
-#                 plugin = module.plugin()
-#                 return plugin
-#             except AttributeError:
-                raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % pluginName)
-            
+            #             print("Module '%s' has no class definition 'Plugin'" % pluginName)
+            #             print("Old skool 'plugin' is deprecated! Adapt your implementation")
+            #             try:
+            #                 plugin = module.plugin()
+            #                 return plugin
+            #             except AttributeError:
+            raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % pluginName)
+
         except Exception as ex:
             raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % pluginName, ex)
-        

@@ -1,4 +1,3 @@
-
 # IVY is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -18,34 +17,32 @@ Tests for `ivy.WorkflowManager` module.
 
 author: jakeret
 """
-from __future__ import print_function, division, absolute_import, unicode_literals
 
+from getopt import GetoptError
 from operator import eq
 
 import pytest
 
-from ivy.loop import Loop
-from ivy.workflow_manager import WorkflowManager
+from ivy import workflow_manager
 from ivy.context import ctx
 from ivy.exceptions.exceptions import InvalidAttributeException
-from getopt import GetoptError
+from ivy.loop import Loop
+from ivy.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
-from ivy import workflow_manager
 
 
 class TestWorkflowManager(ContextSensitiveTest):
 
-
     def test_launch(self):
         args = ["test.config.workflow_config"]
-        
+
         mgr = WorkflowManager(args)
         mgr.launch()
-        
+
         assert ctx() is not None
         assert ctx().params is not None
         assert ctx().params.plugins is not None
-        
+
     def test_parseArgs(self):
         args = ["--a=True",
                 "--b=False",
@@ -62,7 +59,7 @@ class TestWorkflowManager(ContextSensitiveTest):
                 "--bool3=True",
                 "--bool4=False",
                 "test.config.workflow_config"]
-        
+
         mgr = WorkflowManager(args)
 
         assert ctx().params.a == True
@@ -78,14 +75,14 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params.bool2 == False
         assert ctx().params.bool3 == True
         assert ctx().params.bool4 == False
-        assert all(map(eq, ctx().params.j,[1,2,3,4]))
-        
+        assert all(map(eq, ctx().params.j, [1, 2, 3, 4]))
+
     def test_simple_launch(self):
         args = ["test.config.workflow_config_simple"]
-        
+
         mgr = WorkflowManager(args)
         mgr.launch()
-        
+
         assert ctx() is not None
         assert ctx().params is not None
         assert ctx().params.plugins is not None
@@ -93,20 +90,20 @@ class TestWorkflowManager(ContextSensitiveTest):
 
     def test_missing_plugins(self):
         args = ["ivy.config.base_config"]
-        
+
         try:
             mgr = WorkflowManager(args)
             pytest.fail("config without plugins not allowed", True)
         except InvalidAttributeException:
             assert True
-        
+
     def test_missing_config(self):
         try:
             mgr = WorkflowManager(None)
             pytest.fail("missing config not allowed", True)
         except InvalidAttributeException:
             assert True
-        
+
         try:
             mgr = WorkflowManager([])
             pytest.fail("missing config not allowed", True)
@@ -139,11 +136,11 @@ class TestWorkflowManager(ContextSensitiveTest):
         except GetoptError:
             assert True
 
-#     def test_loop(self):
-#         args = ["test.workflow_config"]
-#         mgr = WorkflowManager(args)
-#         mgr.launch()
-#         assert len(ctx().timings) == 2
+    #     def test_loop(self):
+    #         args = ["test.workflow_config"]
+    #         mgr = WorkflowManager(args)
+    #         mgr.launch()
+    #         assert len(ctx().timings) == 2
 
     def test_load_configs_invalid(self):
         try:
@@ -151,39 +148,39 @@ class TestWorkflowManager(ContextSensitiveTest):
             pytest.fail("No config name not allowed", True)
         except InvalidAttributeException:
             assert True
-        
+
     def test_load_configs_one_arg(self):
         config = workflow_manager.loadConfigs("test.config.workflow_config_args")
         assert config is not None
         assert config.conf_arg_int == 1
         assert config.conf_arg_float == 1.0
         assert config.conf_arg_str == "1"
-        
+
     def test_load_configs_multiple_arg(self):
-        config = workflow_manager.loadConfigs(["test.config.workflow_config_args", 
+        config = workflow_manager.loadConfigs(["test.config.workflow_config_args",
                                                "test.config.workflow_config"])
         assert config is not None
-        
-        #from workflow_config_args
+
+        # from workflow_config_args
         assert config.conf_arg_int == 1
         assert config.conf_arg_float == 1.0
         assert config.conf_arg_str == "1"
-        
-        #from workflow_config
+
+        # from workflow_config
         assert config.a == None
         assert config.b == None
-        
+
     def test_load_configs_overwrite(self):
         config = workflow_manager.loadConfigs("test.config.workflow_config_args")
         assert config is not None
         assert config.conf_arg_int == 1
-        
+
         config.conf_arg_int = 2
         assert config.conf_arg_int == 2
-        
+
     def test_create_from_dict(self):
         args = {"plugins": ["test.plugin.simple_plugin", "test.plugin.simple_plugin"],
-                "a":1
+                "a": 1
                 }
         mgr = WorkflowManager(args)
         assert ctx().params is not None
@@ -191,15 +188,12 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params.plugins is not None
         plugins = [p for p in ctx().params.plugins]
         assert len(plugins) is 2
-        
 
     def teardown(self):
-        #tidy up
+        # tidy up
         print("tearing down " + __name__)
         pass
-    
-    
+
+
 if __name__ == '__main__':
     pytest.main("-k TestWorkflowManager")
-    
-    
