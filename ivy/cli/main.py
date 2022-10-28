@@ -12,12 +12,12 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Main executable to run ivy from CLI.
 
 author: L. Gamper, J. Akeret
 
-'''
+"""
 import sys
 
 from ivy.workflow_manager import WorkflowManager

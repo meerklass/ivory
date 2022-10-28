@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 18, 2014
 
 author: jakeret
-'''
+"""
 from ivy import backend
 from ivy import context
 from ivy.exceptions.exceptions import InvalidAttributeException
@@ -40,9 +40,9 @@ class ParallelPluginCollection(AbstractPlugin):
 
     def __init__(self, plugin_list, map_plugin, reduce_plugin=None, ctx=None, parallel=True):
 
-        '''
+        """
         Constructor
-        '''
+        """
         if ctx is None:
             ctx = context.ctx()
         self.ctx = ctx

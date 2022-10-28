@@ -13,11 +13,11 @@
 
 
 # Copyright (c) 2013 ETH Zurich, Institute of Astronomy, Lukas Gamper <lukas.gamper@usystems.ch>
-'''
+"""
 Created on Oct 7, 2013
 @author: Lukas Gamper
 
-'''
+"""
 
 from ivy.plugin.abstract_plugin import AbstractPlugin
 

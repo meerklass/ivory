@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Tests for `ivy.stop_criteria` module.
 
 author: jakeret
-'''
+"""
 
 import pytest
 

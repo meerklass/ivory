@@ -12,18 +12,18 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 5, 2014
 
 author: jakeret
-'''
+"""
 from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
 class Plugin(AbstractPlugin):
-    '''
+    """
     Plugin that computes the square of ctx.value
-    '''
+    """
 
     def __str__(self):
         return __name__

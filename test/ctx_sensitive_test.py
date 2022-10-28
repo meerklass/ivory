@@ -12,19 +12,19 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 11, 2014
 
 author: jakeret
-'''
+"""
 
 from ivy import context
 
 
 class ContextSensitiveTest:
-    '''
+    """
     Simple base class which resets the context after method execution
-    '''
+    """
 
     def teardown_method(self, method):
         context.global_ctx = None

@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 18, 2014
 
 author: jakeret
-'''
+"""
 import time
 from multiprocessing import Pool
 from typing import Optional
@@ -151,8 +151,8 @@ BACKEND_NAME_MAP = {"sequential": SequentialBackend,
 
 
 def create(ctx, force=None):
-    '''
+    """
     Simple factory instantiating backends for the given name in ``ctx.params.backend``
-    '''
+    """
     backend_name = ctx.params.backend if force is None else force
     return BACKEND_NAME_MAP[backend_name](ctx)

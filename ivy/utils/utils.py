@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 5, 2014
 
 author: jakeret
-'''
+"""
 
 TYPE_MAP = {
     'bool': lambda x: boolify(x),
@@ -50,7 +50,7 @@ def listify(s):
 
 
 def inferType(var):
-    '''guesses the str representation of the variables type'''
+    """guesses the str representation of the variables type"""
     var = str(var)  # important if the parameters aren't strings...
     for caster in (boolify, int, float, listify):
         try:

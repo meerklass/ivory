@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 import importlib
 import types
 from getopt import getopt
@@ -34,17 +34,17 @@ CONTEXT_PROVIDER_KEY = "context_provider"
 
 
 class WorkflowManager:
-    '''
+    """
     Manages the workflow process by loading the passed config and 
     parsing the passed arguments and then iterating thru the plugins.
     
     :param argv: arguments to use
-    '''
+    """
 
     def __init__(self, argv):
-        '''
+        """
         Constructor
-        '''
+        """
         self._setup(argv)
 
     def _setup(self, argv):

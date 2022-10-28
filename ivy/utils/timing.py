@@ -12,19 +12,19 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Jul 15, 2014
 
 author: jakeret
-'''
+"""
 
 from collections import OrderedDict
 
 
 class SimpleTiming:
-    '''
+    """
     classdocs
-    '''
+    """
 
     def __init__(self, name, duration):
         self.name = name

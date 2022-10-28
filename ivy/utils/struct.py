@@ -12,11 +12,11 @@
 # along with IVY.  If not, see <http://www.gnu.org/licenses/>.
 
 
-'''
+"""
 Created on Mar 4, 2014
 
 author: jakeret
-'''
+"""
 
 from collections import abc
 from enum import Enum
@@ -125,9 +125,9 @@ class WorkflowState(Enum):
 
 
 class WorkflowStruct(ImmutableStruct):
-    '''
+    """
     Struct representing the internal state of a workflow loop
-    '''
+    """
 
     iter = 0
 
