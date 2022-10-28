@@ -48,7 +48,7 @@ class SequentialBackend:
     def run(self, loop: Loop, map_plugin: Optional[AbstractPlugin] = None) -> list[Struct]:
         if map_plugin is None: map_plugin = SimpleMapPlugin(self.ctx)
 
-        return list(map(CallablePluginLoop(loop), map_plugin.get_workload()))
+        return list(map(CallableLoop(loop), map_plugin.get_workload()))
 
 
 class MultiprocessingBackend:
@@ -63,7 +63,7 @@ class MultiprocessingBackend:
     def run(self, loop, map_plugin):
         pool = Pool(self.ctx.params.cpu_count)
         try:
-            ctx_list = pool.map(CallablePluginLoop(loop, True), map_plugin.get_workload())
+            ctx_list = pool.map(CallableLoop(loop, True), map_plugin.get_workload())
             timing_collection = TimingCollection(str(loop))
             for ctx in ctx_list:
                 for timing in ctx.timings:
@@ -90,7 +90,7 @@ class IpClusterBackend:
         client = ipyparallel.Client()
         view = client.load_balanced_view()
         try:
-            return view.map_sync(CallablePluginLoop(loop), map_plugin.get_workload())
+            return view.map_sync(CallableLoop(loop), map_plugin.get_workload())
         finally:
             pass
 
@@ -109,7 +109,7 @@ class JoblibBackend:
     def run(self, loop, map_plugin):
         import joblib
         with joblib.Parallel(n_jobs=self.ctx.params.cpu_count) as parallel:
-            ctx_list = parallel(joblib.delayed(CallablePluginLoop(loop, True))(ctx)
+            ctx_list = parallel(joblib.delayed(CallableLoop(loop, True))(ctx)
                                 for ctx in map_plugin.get_workload())
             timing_collection = TimingCollection(str(loop))
             for ctx in ctx_list:
@@ -119,7 +119,7 @@ class JoblibBackend:
             return ctx_list
 
 
-class CallablePluginLoop:
+class CallableLoop:
     """
     Callable wrapper for the loop execution
     """
