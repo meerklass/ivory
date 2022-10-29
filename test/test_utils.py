@@ -46,10 +46,34 @@ class TestStruct:
         b = a.copy()
         assert b.z == 3
 
-    def test_immutableStruct(self):
+    def test_immutable_struct_when_setitem(self):
         a = ImmutableStruct()
         try:
             a['x'] = 1
-            pytest.fail("Not mutation allowd on immutable", False)
+            pytest.fail("Not mutation allowed on immutable", False)
+        except IllegalAccessException:
+            assert True
+
+    def test_immutable_struct_when_setattr(self):
+        a = ImmutableStruct()
+        try:
+            a.x = 1
+            pytest.fail("Not mutation allowed on immutable", False)
+        except IllegalAccessException:
+            assert True
+
+    def test_immutable_struct_when_delattr(self):
+        a = ImmutableStruct({'x': 1})
+        try:
+            del a.x
+            pytest.fail("Not mutation allowed on immutable", False)
+        except IllegalAccessException:
+            assert True
+
+    def test_immutable_struct_when_delitem(self):
+        a = ImmutableStruct({'x': 1})
+        try:
+            del a['x']
+            pytest.fail("Not mutation allowed on immutable", False)
         except IllegalAccessException:
             assert True

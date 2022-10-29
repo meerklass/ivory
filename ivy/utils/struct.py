@@ -68,23 +68,29 @@ class ImmutableStruct(abc.MutableMapping):
         if initializer is not None:
             try:
                 # initializer is `dict`-like?
-                for name, value in initializer.items():
-                    self.__dict__[name] = value
+                for key, value in initializer.items():
+                    self.__dict__[key] = value
             except AttributeError:
                 # initializer is a sequence of (name,value) pairs?
-                for name, value in initializer:
-                    self.__dict__[name] = value
-        for name, value in extra_args.items():
-            self.__dict__[name] = value
+                for key, value in initializer:
+                    self.__dict__[key] = value
+        for key, value in extra_args.items():
+            self.__dict__[key] = value
 
-    def __setitem__(self, name, val):
-        raise IllegalAccessException("Trying to modify immutable struct with: %s=%s" % (str(name), str(val)))
+    def __setitem__(self, key, value):
+        raise IllegalAccessException("Trying to modify immutable struct with: %s=%s" % (str(key), str(value)))
 
-    def __getitem__(self, name):
-        return self.__dict__[name]
+    def __delitem__(self, key):
+        raise IllegalAccessException(f'Trying to delete attribute "{key}" of immutable struct.')
 
-    def __delitem__(self, name):
-        raise IllegalAccessException("Trying to delete entry in immutable struct.")
+    def __delattr__(self, key):
+        raise IllegalAccessException(f'Trying to delete attribute "{key}" of immutable struct.')
+
+    def __setattr__(self, key, value):
+        raise IllegalAccessException(f'Trying to modify immutable struct {key}={value}.')
+
+    def __getitem__(self, key):
+        return self.__dict__[key]
 
     def __len__(self):
         return len(self.__dict__)
@@ -94,10 +100,11 @@ class ImmutableStruct(abc.MutableMapping):
             yield i
 
     def __str__(self):
-        str = "{\n"
-        for name, value in self.items():
-            str += ("%s='%s'\n" % (name, value))
-        str += "}"
+        """ Returns a nicely formatted `str` of `self`. """
+        str = '{\n'
+        for key, value in self.items():
+            str += f'{key}={value}\n'
+        str += '}'
         return str
 
     def copy(self):
@@ -107,24 +114,33 @@ class ImmutableStruct(abc.MutableMapping):
     def keys(self):
         return self.__dict__.keys()
 
+    def values(self):
+        return self.__dict__.values()
+
 
 class Struct(ImmutableStruct):
     """
     Mutable implementation of a Struct
     """
 
-    def __setitem__(self, name, val):
-        self.__dict__[name] = val
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
 
-    def __delitem__(self, name):
-        del self.__dict__[name]
+    def __delitem__(self, key):
+        del self.__dict__[key]
+
+    def __setattr__(self, key, value):
+        self.__setitem__(key=key, value=value)
+
+    def __delattr__(self, key):
+        self.__delitem__(key=key)
 
     def copy(self):
         """Return a (shallow) copy of this `Struct` instance."""
         return Struct(self)
 
 
-class WorkflowStruct(ImmutableStruct):
+class WorkflowStruct(Struct):
     """
     Struct representing the internal state of a workflow loop
     """
