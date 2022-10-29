@@ -81,7 +81,7 @@ class ImmutableStruct(abc.MutableMapping):
         raise IllegalAccessException("Trying to modify immutable struct with: %s=%s" % (str(key), str(value)))
 
     def __delitem__(self, key):
-        raise IllegalAccessException(f'Trying to delete attribute "{key}" of immutable struct.')
+        raise IllegalAccessException(f'Trying to delete item "{key}" of immutable struct.')
 
     def __delattr__(self, key):
         raise IllegalAccessException(f'Trying to delete attribute "{key}" of immutable struct.')
