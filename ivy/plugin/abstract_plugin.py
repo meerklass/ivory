@@ -1,40 +1,46 @@
-# IVY is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# IVY is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with IVY.  If not, see <http://www.gnu.org/licenses/>.
-
-
-"""
-Created on Mar 4, 2014
-
-author: jakeret
-"""
-
 from abc import ABC, abstractmethod
+from typing import Any, Optional, Type
+
+from ivy import context
+from ivy.utils.struct import Struct
 
 
 class AbstractPlugin(ABC):
     """
-    Abstract base class for all the plugins providing standardized
-    interfaces
+    Abstract base class for all plugins.
+    The config for a plugin is made accessible via `self.config
     """
 
-    def __init__(self, ctx, **kwargs):
+    def __init__(self, ctx: Struct, **kwargs: dict[str, Any]):
+        """
+        Initialize with context `ctx` and kwargs.
+        The config of the `plugin` is made accessible via `self.config`.
+        """
         self.ctx = ctx
         self.ctx.update(kwargs)
 
-    @abstractmethod
+        self.config = self.ctx.params[self.plugin_name]
+
+    def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> Optional[Struct]:
+        """ Returns the output of a `plugin` if it has already run. """
+        if plugin.plugin_name in self.ctx:
+            return self.ctx[plugin.plugin_name]
+
     def __str__(self):
-        pass
+        return self.plugin_name
+
+    def save_to_context(self, result_dict: dict):
+        """ Save `result_dict` to `self.ctx` for following `plugin`s to access. """
+        self.ctx[self.plugin_name] = context.create_immutable_ctx(**result_dict)
 
     @abstractmethod
     def run(self):
+        """ Run the plugin and store results. """
+        pass
+
+    @classmethod
+    @property
+    @abstractmethod
+    def plugin_name(cls):
+        """ Return the name of the `plugin`. This must match the entry in the configuration file. """
         pass
