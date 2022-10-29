@@ -17,7 +17,7 @@ Ivy workflow engine
 
 Simple and flexible workflow engine
 
-The **ivy** package has been developed at ETH Zurich in the `Software Lab of the Cosmology Research Group <http://www.cosmology.ethz.ch/research/software-lab.html>`_ of the `ETH Institute of Astronomy <http://www.astro.ethz.ch>`_. 
+This **ivy** package has been developed at the `Centre for Radio Cosmology` at UWC and at the `Jodrell Bank Centre for Astrophysics` at `UoM`. It is an upgrade of the original `python 2.7` **ivy** package developed at ETH Zurich in the `Software Lab of the Cosmology Research Group <http://www.cosmology.ethz.ch/research/software-lab.html>`_ of the `ETH Institute of Astronomy <http://www.astro.ethz.ch>`_.
 
 The development is coordinated on `GitHub <http://github.com/cosmo-ethz/ivy>`_ and contributions are welcome. The documentation of **ivy** is available at `readthedocs.org <http://ivy.readthedocs.io/>`_ .
 
