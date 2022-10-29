@@ -89,7 +89,7 @@ class WorkflowManager:
                 raise InvalidAttributeException('unknown option: {:}'.format(opt[0][2:]))
             else:
                 name = opt[0][2:].replace('-', '_')
-                config[name] = TYPE_MAP[type(config[name]).__name__](opt[1])
+                config[name] = TYPE_MAP[type(config[name])](opt[1])
 
         return config
 
