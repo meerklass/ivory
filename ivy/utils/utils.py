@@ -17,15 +17,15 @@ Created on Mar 5, 2014
 
 author: jakeret
 """
+from types import NoneType
 
 TYPE_MAP = {
-    'bool': lambda x: boolify(x),
-    'int': lambda x: int(x),
-    'float': lambda x: float(x),
-    'str': lambda x: x,
-    'unicode': lambda x: x,
-    'list': lambda x: x.split(','),
-    'NoneType': lambda x: inferType(x)
+    bool: lambda x: boolify(x),
+    int: lambda x: int(x),
+    float: lambda x: float(x),
+    str: lambda x: x,
+    list: lambda x: x.split(','),
+    NoneType: lambda x: inferType(x)
 
 }
 
