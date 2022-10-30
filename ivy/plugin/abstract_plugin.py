@@ -21,6 +21,11 @@ class AbstractPlugin(ABC):
 
         self.config = self.ctx.params[self.plugin_name]
 
+    @classmethod
+    @property
+    def plugin_name(self):
+        return self.__name__
+
     def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> Optional[Struct]:
         """ Returns the output of a `plugin` if it has already run. """
         if plugin.plugin_name in self.ctx:
@@ -36,11 +41,4 @@ class AbstractPlugin(ABC):
     @abstractmethod
     def run(self):
         """ Run the plugin and store results. """
-        pass
-
-    @classmethod
-    @property
-    @abstractmethod
-    def plugin_name(cls):
-        """ Return the name of the `plugin`. This must match the entry in the configuration file. """
         pass
