@@ -49,53 +49,49 @@ class TestParallelPluginCollection(ContextSensitiveTest):
             assert True
 
     def test_sequential(self):
-        ctx = context.ctx()
-        ctx.timings = []
-        ctx.params = context.create_immutable_ctx(backend="sequential",
-                                                  valuesMin=1,
-                                                  valuesMax=10)
+        mock_ctx = context.ctx()
+        mock_ctx.timings = []
+        params_context = context.create_immutable_ctx(
+            RangeMapPlugin=context.create_immutable_ctx(values_min=1, values_max=10),
+            Pipeline=context.create_immutable_ctx(backend='sequential')
+        )
+        mock_ctx.params = params_context
 
-        map_plugin = range_map_plugin.Plugin(ctx)
+        map_plugin = range_map_plugin.RangeMapPlugin(mock_ctx)
         plugin_list = [PLUGIN_NAME]
-        reduce_plugin = sum_reduce_plugin.Plugin(ctx)
+        reduce_plugin = sum_reduce_plugin.SumReducePlugin(mock_ctx)
 
-        parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
-        parallelPluginCollection.run()
-        assert ctx.valuesSum == 285
+        parallel_plugin_collection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
+        parallel_plugin_collection.run()
+        assert mock_ctx.SumReducePlugin.values_sum == 285
 
     def test_multiprocessing(self):
-        ctx = context.ctx()
-        ctx.timings = []
-        ctx.params = context.create_immutable_ctx(backend="multiprocessing",
-                                                  cpu_count=8,
-                                                  valuesMin=1,
-                                                  valuesMax=10)
+        mock_ctx = context.ctx()
+        mock_ctx.timings = []
+        params_context = context.create_immutable_ctx(
+            RangeMapPlugin=context.create_immutable_ctx(values_min=1, values_max=10),
+            Pipeline=context.create_immutable_ctx(backend='multiprocessing', cpu_count=8)
+        )
+        mock_ctx.params = params_context
 
-        map_plugin = range_map_plugin.Plugin(ctx)
+        map_plugin = range_map_plugin.RangeMapPlugin(mock_ctx)
         plugin_list = [PLUGIN_NAME]
-        reduce_plugin = sum_reduce_plugin.Plugin(ctx)
+        reduce_plugin = sum_reduce_plugin.SumReducePlugin(mock_ctx)
 
-        parallelPluginCollection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
-        parallelPluginCollection.run()
-        assert ctx.valuesSum == 285
+        parallel_plugin_collection = ParallelPluginCollection(plugin_list, map_plugin, reduce_plugin)
+        parallel_plugin_collection.run()
+        assert mock_ctx.SumReducePlugin.values_sum == 285
 
     #
     def test_parallel_workflow(self):
-        args = ["--backend=multiprocessing",
-                "--cpu-count=1",
+        args = ["--Pipeline-backend=multiprocessing",
+                "--Pipeline-cpu-count=1",
                 "test.config.workflow_config_parallel"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
-        assert ctx().valuesSum == 285
-
-    def teardown(self):
-        # tidy up
-        print("tearing down " + __name__)
-        pass
+        assert ctx().SumReducePlugin.values_sum == 204
 
 
 if __name__ == '__main__':
-    #     pytest.main()
-    test = TestParallelPluginCollection()
-    test.test_sequential()
+    pytest.main()
