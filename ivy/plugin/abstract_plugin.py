@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Type
+from typing import Any, Type
 
 from ivy import context
-from ivy.utils.struct import Struct
+from ivy.utils.struct import Struct, ImmutableStruct
 
 
 class AbstractPlugin(ABC):
@@ -19,10 +19,17 @@ class AbstractPlugin(ABC):
         self.ctx = ctx
         self.ctx.update(kwargs)
 
-        self.config = self.ctx.params[self.name]
+        self.config = context.create_immutable_ctx()
+        self.set_config()
 
     def __str__(self):
         return self.name
+
+    def set_config(self):
+        """ Set the config of `self` if it is present. """
+        if 'params' in self.ctx:
+            if self.name in self.ctx.params:
+                self.config = self.ctx.params[self.name]
 
     @abstractmethod
     def run(self):
@@ -34,10 +41,11 @@ class AbstractPlugin(ABC):
     def name(self):
         return self.__name__
 
-    def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> Optional[Struct]:
-        """ Returns the output of a `plugin` if it has already run. """
+    def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> ImmutableStruct:
+        """ Returns the output of a `plugin`. """
         if plugin.name in self.ctx:
             return self.ctx[plugin.name]
+        return context.create_immutable_ctx()
 
     def save_to_context(self, result_dict: dict):
         """ Save `result_dict` to `self.ctx` for following `plugin`s to access. """

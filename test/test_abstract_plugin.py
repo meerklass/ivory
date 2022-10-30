@@ -34,7 +34,7 @@ class TestAbstractPlugin:
     def test_output_of_plugin(self):
         mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
         mock_plugin = MockPlugin(ctx=mock_ctx)
-        assert mock_plugin.output_of_plugin(plugin=MockPlugin) is None
+        assert 'mock_result' not in mock_plugin.output_of_plugin(plugin=MockPlugin)
         mock_plugin.run()
         assert 'mock_result' == mock_plugin.output_of_plugin(plugin=MockPlugin)['mock_output']
 
