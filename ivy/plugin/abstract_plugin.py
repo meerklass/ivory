@@ -21,6 +21,14 @@ class AbstractPlugin(ABC):
 
         self.config = self.ctx.params[self.plugin_name]
 
+    def __str__(self):
+        return self.plugin_name
+
+    @abstractmethod
+    def run(self):
+        """ Run the plugin and store results. """
+        pass
+
     @classmethod
     @property
     def plugin_name(self):
@@ -31,14 +39,6 @@ class AbstractPlugin(ABC):
         if plugin.plugin_name in self.ctx:
             return self.ctx[plugin.plugin_name]
 
-    def __str__(self):
-        return self.plugin_name
-
     def save_to_context(self, result_dict: dict):
         """ Save `result_dict` to `self.ctx` for following `plugin`s to access. """
         self.ctx[self.plugin_name] = context.create_immutable_ctx(**result_dict)
-
-    @abstractmethod
-    def run(self):
-        """ Run the plugin and store results. """
-        pass

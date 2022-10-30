@@ -21,6 +21,10 @@ class TestAbstractPlugin:
         MockPlugin(ctx=mock_ctx)
         assert 1 == mock_ctx.params.MockPlugin.mock_parameter
 
+    def test_str(self):
+        mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
+        assert 'MockPlugin' == str(MockPlugin(ctx=mock_ctx))
+
     def test_run(self):
         mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
         mock_plugin = MockPlugin(ctx=mock_ctx)
@@ -33,10 +37,6 @@ class TestAbstractPlugin:
         assert mock_plugin.output_of_plugin(plugin=MockPlugin) is None
         mock_plugin.run()
         assert 'mock_result' == mock_plugin.output_of_plugin(plugin=MockPlugin)['mock_output']
-
-    def test_str(self):
-        mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
-        assert 'MockPlugin' == str(MockPlugin(ctx=mock_ctx))
 
     def test_save_to_context(self):
         mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
