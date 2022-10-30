@@ -20,18 +20,14 @@ author: jakeret
 from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
-class Plugin(AbstractPlugin):
+class SimplePlugin(AbstractPlugin):
     """
     Simple implementation of the AbstractPlugin
     """
-
-    def __init__(self, ctx, **kwargs):
-        self.value = kwargs.pop("value", None)
-        super(Plugin, self).__init__(ctx, **kwargs)
 
     def __str__(self):
         return __name__
 
     def run(self):
-        if self.value is not None:
-            print(self.value)
+        if self.config.value is not None:
+            print(self.config.value)

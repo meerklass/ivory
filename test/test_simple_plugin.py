@@ -21,25 +21,20 @@ author: jakeret
 import pytest
 
 from ivy.context import ctx
-from test.plugin.simple_plugin import Plugin
+from test.plugin.simple_plugin import SimplePlugin
 
 
 class TestSimplePlugin:
 
     def test_simple(self):
-        plugin = Plugin(ctx())
-        assert plugin.value is None
+        plugin = SimplePlugin(ctx())
+        assert 'value' not in plugin.ctx
 
-        plugin = Plugin(ctx(), value=1)
-        assert plugin.value == 1
+        plugin = SimplePlugin(ctx(), value=1)
+        assert plugin.ctx.value == 1
 
-        plugin = Plugin(ctx(), foo=1)
+        SimplePlugin(ctx(), foo=1)
         assert ctx().foo == 1
-
-    def teardown(self):
-        # tidy up
-        print("tearing down " + __name__)
-        pass
 
 
 if __name__ == '__main__':
