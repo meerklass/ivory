@@ -23,14 +23,14 @@ def ctx():
 
 def register(loop):
     try:
-        l = ctx()[loop]
+        ctx()[str(loop)]
         raise InvalidLoopException()
     except KeyError or AttributeError:
-        ctx()[loop] = WorkflowStruct()
+        ctx()[str(loop)] = WorkflowStruct()
 
 
 def loop_ctx(loop):
-    return ctx()[loop]
+    return ctx()[str(loop)]
 
 
 def create_immutable_ctx(**args):
