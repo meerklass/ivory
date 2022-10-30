@@ -33,16 +33,9 @@ class TestCli(ContextSensitiveTest):
 
     def test_launch_loop(self):
         _main(*["test.config.workflow_config_cli"])
-        assert ctx() is not None
-        assert ctx().params is not None
-        assert ctx().params.plugins is not None
+        assert ctx().params.Pipeline.plugins is not None
         assert len(ctx().timings) == 2
-
-    def teardown(self):
-        # tidy up
-        print("tearing down " + __name__)
-        pass
 
 
 if __name__ == '__main__':
-    pytest.main("-k TestCli")
+    pytest.main()
