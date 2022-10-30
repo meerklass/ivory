@@ -1,37 +1,12 @@
-# IVY is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# IVY is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with IVY.  If not, see <http://www.gnu.org/licenses/>.
+from ivy.plugin.abstract_plugin import AbstractPlugin
 
 
-"""
-Created on Mar 18, 2014
+class RangeMapPlugin(AbstractPlugin):
+    """ Yields a range of contexts. """
 
-author: jakeret
-"""
-
-
-class Plugin:
-    """
-    classdocs
-    """
-
-    def __init__(self, ctx):
-        """
-        Constructor
-        """
-        self.ctx = ctx
-
-    def get_workload(self):
-        values = [i for i in range(self.ctx.params.valuesMin, self.ctx.params.valuesMax)]
+    def run(self):
+        """ Get the workload. """
+        values = [i for i in range(self.config.values_min, self.config.values_max)]
 
         for value in values:
             ctx = self.ctx.copy()
