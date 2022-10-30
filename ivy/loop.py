@@ -72,7 +72,7 @@ class Loop:
         result = 'loop: {\n'
         for plugin in self.plugin_list:
             if isinstance(plugin, AbstractPlugin):
-                string_to_add = f'{plugin.plugin_name}\n'
+                string_to_add = f'{plugin.name}\n'
             elif isinstance(plugin, str):
                 string_to_add = f'{plugin}\n'
             elif isinstance(plugin, Loop):

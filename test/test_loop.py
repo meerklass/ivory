@@ -26,7 +26,7 @@ from ivy.loop import Loop
 from ivy.utils.stop_criteria import RangeStopCriteria
 from ivy.utils.struct import Struct, WorkflowStruct
 from test.ctx_sensitive_test import ContextSensitiveTest
-from test.plugin.simple_plugin import Plugin
+from test.plugin.simple_plugin import SimplePlugin
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
@@ -35,14 +35,14 @@ class TestLoop(ContextSensitiveTest):
 
     def test_none(self):
         try:
-            loop = Loop(None)
+            Loop(None)
             assert False
         except InvalidLoopException:
             assert True
 
     def test_one_plugin(self):
         mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
-        plugin = Plugin(mock_ctx)
+        plugin = SimplePlugin(mock_ctx)
         loop = Loop(plugin)
 
         p = next(loop)
@@ -56,8 +56,8 @@ class TestLoop(ContextSensitiveTest):
 
     def test_plugin_instances(self):
         mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
-        plugin1 = Plugin(mock_ctx)
-        plugin2 = Plugin(mock_ctx)
+        plugin1 = SimplePlugin(mock_ctx)
+        plugin2 = SimplePlugin(mock_ctx)
         loop = Loop([plugin1, plugin2])
 
         assert next(loop) == plugin1
@@ -74,9 +74,9 @@ class TestLoop(ContextSensitiveTest):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME], ctx=mock_ctx)
 
         p = next(loop)
-        assert isinstance(p, Plugin)
+        assert isinstance(p, SimplePlugin)
         p = next(loop)
-        assert isinstance(p, Plugin)
+        assert isinstance(p, SimplePlugin)
 
         try:
             next(loop)
@@ -89,8 +89,8 @@ class TestLoop(ContextSensitiveTest):
 
         loop = Loop(Loop([PLUGIN_NAME, PLUGIN_NAME], ctx=mock_ctx))
 
-        assert isinstance(next(loop), Plugin)
-        assert isinstance(next(loop), Plugin)
+        assert isinstance(next(loop), SimplePlugin)
+        assert isinstance(next(loop), SimplePlugin)
         try:
             next(loop)
             assert False
@@ -104,10 +104,10 @@ class TestLoop(ContextSensitiveTest):
                            PLUGIN_NAME], ctx=mock_ctx),
                      PLUGIN_NAME], ctx=mock_ctx)
 
-        assert isinstance(next(loop), Plugin)
-        assert isinstance(next(loop), Plugin)
-        assert isinstance(next(loop), Plugin)
-        assert isinstance(next(loop), Plugin)
+        assert isinstance(next(loop), SimplePlugin)
+        assert isinstance(next(loop), SimplePlugin)
+        assert isinstance(next(loop), SimplePlugin)
+        assert isinstance(next(loop), SimplePlugin)
         try:
             next(loop)
             assert False
@@ -121,7 +121,7 @@ class TestLoop(ContextSensitiveTest):
 
         cnt = 0
         for p in loop:
-            assert isinstance(p, Plugin)
+            assert isinstance(p, SimplePlugin)
             cnt += 1
 
         assert cnt == len(plugin_list)
@@ -135,7 +135,7 @@ class TestLoop(ContextSensitiveTest):
 
         cnt = 0
         for p in loop:
-            assert isinstance(p, Plugin)
+            assert isinstance(p, SimplePlugin)
             cnt += 1
 
         assert cnt == len(plugin_list) * max_iter
@@ -144,7 +144,7 @@ class TestLoop(ContextSensitiveTest):
         mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})}),
                            'value': None})
         max_iter = 3
-        plugin_list = [Plugin(mock_ctx), Plugin(mock_ctx)]
+        plugin_list = [SimplePlugin(mock_ctx), SimplePlugin(mock_ctx)]
 
         loop = Loop(
             Loop(plugin_list,
@@ -155,7 +155,7 @@ class TestLoop(ContextSensitiveTest):
 
         cnt = 0
         for plugin in loop:
-            assert isinstance(plugin, Plugin)
+            assert isinstance(plugin, SimplePlugin)
             plugin.run()
             cnt += 1
 
