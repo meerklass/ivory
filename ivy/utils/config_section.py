@@ -1,0 +1,2 @@
+class ConfigSection(dict):
+    pass
