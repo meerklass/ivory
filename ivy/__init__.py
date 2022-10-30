@@ -1,15 +1,9 @@
-__author__ = 'Joel Akeret'
-__email__ = 'jakeret@phys.ethz.ch'
-__version__ = '0.1.0'
-__credits__ = 'ETH Zurich, Institute for Astronomy'
-
 # register custom reduce method for type MethodType
 import copyreg
 import types
 
 from ivy import context
 from ivy.workflow_manager import WorkflowManager
-from ivy.workflow_manager import load_configs
 
 
 def reduce_method(m):
