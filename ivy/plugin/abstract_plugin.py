@@ -19,10 +19,10 @@ class AbstractPlugin(ABC):
         self.ctx = ctx
         self.ctx.update(kwargs)
 
-        self.config = self.ctx.params[self.plugin_name]
+        self.config = self.ctx.params[self.name]
 
     def __str__(self):
-        return self.plugin_name
+        return self.name
 
     @abstractmethod
     def run(self):
@@ -31,14 +31,14 @@ class AbstractPlugin(ABC):
 
     @classmethod
     @property
-    def plugin_name(self):
+    def name(self):
         return self.__name__
 
     def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> Optional[Struct]:
         """ Returns the output of a `plugin` if it has already run. """
-        if plugin.plugin_name in self.ctx:
-            return self.ctx[plugin.plugin_name]
+        if plugin.name in self.ctx:
+            return self.ctx[plugin.name]
 
     def save_to_context(self, result_dict: dict):
         """ Save `result_dict` to `self.ctx` for following `plugin`s to access. """
-        self.ctx[self.plugin_name] = context.create_immutable_ctx(**result_dict)
+        self.ctx[self.name] = context.create_immutable_ctx(**result_dict)

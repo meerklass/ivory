@@ -8,7 +8,7 @@ class MockPlugin(AbstractPlugin):
 
     @classmethod
     @property
-    def plugin_name(cls):
+    def name(cls):
         return 'MockPlugin'
 
     def run(self):
