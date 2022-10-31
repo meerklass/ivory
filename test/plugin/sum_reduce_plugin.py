@@ -9,4 +9,4 @@ class SumReducePlugin(AbstractPlugin):
         for ctx in ctx_list:
             sum_ += ctx.value
 
-        self.save_to_context(result_dict={'values_sum': sum_})
+        self.save_to_context(values_sum=sum_)
