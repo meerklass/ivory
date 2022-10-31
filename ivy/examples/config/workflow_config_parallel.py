@@ -1,6 +1,7 @@
 from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
+from ivy.utils.config_section import ConfigSection
 
-Pipeline = dict(
+Pipeline = ConfigSection(
     backend="sequential",
     cpu_count=1,
     valuesMin=1,
