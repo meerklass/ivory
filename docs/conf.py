@@ -47,7 +47,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ivory workflow engine'
-copyright = u'2014, ETH Zurich, Institute for Astronomy'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

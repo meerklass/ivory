@@ -44,7 +44,7 @@ PACKAGE_PATH = os.path.abspath(os.path.join(__file__, os.pardir))
 
 setup(
     name='ivory',
-    version='0.1.0',
+    version='0.0.1',
     description='Simple and flexible workflow engine',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='',
