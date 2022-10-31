@@ -41,12 +41,12 @@ class AbstractPlugin(ABC):
     def name(self):
         return self.__name__
 
-    def output_of_plugin(self, plugin: Type['AbstractPlugin']) -> ImmutableStruct:
-        """ Returns the output of a `plugin`. """
-        if plugin.name in self.ctx:
-            return self.ctx[plugin.name]
+    def output_of_plugin(self, plugin_name: str) -> ImmutableStruct:
+        """ Returns the output of an `AbstractPlugin` with name `plugin_name`. """
+        if plugin_name in self.ctx:
+            return self.ctx[plugin_name]
         return context.create_immutable_ctx()
 
-    def save_to_context(self, result_dict: dict):
-        """ Save `result_dict` to `self.ctx` for following `plugin`s to access. """
-        self.ctx[self.name] = context.create_immutable_ctx(**result_dict)
+    def save_to_context(self, **kwargs):
+        """ Save `kwargs` to `self.ctx` for following `plugin`s to access. """
+        self.ctx[self.name] = context.create_immutable_ctx(**kwargs)
