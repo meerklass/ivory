@@ -2,12 +2,12 @@ import time
 from multiprocessing import Pool
 from typing import Optional
 
-from ivy.context import get_context_provider
-from ivy.loop import Loop
-from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.utils.struct import Struct, ImmutableStruct
-from ivy.utils.timing import SimpleTiming
-from ivy.utils.timing import TimingCollection
+from ivory.context import get_context_provider
+from ivory.loop import Loop
+from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.utils.struct import Struct, ImmutableStruct
+from ivory.utils.timing import SimpleTiming
+from ivory.utils.timing import TimingCollection
 
 
 class SimpleMapPlugin(AbstractPlugin):

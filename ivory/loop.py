@@ -1,13 +1,13 @@
 from typing import List, Optional
 
-from ivy import context
-from ivy.context import loop_ctx
-from ivy.exceptions.exceptions import InvalidLoopException
-from ivy.exceptions.exceptions import UnsupportedPluginTypeException
-from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.plugin.plugin_factory import PluginFactory
-from ivy.utils.stop_criteria import SimpleStopCriteria, AbstractStopCriteria
-from ivy.utils.struct import WorkflowState, Struct
+from ivory import context
+from ivory.context import loop_ctx
+from ivory.exceptions.exceptions import InvalidLoopException
+from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.plugin.plugin_factory import PluginFactory
+from ivory.utils.stop_criteria import SimpleStopCriteria, AbstractStopCriteria
+from ivory.utils.struct import WorkflowState, Struct
 
 
 class Loop:

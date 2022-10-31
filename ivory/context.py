@@ -1,6 +1,5 @@
-# Copyright 2013 ETHZ.ch Lukas Gamper <lukas.gamper@usystems.ch>
-from ivy.exceptions.exceptions import InvalidLoopException
-from ivy.utils.struct import WorkflowStruct
+from ivory.exceptions.exceptions import InvalidLoopException
+from ivory.utils.struct import WorkflowStruct
 
 __all__ = ["ctx", "loop_ctx", "get_context_provider"]
 
@@ -42,5 +41,5 @@ def _create_ctx(**args):
 
 
 def get_context_provider():
-    from ivy.context_provider import DefaultContextProvider
+    from ivory.context_provider import DefaultContextProvider
     return DefaultContextProvider

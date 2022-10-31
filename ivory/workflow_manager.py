@@ -3,16 +3,16 @@ from getopt import getopt
 from types import ModuleType
 from typing import Optional, Any
 
-from ivy import context
-from ivy.backend import SequentialBackend
-from ivy.config_keys import ConfigKeys
-from ivy.context import ctx
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.loop import Loop
-from ivy.utils.config_section import ConfigSection
-from ivy.utils.infer_type import InferType
-from ivy.utils.opt_helper import get_all_longopts, get_opt_parameter_dict
-from ivy.utils.struct import ImmutableStruct
+from ivory import context
+from ivory.backend import SequentialBackend
+from ivory.config_keys import ConfigKeys
+from ivory.context import ctx
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.loop import Loop
+from ivory.utils.config_section import ConfigSection
+from ivory.utils.infer_type import InferType
+from ivory.utils.opt_helper import get_all_longopts, get_opt_parameter_dict
+from ivory.utils.struct import ImmutableStruct
 
 
 class WorkflowManager:

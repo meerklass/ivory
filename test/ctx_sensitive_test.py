@@ -1,4 +1,4 @@
-from ivy import context
+from ivory import context
 
 
 class ContextSensitiveTest:

@@ -1,7 +1,7 @@
-ivy
+ivory
 ===
 
 .. toctree::
    :maxdepth: 4
 
-   ivy
+   ivory

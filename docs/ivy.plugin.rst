@@ -4,7 +4,7 @@ plugin Package
 :mod:`abstract_plugin` Module
 -------------------------
 
-.. automodule:: ivy.plugin.abstract_plugin
+.. automodule:: ivory.plugin.abstract_plugin
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ plugin Package
 :mod:`parallel_plugin_collection` Module
 ----------------------------------------
 
-.. automodule:: ivy.plugin.parallel_plugin_collection
+.. automodule:: ivory.plugin.parallel_plugin_collection
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ plugin Package
 :mod:`plugin_factory` Module
 ----------------------------
 
-.. automodule:: ivy.plugin.plugin_factory
+.. automodule:: ivory.plugin.plugin_factory
     :members:
     :undoc-members:
     :show-inheritance:

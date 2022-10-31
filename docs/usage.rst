@@ -2,9 +2,9 @@
 Usage
 ========
 
-To use Ivy workflow engine in a project::
+To use ivory workflow engine in a project::
 
-	from ivy.workflow_manager import WorkflowManager
+	from ivory.workflow_manager import WorkflowManager
 	args = ["--size-x=100",
 		"--size-y=100", 
 		"ufig.config.random"]
@@ -12,16 +12,16 @@ To use Ivy workflow engine in a project::
 	mgr = WorkflowManager(args)
 	mgr.launch()
     
-alternatively ivy can also be used from the command line::
+alternatively ivory can also be used from the command line::
 
-	$ ivy --size-x=100 --size-y=100 ufig.config.random
+	$ ivory --size-x=100 --size-y=100 ufig.config.random
 	
 	
 A configuration can range form very simple to arbitrarily complex. 
 
 In the simplest case the configuration file would look something like::
 
-	from ivy.config import base_config
+	from ivory.config import base_config
 
 	plugins = ["test.plugin.simple_plugin",
            	"test.plugin.simple_plugin"
@@ -32,12 +32,12 @@ Importing basic functionality from `base_config` and defining a list of plugins.
 
 A slightly more complex use case would look something like::
 
-	from ivy.config import base_config
-	from ivy.loop import Loop
-	from ivy.utils.stop_criteria import RangeStopCriteria
+	from ivory.config import base_config
+	from ivory.loop import Loop
+	from ivory.utils.stop_criteria import RangeStopCriteria
 
-	context_provider = "ivy.context_provider.PickleContextProvider"
-	ctx_file_name = "ivy_cxt.dump"
+	context_provider = "ivory.context_provider.PickleContextProvider"
+	ctx_file_name = "ivory_cxt.dump"
 
 	plugins = Loop(["test.plugin.simple_plugin",
 			Loop(["test.plugin.simple_plugin",
@@ -51,7 +51,7 @@ A slightly more complex use case would look something like::
 	c=None
 
 Configures the 'PickleContextProvider' as context provider which ensures that 
-the context is persisted to the file "ivy_ctx.dump" after every execution of a plugin
+the context is persisted to the file "ivory_ctx.dump" after every execution of a plugin
 
 The list of plugins consists of two nested loops. Each having two plugins. The inner lopp will be 
 executed 5 times and the outer loop twice.
@@ -61,4 +61,4 @@ and c is a NoneType. The type of c will automatically be inferred from the given
 
 Calling this config and overriding the attributes from the command line would look something like this::
 
-	$ ivy --a=1.75 --b=zeta,beta,gamma --c=False package.subpackage.module
+	$ ivory --a=1.75 --b=zeta,beta,gamma --c=False package.subpackage.module

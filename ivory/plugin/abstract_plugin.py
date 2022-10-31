@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Type
 
-from ivy import context
-from ivy.utils.struct import Struct, ImmutableStruct
+from ivory import context
+from ivory.utils.struct import Struct, ImmutableStruct
 
 
 class AbstractPlugin(ABC):

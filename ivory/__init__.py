@@ -2,8 +2,8 @@
 import copyreg
 import types
 
-from ivy import context
-from ivy.workflow_manager import WorkflowManager
+from ivory import context
+from ivory.workflow_manager import WorkflowManager
 
 
 def reduce_method(m):
@@ -16,7 +16,7 @@ copyreg.pickle(types.MethodType, reduce_method)
 def execute(args):
     """
     Runs a workflow for the given arguments.
-    :param args: list of arguments which should be passed to ivy. The last argument has to be the config
+    :param args: list of arguments which should be passed to ivory. The last argument has to be the config
     
     :returns: the global_ctx
     """

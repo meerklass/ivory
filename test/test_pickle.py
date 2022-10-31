@@ -1,12 +1,12 @@
 from pickle import dumps
 from pickle import loads
 
-from ivy import context
-from ivy.context import ctx
-from ivy.loop import Loop
-from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
-from ivy.utils.struct import Struct
-from ivy.workflow_manager import WorkflowManager
+from ivory import context
+from ivory.context import ctx
+from ivory.loop import Loop
+from ivory.plugin.parallel_plugin_collection import ParallelPluginCollection
+from ivory.utils.struct import Struct
+from ivory.workflow_manager import WorkflowManager
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
@@ -41,9 +41,9 @@ class TestPickle:
         ctx = context.ctx()
 
         parallelPluginCollection = ParallelPluginCollection(
-            "ivy.plugin.simple_map_plugin",
-            ["ivy.plugin.simple_square_plugin"],
-            "ivy.plugin.simple_reduce_plugin")
+            "ivory.plugin.simple_map_plugin",
+            ["ivory.plugin.simple_square_plugin"],
+            "ivory.plugin.simple_reduce_plugin")
 
         sParallelPluginCollection = dumps(parallelPluginCollection)
         parallelPluginCollectio2 = loads(sParallelPluginCollection)

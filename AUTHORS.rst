@@ -10,7 +10,7 @@ Development lead
 Development lead of original package ivy
 ----------------
 
-* Joel Akeret <jakeret@phys.ethz.ch>
+* Joel Akeret
 
 Contributors
 ------------

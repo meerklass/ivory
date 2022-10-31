@@ -1,5 +1,5 @@
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.utils.config_section import ConfigSection
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.utils.config_section import ConfigSection
 
 
 def get_all_longopts(config_sections: dict[str, ConfigSection]) -> list[str]:

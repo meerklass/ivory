@@ -1,6 +1,6 @@
 import pytest
 
-from ivy.utils.infer_type import InferType
+from ivory.utils.infer_type import InferType
 
 
 class TestInferType:

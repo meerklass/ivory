@@ -43,23 +43,23 @@ tests_require = ['pytest>=2.3']
 PACKAGE_PATH = os.path.abspath(os.path.join(__file__, os.pardir))
 
 setup(
-    name='ivy',
-    version='0.1.0',
+    name='ivory',
+    version='0.0.1',
     description='Simple and flexible workflow engine',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='',
     author_email='',
     url='',
     packages=find_packages(PACKAGE_PATH),
-    package_dir={'ivy': 'ivy'},
+    package_dir={'ivory': 'ivory'},
     include_package_data=True,
     install_requires=requires,
     license='GPLv3',
     zip_safe=False,
-    keywords='ivy',
+    keywords='ivory',
     entry_points={
         'console_scripts': [
-            'ivy = ivy.cli.main:run',
+            'ivory = ivory.cli.main:run',
         ]
     },
 

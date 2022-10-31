@@ -1,8 +1,8 @@
 import pickle
 
-from ivy.context import ctx
-from ivy.utils.struct import ImmutableStruct
-from ivy.utils.struct import Struct
+from ivory.context import ctx
+from ivory.utils.struct import ImmutableStruct
+from ivory.utils.struct import Struct
 
 
 class DefaultContextProvider:

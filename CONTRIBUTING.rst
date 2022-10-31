@@ -28,8 +28,8 @@ Implement Features
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-Ivy workflow engine could always use more documentation, whether as part of the 
-official Ivy workflow engine docs, in docstrings, or even on the web in blog posts,
+Ivory workflow engine could always use more documentation, whether as part of the
+official Ivory workflow engine docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -60,4 +60,4 @@ Tips
 
 To run a subset of tests::
 
-	 $ py.test test/test_ivy.py
+	 $ py.test test/test_ivory.py

@@ -1,9 +1,9 @@
 import importlib
 from typing import Optional
 
-from ivy.exceptions.exceptions import UnsupportedPluginTypeException
-from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.utils.struct import Struct
+from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.utils.struct import Struct
 
 
 class PluginFactory:

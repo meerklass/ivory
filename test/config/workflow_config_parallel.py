@@ -1,5 +1,5 @@
-from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
-from ivy.utils.config_section import ConfigSection
+from ivory.plugin.parallel_plugin_collection import ParallelPluginCollection
+from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
     backend="sequential",

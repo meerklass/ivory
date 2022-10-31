@@ -1,11 +1,11 @@
 import pytest
 
-from ivy.context import loop_ctx
-from ivy.exceptions.exceptions import InvalidLoopException
-from ivy.exceptions.exceptions import UnsupportedPluginTypeException
-from ivy.loop import Loop
-from ivy.utils.stop_criteria import RangeStopCriteria
-from ivy.utils.struct import Struct, WorkflowStruct
+from ivory.context import loop_ctx
+from ivory.exceptions.exceptions import InvalidLoopException
+from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.loop import Loop
+from ivory.utils.stop_criteria import RangeStopCriteria
+from ivory.utils.struct import Struct, WorkflowStruct
 from test.ctx_sensitive_test import ContextSensitiveTest
 from test.plugin.simple_plugin import SimplePlugin
 

@@ -1,8 +1,8 @@
 import pytest
 
-from ivy import context
-from ivy.cli.main import _main
-from ivy.context import ctx
+from ivory import context
+from ivory.cli.main import _main
+from ivory.context import ctx
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 

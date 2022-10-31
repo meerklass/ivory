@@ -1,7 +1,7 @@
 import pytest
 
-from ivy.utils.struct import WorkflowState
-from ivy.utils.struct import WorkflowStruct
+from ivory.utils.struct import WorkflowState
+from ivory.utils.struct import WorkflowStruct
 
 
 class TestWorkflowStruct:

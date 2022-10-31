@@ -1,9 +1,9 @@
-from ivy import backend
-from ivy import context
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.loop import Loop
-from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.plugin.plugin_factory import PluginFactory
+from ivory import backend
+from ivory import context
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.loop import Loop
+from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.plugin.plugin_factory import PluginFactory
 
 
 class ParallelPluginCollection(AbstractPlugin):

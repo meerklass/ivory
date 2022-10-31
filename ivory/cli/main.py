@@ -1,6 +1,6 @@
 import sys
 
-from ivy.workflow_manager import WorkflowManager
+from ivory.workflow_manager import WorkflowManager
 
 
 def run():
@@ -21,21 +21,20 @@ def _main(*argv):
 
 def _usage():
     """
-    Return usage of the main ivy call and an example.
+    Return usage of the main ivory call and an example.
     """
 
     usage = """
-    **Ivy workflow engine**
-    Copyright (c) 2014 ETH Zurich, Institute for Astronomy
+    **ivory workflow engine**
     
     Usage:
-    ivy [arguments] configuration
+    ivory [arguments] configuration
     
     Only arguments already preconfigured in the given configuration will be accepted.
     Note: Dashed '-' will be converted into underlines '_' for all the arguments
     
     example:
-    - ivy --size-x=100 --size-y=100 ufig.config.random
+    - ivory --size-x=100 --size-y=100 ufig.config.random
     """
     print(usage)
 

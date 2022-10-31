@@ -1,8 +1,8 @@
 from abc import abstractmethod, ABC
 
-from ivy.context import loop_ctx
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.utils.struct import WorkflowState
+from ivory.context import loop_ctx
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.utils.struct import WorkflowState
 
 
 class AbstractStopCriteria(ABC):

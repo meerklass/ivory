@@ -1,7 +1,7 @@
 from collections import abc
 from enum import Enum
 
-from ivy.exceptions.exceptions import IllegalAccessException
+from ivory.exceptions.exceptions import IllegalAccessException
 
 
 class WorkflowState(Enum):
