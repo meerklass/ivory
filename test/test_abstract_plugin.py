@@ -38,6 +38,11 @@ class TestAbstractPlugin:
         mock_plugin.run()
         assert 'mock_result' == mock_plugin.output_of_plugin(plugin_name='MockPlugin')['mock_output']
 
+    def test_config_of_section(self):
+        mock_ctx = Struct({'params': Struct({'MockSection': Struct({'mock_entry': 1})})})
+        mock_plugin = MockPlugin(ctx=mock_ctx)
+        assert 1 == mock_plugin.config_of_section(section_name='MockSection').mock_entry
+
     def test_save_to_context(self):
         mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
         mock_plugin = MockPlugin(ctx=mock_ctx)

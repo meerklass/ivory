@@ -47,6 +47,12 @@ class AbstractPlugin(ABC):
             return self.ctx[plugin_name]
         return context.create_immutable_ctx()
 
+    def config_of_section(self, section_name: str) -> ImmutableStruct:
+        """ Returns the config given in a shared config section. """
+        if section_name in self.ctx.params:
+            return self.ctx.params[section_name]
+        return context.create_immutable_ctx()
+
     def save_to_context(self, **kwargs):
         """ Save `kwargs` to `self.ctx` for following `plugin`s to access. """
         self.ctx[self.name] = context.create_immutable_ctx(**kwargs)
