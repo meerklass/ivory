@@ -34,7 +34,7 @@ PLUGIN_NAME = "test.plugin.simple_plugin"
 class TestPickle:
     def test_loop_pickle(self):
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME])
-        plugin = next(loop)
+        next(loop)
 
         dumps_loop = dumps(loop)
         loop2 = loads(dumps_loop)
@@ -74,8 +74,8 @@ class TestPickle:
         l_ctx2 = loads(s_l_ctx)
 
     def test_workflow_context_pickle(self):
-        args = ["--backend=multiprocessing",
-                "--cpu-count=1",
+        args = ["--Pipeline-backend=multiprocessing",
+                "--Pipeline-cpu-count=1",
                 "test.config.workflow_config_parallel"]
 
         mgr = WorkflowManager(args)

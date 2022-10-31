@@ -45,9 +45,7 @@ class ParallelPluginCollection(AbstractPlugin):
         """
         if ctx is None:
             ctx = context.ctx()
-        self.ctx = ctx
-
-        super(ParallelPluginCollection, self).__init__(self.ctx)
+        super().__init__(ctx)
 
         if not isinstance(plugin_list, Loop):
             plugin_list = Loop(plugin_list)
@@ -61,9 +59,6 @@ class ParallelPluginCollection(AbstractPlugin):
         self.reduce_plugin = reduce_plugin
         self.parallel = parallel
 
-    def __str__(self):
-        return "ParallelPluginCollection"
-
     def run(self):
         force = None
         if not self.parallel:
@@ -73,13 +68,13 @@ class ParallelPluginCollection(AbstractPlugin):
 
         map_plugin = self.map_plugin
         if isinstance(self.map_plugin, str):
-            map_plugin = PluginFactory.createInstance(map_plugin, self.ctx)
+            map_plugin = PluginFactory.create_instance(map_plugin, self.ctx)
 
         ctx_list = backend_impl.run(self.plugin_list, map_plugin)
 
         if self.reduce_plugin is not None:
             reduce_plugin = self.reduce_plugin
             if isinstance(self.reduce_plugin, str):
-                reduce_plugin = PluginFactory.createInstance(reduce_plugin, self.ctx)
+                reduce_plugin = PluginFactory.create_instance(reduce_plugin, self.ctx)
 
-            reduce_plugin.reduce(ctx_list)
+            reduce_plugin.run(ctx_list)

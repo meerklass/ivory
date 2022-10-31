@@ -13,17 +13,29 @@
 
 
 """
+Tests for `ivy.simple_plugin` module.
 
 author: jakeret
 """
-# from ivy.config import base_config
-from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
 
-backend = "sequential"
-cpu_count=1
-valuesMin = 1
-valuesMax = 16
+import pytest
 
-plugins = ParallelPluginCollection(["ivy.plugin.simple_square_plugin"], 
-                                    "ivy.plugin.range_map_plugin",
-                                    "ivy.plugin.sum_reduce_plugin")
+from ivy.context import ctx
+from test.plugin.simple_plugin import SimplePlugin
+
+
+class TestSimplePlugin:
+
+    def test_simple(self):
+        plugin = SimplePlugin(ctx())
+        assert 'value' not in plugin.ctx
+
+        plugin = SimplePlugin(ctx(), value=1)
+        assert plugin.ctx.value == 1
+
+        SimplePlugin(ctx(), foo=1)
+        assert ctx().foo == 1
+
+
+if __name__ == '__main__':
+    pytest.main()

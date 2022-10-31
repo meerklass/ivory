@@ -17,6 +17,7 @@ Created on Mar 4, 2014
 
 author: jakeret
 """
+from typing import List, Optional
 
 from ivy import context
 from ivy.context import loop_ctx
@@ -24,8 +25,8 @@ from ivy.exceptions.exceptions import InvalidLoopException
 from ivy.exceptions.exceptions import UnsupportedPluginTypeException
 from ivy.plugin.abstract_plugin import AbstractPlugin
 from ivy.plugin.plugin_factory import PluginFactory
-from ivy.utils.stop_criteria import SimpleStopCriteria
-from ivy.utils.struct import WorkflowState
+from ivy.utils.stop_criteria import SimpleStopCriteria, AbstractStopCriteria
+from ivy.utils.struct import WorkflowState, Struct
 
 
 class Loop:
@@ -38,8 +39,15 @@ class Loop:
 
     _current_plugin = None
 
-    def __init__(self, plugin_list, stop=None, ctx=None):
+    def __init__(self, plugin_list: str | List[str] | AbstractPlugin | List[AbstractPlugin] | 'Loop',
+                 stop: AbstractStopCriteria = None,
+                 ctx: Optional[Struct] = None):
+        """
+        Very broad options for input `plugin_list`. If they come as some form of `str`, the input `ctx` must be given
+        to instantiate them.
+        """
 
+        self.plugin_list_iter = None
         if plugin_list is None:
             raise InvalidLoopException("Plugin list is None")
 
@@ -59,12 +67,33 @@ class Loop:
             ctx = context.ctx()
         self.ctx = ctx
 
+    def __str__(self):
+        """ Information summary `str`. """
+        result = 'loop: {\n'
+        for plugin in self.plugin_list:
+            if isinstance(plugin, AbstractPlugin):
+                string_to_add = f'{plugin.name}\n'
+            elif isinstance(plugin, str):
+                string_to_add = f'{plugin}\n'
+            elif isinstance(plugin, Loop):
+                string_to_add = f'{str(plugin)}\n'
+            else:
+                raise ValueError(f'`plugin` must be either `AbstractPlugin`, `str` or `Loop`. Got {plugin}')
+            result += string_to_add
+        result += f'hash {self.__hash__()}\n}}'
+        return result
+
+    def __gt__(self, other):
+        """ Overload of > for alphabetical order to enable `dir(loop)`. """
+        if isinstance(other, str):
+            return self.__str__() > other
+
     def reset(self):
         """
         Resets the internal state of the loop
         """
 
-        self.plugin_list_itr = iter(self.plugin_list)
+        self.plugin_list_iter = iter(self.plugin_list)
         loop_ctx(self).reset()
 
     def __iter__(self):
@@ -80,7 +109,7 @@ class Loop:
                 raise StopIteration
 
             if self._current_plugin is None:
-                self._current_plugin = next(self.plugin_list_itr)
+                self._current_plugin = next(self.plugin_list_iter)
 
                 plugin = self._current_plugin
                 if isinstance(plugin, AbstractPlugin):
@@ -124,11 +153,11 @@ class Loop:
         return SimpleStopCriteria()
 
     def _instantiate(self, plugin_name):
-        return PluginFactory.createInstance(plugin_name, self.ctx)
+        return PluginFactory.create_instance(plugin_name, self.ctx)
 
     def _load_iter(self):
-        if self.plugin_list_itr is None:
+        if self.plugin_list_iter is None:
             self._create_iter()
 
     def _create_iter(self):
-        self.plugin_list_itr = iter(self.plugin_list)
+        self.plugin_list_iter = iter(self.plugin_list)
