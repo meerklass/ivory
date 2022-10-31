@@ -17,11 +17,3 @@ Contents:
    contributing
    authors
    history
-
-Feedback
-========
-
-If you have any suggestions or questions about **Ivy workflow engine** feel free to email me
-at jakeret@phys.ethz.ch.
-
-If you encounter any errors or problems with **Ivy workflow engine**, please let me know!
