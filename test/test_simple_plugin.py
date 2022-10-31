@@ -1,6 +1,6 @@
 import pytest
 
-from ivy.context import ctx
+from ivory.context import ctx
 from test.plugin.simple_plugin import SimplePlugin
 
 

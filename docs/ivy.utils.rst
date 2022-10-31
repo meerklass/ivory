@@ -4,7 +4,7 @@ utils Package
 :mod:`stop_criteria` Module
 ---------------------------
 
-.. automodule:: ivy.utils.stop_criteria
+.. automodule:: ivory.utils.stop_criteria
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ utils Package
 :mod:`struct` Module
 --------------------
 
-.. automodule:: ivy.utils.struct
+.. automodule:: ivory.utils.struct
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ utils Package
 :mod:`utils` Module
 -------------------
 
-.. automodule:: ivy.utils.utils
+.. automodule:: ivory.utils.utils
     :members:
     :undoc-members:
     :show-inheritance:

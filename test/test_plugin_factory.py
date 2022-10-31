@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ivy.context import ctx
-from ivy.exceptions.exceptions import UnsupportedPluginTypeException
-from ivy.plugin.plugin_factory import PluginFactory
+from ivory.context import ctx
+from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.plugin.plugin_factory import PluginFactory
 from test.plugin import simple_plugin
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
@@ -27,7 +27,7 @@ class TestPluginFactory:
             assert True
 
     def test_invalid_module(self):
-        plugin_name = "ivy.plugin.AbstractPlugin"
+        plugin_name = "ivory.plugin.AbstractPlugin"
         try:
             plugin = PluginFactory.create_instance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)

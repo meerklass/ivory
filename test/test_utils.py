@@ -1,8 +1,8 @@
 import pytest
 
-from ivy.exceptions.exceptions import IllegalAccessException
-from ivy.utils.struct import ImmutableStruct
-from ivy.utils.struct import Struct
+from ivory.exceptions.exceptions import IllegalAccessException
+from ivory.utils.struct import ImmutableStruct
+from ivory.utils.struct import Struct
 
 
 class TestStruct:

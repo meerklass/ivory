@@ -1,7 +1,7 @@
-from ivy.utils.config_section import ConfigSection
+from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
-    context_provider="ivy.context_provider.PickleContextProvider",
+    context_provider="ivory.context_provider.PickleContextProvider",
     ctx_file_name="le_cxt.dump",
     plugins=["test.plugin.simple_plugin"],
 )

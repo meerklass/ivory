@@ -4,7 +4,7 @@ cli Package
 :mod:`cli` Package
 ------------------
 
-.. automodule:: ivy.cli
+.. automodule:: ivory.cli
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ cli Package
 :mod:`main` Module
 ------------------
 
-.. automodule:: ivy.cli.main
+.. automodule:: ivory.cli.main
     :members:
     :undoc-members:
     :show-inheritance:

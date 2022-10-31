@@ -3,13 +3,13 @@ from operator import eq
 
 import pytest
 
-from ivy.config_keys import ConfigKeys
-from ivy.context import ctx
-from ivy.exceptions.exceptions import InvalidAttributeException, IllegalAccessException
-from ivy.loop import Loop
-from ivy.utils.config_section import ConfigSection
-from ivy.utils.struct import Struct
-from ivy.workflow_manager import WorkflowManager
+from ivory.config_keys import ConfigKeys
+from ivory.context import ctx
+from ivory.exceptions.exceptions import InvalidAttributeException, IllegalAccessException
+from ivory.loop import Loop
+from ivory.utils.config_section import ConfigSection
+from ivory.utils.struct import Struct
+from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
 from test.plugin.simple_plugin import SimplePlugin
 

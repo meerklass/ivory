@@ -4,7 +4,7 @@ exceptions Package
 :mod:`exceptions` Module
 ------------------------
 
-.. automodule:: ivy.exceptions.exceptions
+.. automodule:: ivory.exceptions.exceptions
     :members:
     :undoc-members:
     :show-inheritance:

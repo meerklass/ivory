@@ -13,7 +13,7 @@ Contents:
 
    installation
    usage
-   ivy
+   ivory
    contributing
    authors
    history

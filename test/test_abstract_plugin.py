@@ -1,7 +1,7 @@
 import pytest
 
-from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.utils.struct import Struct
+from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.utils.struct import Struct
 
 
 class MockPlugin(AbstractPlugin):

@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from ivy import context
-from ivy.context import ctx
-from ivy.context_provider import DefaultContextProvider
-from ivy.context_provider import PickleContextProvider
-from ivy.utils.struct import ImmutableStruct
-from ivy.utils.struct import Struct
-from ivy.workflow_manager import WorkflowManager
+from ivory import context
+from ivory.context import ctx
+from ivory.context_provider import DefaultContextProvider
+from ivory.context_provider import PickleContextProvider
+from ivory.utils.struct import ImmutableStruct
+from ivory.utils.struct import Struct
+from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 
@@ -51,7 +51,7 @@ class TestPickleContextProvider(ContextSensitiveTest):
         mgr.launch()
 
         assert ctx() is not None
-        from ivy.context import get_context_provider
+        from ivory.context import get_context_provider
         assert get_context_provider() == PickleContextProvider
 
     def test_storeContext(self, tmpdir):

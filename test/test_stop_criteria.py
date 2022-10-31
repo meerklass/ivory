@@ -1,9 +1,9 @@
 import pytest
 
-from ivy.context import loop_ctx
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.loop import Loop
-from ivy.utils.stop_criteria import RangeStopCriteria
+from ivory.context import loop_ctx
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.loop import Loop
+from ivory.utils.stop_criteria import RangeStopCriteria
 
 
 class TestStopCriteria:

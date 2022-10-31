@@ -1,11 +1,11 @@
 import pytest
 
-from ivy import context
-from ivy.context import ctx
-from ivy.exceptions.exceptions import InvalidAttributeException
-from ivy.exceptions.exceptions import InvalidLoopException
-from ivy.plugin.parallel_plugin_collection import ParallelPluginCollection
-from ivy.workflow_manager import WorkflowManager
+from ivory import context
+from ivory.context import ctx
+from ivory.exceptions.exceptions import InvalidAttributeException
+from ivory.exceptions.exceptions import InvalidLoopException
+from ivory.plugin.parallel_plugin_collection import ParallelPluginCollection
+from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
 from test.plugin import range_map_plugin
 from test.plugin import sum_reduce_plugin

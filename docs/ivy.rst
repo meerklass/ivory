@@ -1,10 +1,10 @@
-ivy Package
+ivory Package
 ===========
 
-:mod:`ivy` Package
+:mod:`ivory` Package
 ------------------
 
-.. automodule:: ivy.__init__
+.. automodule:: ivory.__init__
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ ivy Package
 :mod:`backend` Module
 ---------------------
 
-.. automodule:: ivy.backend
+.. automodule:: ivory.backend
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ ivy Package
 :mod:`context` Module
 ---------------------
 
-.. automodule:: ivy.context
+.. automodule:: ivory.context
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ ivy Package
 :mod:`context_provider` Module
 ------------------------------
 
-.. automodule:: ivy.context_provider
+.. automodule:: ivory.context_provider
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ ivy Package
 :mod:`loop` Module
 ------------------
 
-.. automodule:: ivy.loop
+.. automodule:: ivory.loop
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ ivy Package
 :mod:`workflow_manager` Module
 ------------------------------
 
-.. automodule:: ivy.workflow_manager
+.. automodule:: ivory.workflow_manager
     :members:
     :undoc-members:
     :show-inheritance:
@@ -54,9 +54,9 @@ Subpackages
 
 .. toctree::
 
-    ivy.cli
-    ivy.config
-    ivy.exceptions
-    ivy.plugin
-    ivy.utils
+    ivory.cli
+    ivory.config
+    ivory.exceptions
+    ivory.plugin
+    ivory.utils
 

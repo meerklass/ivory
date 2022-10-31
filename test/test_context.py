@@ -1,12 +1,12 @@
 import pytest
 
-from ivy import context
-from ivy.context import loop_ctx
-from ivy.context import register
-from ivy.exceptions.exceptions import InvalidLoopException
-from ivy.loop import Loop
-from ivy.utils.struct import ImmutableStruct
-from ivy.utils.struct import Struct
+from ivory import context
+from ivory.context import loop_ctx
+from ivory.context import register
+from ivory.exceptions.exceptions import InvalidLoopException
+from ivory.loop import Loop
+from ivory.utils.struct import ImmutableStruct
+from ivory.utils.struct import Struct
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 

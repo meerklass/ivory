@@ -24,7 +24,7 @@ clean-pyc:
 	find . -name '__pycache__' -exec rm -rf {} +
 
 lint:
-	flake8 ivy test
+	flake8 ivory test
 
 test:
 	py.test
@@ -33,15 +33,15 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source ivy setup.py test
+	coverage run --source ivory setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/ivy.rst
+	rm -f docs/ivory.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ ivy
+	sphinx-apidoc -o docs/ ivory
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
