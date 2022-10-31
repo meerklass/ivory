@@ -3,6 +3,7 @@ from typing import Optional
 
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
 from ivory.plugin.abstract_plugin import AbstractPlugin
+from ivory.utils.config_section import ConfigSection
 from ivory.utils.struct import Struct
 
 
@@ -37,9 +38,18 @@ class PluginFactory:
     @staticmethod
     def _get_plugin_attribute(module) -> Optional[type[AbstractPlugin]]:
         """
-        Returns the first occuring (alphabetically) `class` in `module`
-        that ends with 'Plugin' and is not 'AbstractPlugin.
+        Returns the `class` in `module` that ends with 'Plugin' and is not 'AbstractPlugin.
+        :raise ValueError: if more than one valid `class` is found
         """
+        result = None
+        already_found = False
         for attribute in dir(module):
             if attribute.endswith('Plugin') and not attribute.startswith('Abstract') and not attribute.startswith('_'):
-                return getattr(module, attribute)
+                attribute = getattr(module, attribute)
+                if isinstance(attribute, ConfigSection):
+                    continue
+                if already_found:
+                    raise ValueError(f'Input `module` {module} contains more than one valid `Plugin`.')
+                result = attribute
+                already_found = True
+        return result

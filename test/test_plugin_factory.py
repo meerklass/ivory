@@ -35,14 +35,18 @@ class TestPluginFactory:
         except UnsupportedPluginTypeException as ex:
             assert True
 
-    def test_get_plugin_attribute(self):
+    def test_get_plugin_attribute_expect_value_error(self):
         mock_module = MagicMock(__dir__=MagicMock(return_value=[
             '_invalid',
             'MockPlugin',
             'AbstractInvalidPlugin',
             'SecondMockIsNotSeenPlugin'
         ]))
-        assert mock_module.MockPlugin == PluginFactory._get_plugin_attribute(module=mock_module)
+        try:
+            PluginFactory._get_plugin_attribute(module=mock_module)
+            assert False
+        except ValueError:
+            assert True
 
 
 if __name__ == '__main__':
