@@ -24,14 +24,15 @@ from typing import Optional
 from ivy.context import get_context_provider
 from ivy.loop import Loop
 from ivy.plugin.abstract_plugin import AbstractPlugin
-from ivy.utils.struct import Struct
+from ivy.utils.struct import Struct, ImmutableStruct
 from ivy.utils.timing import SimpleTiming
 from ivy.utils.timing import TimingCollection
 
 
 class SimpleMapPlugin(AbstractPlugin):
+    """ Simplest implementation of a plugin that returns its context when run. """
 
-    def run(self):
+    def run(self) -> list[ImmutableStruct]:
         return [self.ctx]
 
 
@@ -146,8 +147,7 @@ class CallableLoop:
 BACKEND_NAME_MAP = {"sequential": SequentialBackend,
                     "multiprocessing": MultiprocessingBackend,
                     "ipcluster": IpClusterBackend,
-                    "joblib": JoblibBackend,
-                    }
+                    "joblib": JoblibBackend}
 
 
 def create(ctx, force=None):
