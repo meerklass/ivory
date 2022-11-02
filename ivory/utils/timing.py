@@ -11,7 +11,7 @@ class SimpleTiming:
         self.duration = duration
 
     def __str__(self):
-        return "{0!s:30}: {1:>7.3f}s".format(self.name, self.duration)
+        return "{0!s:30}: {1:>7.0f} s".format(self.name, self.duration)
 
 
 class TimingCollection(SimpleTiming):
