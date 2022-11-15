@@ -1,11 +1,11 @@
 import time
-from struct import Struct
 from typing import Any
 
 from ivory.context import get_context_provider
 from ivory.loop import Loop
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.result import Result
+from ivory.utils.struct import Struct
 from ivory.utils.timing import SimpleTiming
 
 
