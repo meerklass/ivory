@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from ivory import context
 from ivory.utils.requirement import Requirement
 from ivory.utils.result import Result
-from ivory.utils.struct import Struct, ImmutableStruct
+from ivory.utils.struct import Struct
 
 
 class AbstractPlugin(ABC):
@@ -54,9 +54,3 @@ class AbstractPlugin(ABC):
     def set_result(self, result: Result):
         """ Appends `result` to `self.result`. """
         self.results.append(result)
-
-    def config_of_section(self, section_name: str) -> ImmutableStruct:
-        """ Returns the config given in a shared config section. """
-        if section_name in self.ctx.params:
-            return self.ctx.params[section_name]
-        return context.create_immutable_ctx()
