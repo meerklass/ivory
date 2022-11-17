@@ -12,14 +12,11 @@ from ivory.utils.timing import SimpleTiming
 class LoopRunner:
     """ Runs all plugins in a loop. """
 
-    def __init__(self, loop: Loop, parallel: bool = False):
+    def __init__(self, loop: Loop):
         self.loop = loop
-        self.parallel = parallel
 
     def __call__(self, ctx: Struct) -> Struct:
         """ Runs all plugins in `self.loop` on `ctx` and returns `ctx` afterwards. """
-        if self.parallel:
-            ctx.timings = []
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
