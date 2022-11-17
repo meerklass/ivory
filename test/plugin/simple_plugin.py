@@ -9,3 +9,6 @@ class SimplePlugin(AbstractPlugin):
     def run(self):
         if 'value' in self.config:
             print(self.config.value)
+
+    def set_requirements(self):
+        pass

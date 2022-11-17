@@ -1,12 +1,11 @@
 from pickle import dumps
 from pickle import loads
 
-from ivory import context
+import pytest
+
 from ivory.context import ctx
 from ivory.loop import Loop
-from ivory.plugin.parallel_plugin_collection import ParallelPluginCollection
 from ivory.utils.struct import Struct
-from ivory.workflow_manager import WorkflowManager
 
 PLUGIN_NAME = "test.plugin.simple_plugin"
 
@@ -37,29 +36,7 @@ class TestPickle:
         dumps_struct = dumps(struct)
         struct2 = loads(dumps_struct)
 
-    def test_parallel_plugin_collection_pickle(self):
-        ctx = context.ctx()
-
-        parallelPluginCollection = ParallelPluginCollection(
-            "ivory.plugin.simple_map_plugin",
-            ["ivory.plugin.simple_square_plugin"],
-            "ivory.plugin.simple_reduce_plugin")
-
-        sParallelPluginCollection = dumps(parallelPluginCollection)
-        parallelPluginCollectio2 = loads(sParallelPluginCollection)
-
     def test_context_pickle(self):
-        l_ctx = ctx()
-        s_l_ctx = dumps(l_ctx)
-        l_ctx2 = loads(s_l_ctx)
-
-    def test_workflow_context_pickle(self):
-        args = ["--Pipeline-backend=multiprocessing",
-                "--Pipeline-cpu-count=1",
-                "test.config.workflow_config_parallel"]
-
-        mgr = WorkflowManager(args)
-
         l_ctx = ctx()
         s_l_ctx = dumps(l_ctx)
         l_ctx2 = loads(s_l_ctx)
@@ -76,6 +53,4 @@ class TestPickle:
 
 
 if __name__ == '__main__':
-    #     pytest.main()
-    test = TestPickle()
-    test.test_loop_pickle()
+    pytest.main()
