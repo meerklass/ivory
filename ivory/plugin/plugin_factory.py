@@ -12,6 +12,7 @@ class PluginFactory:
     Simple factory creating instances of plugins
     """
 
+    # TODO(amadeus) this should hand over the config parameters directly to the plugins
     @staticmethod
     def create_instance(plugin_name: str, ctx: Struct) -> Optional[AbstractPlugin]:
         """
