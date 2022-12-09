@@ -4,7 +4,6 @@ import pytest
 
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.result import Result
-from ivory.utils.struct import Struct
 
 
 class MockPlugin(AbstractPlugin):
@@ -20,20 +19,13 @@ class MockPlugin(AbstractPlugin):
 
 class TestAbstractPlugin:
     def test_ini(self):
-        mock_ctx = Struct({'params': Struct({'MockPlugin': Struct({'mock_parameter': 1})})})
-        assert isinstance(MockPlugin(ctx=mock_ctx), MockPlugin)
+        assert isinstance(MockPlugin(), MockPlugin)
 
     def test_str(self):
-        mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
-        assert 'MockPlugin' == str(MockPlugin(ctx=mock_ctx))
-
-    def test_set_config(self):
-        mock_ctx = Struct({'params': Struct({'MockPlugin': Struct({'mock_parameter': 1})})})
-        assert 1 == MockPlugin(ctx=mock_ctx).config.mock_parameter
+        assert 'MockPlugin' == str(MockPlugin())
 
     def test_run(self):
-        mock_ctx = Struct({'params': Struct({'MockPlugin': 'mock_struct'})})
-        mock_plugin = MockPlugin(ctx=mock_ctx)
+        mock_plugin = MockPlugin()
         mock_plugin.run()
         assert 'mock_result' == mock_plugin.results[0].result
         assert isinstance(mock_plugin.results[0].location, MagicMock)
