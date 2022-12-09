@@ -6,4 +6,3 @@ class ConfigKeys(Enum):
     PARAMS = 'params'
     PLUGINS = 'plugins'
     PIPELINE = 'Pipeline'
-    CONTEXT_PROVIDER = 'context_provider'
