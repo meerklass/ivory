@@ -46,14 +46,6 @@ class WorkflowManager:
         if ConfigKeys.PLUGINS.value not in config.Pipeline.keys():
             raise InvalidAttributeException("plugins definition is missing")
 
-        if ConfigKeys.CONTEXT_PROVIDER.value in config.Pipeline.keys():
-            def get_context_provider_wrapper():
-                class_name = config.Pipeline[ConfigKeys.CONTEXT_PROVIDER.value]
-                module_name = ".".join(class_name.split(".")[:-1])
-                module = importlib.import_module(module_name)
-                return getattr(module, class_name.split(".")[-1])
-
-            context.get_context_provider = get_context_provider_wrapper
         ctx().params = context.create_immutable_ctx(**config)
         ctx().plugins = ctx().params.Pipeline.plugins
 
