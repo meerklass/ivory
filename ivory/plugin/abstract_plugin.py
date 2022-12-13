@@ -8,7 +8,7 @@ from ivory.utils.result import Result
 class AbstractPlugin(ABC):
     """
     Abstract base class for all plugins.
-    The config for a plugin is made accessible via `self.config
+    Inheritors can access config parameters via the `__init__()` call.
     The input arguments of the `run` method need to be defined in `cls.requirements`.
     """
 
