@@ -1,6 +1,8 @@
 import importlib
-from typing import Optional
+from types import ModuleType
+from typing import Optional, Any
 
+from ivory.config_keys import ConfigKeys
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.config_section import ConfigSection
@@ -12,7 +14,6 @@ class PluginFactory:
     Simple factory creating instances of plugins
     """
 
-    # TODO(amadeus) this should hand over the config parameters directly to the plugins
     @staticmethod
     def create_instance(plugin_name: str, ctx: Struct) -> Optional[AbstractPlugin]:
         """
@@ -33,11 +34,15 @@ class PluginFactory:
         except Exception as ex:
             raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % plugin_name, ex)
         plugin = PluginFactory._get_plugin_attribute(module)
+        if ConfigKeys.PARAMS.value in ctx and plugin.name in ctx.params:
+            config = ctx.params[plugin.name]
+        else:
+            config = {}
         if plugin is not None:
-            return plugin(ctx)
+            return plugin(**config)
 
     @staticmethod
-    def _get_plugin_attribute(module) -> Optional[type[AbstractPlugin]]:
+    def _get_plugin_attribute(module: ModuleType) -> Optional[type[AbstractPlugin]]:
         """
         Returns the `class` in `module` that ends with 'Plugin' and is not 'AbstractPlugin.
         :raise ValueError: if more than one valid `class` is found

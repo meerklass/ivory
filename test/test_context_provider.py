@@ -1,14 +1,8 @@
-import os
-
 import pytest
 
-from ivory import context
-from ivory.context import ctx
 from ivory.context_provider import DefaultContextProvider
-from ivory.context_provider import PickleContextProvider
 from ivory.utils.struct import ImmutableStruct
 from ivory.utils.struct import Struct
-from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 
@@ -27,7 +21,7 @@ class TestContextProvider(ContextSensitiveTest):
         assert isinstance(ctx, Struct)
         assert ctx.a == 3
 
-    def test_create_immu_ctx(self):
+    def test_create_immutable_ctx(self):
         ctx = DefaultContextProvider.create_immutable_context()
         assert isinstance(ctx, ImmutableStruct)
 
@@ -39,31 +33,6 @@ class TestContextProvider(ContextSensitiveTest):
         ctx = DefaultContextProvider.create_immutable_context(**args)
         assert isinstance(ctx, ImmutableStruct)
         assert ctx.a == 3
-
-
-class TestPickleContextProvider(ContextSensitiveTest):
-
-    def test_cust_ctx_provider(self):
-        context.global_ctx = None
-        args = ["test.config.workflow_config_cust"]
-
-        mgr = WorkflowManager(args)
-        mgr.launch()
-
-        assert ctx() is not None
-        from ivory.context import get_context_provider
-        assert get_context_provider() == PickleContextProvider
-
-    def test_storeContext(self, tmpdir):
-        path = str(tmpdir.join("le_ctx"))
-        ctx().ctx_file_name = path
-        PickleContextProvider.store_context()
-        assert os.path.exists(path)
-
-    def teardown(self):
-        # tidy up
-        print("tearing down " + __name__)
-        context.global_ctx = None
 
 
 if __name__ == '__main__':

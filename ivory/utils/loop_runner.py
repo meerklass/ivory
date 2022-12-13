@@ -1,7 +1,9 @@
+import os
+import pickle
 import time
 from typing import Any
 
-from ivory.context import get_context_provider
+from ivory.enum.context_storage_enum import ContextStorageEnum
 from ivory.loop import Loop
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.result import Result
@@ -24,8 +26,7 @@ class LoopRunner:
             plugin.run(**self._run_args(plugin=plugin, ctx=ctx))
             self._store_to_ctx(results=plugin.results, ctx=ctx)
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
-
-            get_context_provider().store_context()
+            self._store_ctx(ctx=ctx)
 
         self.loop.reset()
         self._print_timings(timings_list=ctx.timings)
@@ -42,6 +43,28 @@ class LoopRunner:
                 print('Overwriting is not allowed. Discard result...')
                 return
             ctx[result.location] = result
+
+    @staticmethod
+    def _store_ctx(ctx: Struct):
+        """
+        Store the `Struct` `ctx` to disc as a `pickle` using storage directory and file name contained in `ctx` itself.
+        If either of the keys `ContextStorageEnum.DIRECTORY` or `ContextStorageEnum.FILE_NAME` are missing
+        or pointing to `None` entries, nothing is done.
+        Both `ctx[ContextStorageEnum.DIRECTORY]` and `ctx[ContextStorageEnum.FILE_NAME]`
+        are set to `None` after storage.
+        """
+        try:
+            context_storage_directory = ctx[ContextStorageEnum.DIRECTORY]
+            context_file_name = ctx[ContextStorageEnum.FILE_NAME]
+        except KeyError:
+            return
+        if context_storage_directory is not None and context_file_name is not None:
+            file_name = os.path.join(context_storage_directory.result, context_file_name.result)
+            with open(file_name, "wb") as out_file:
+                pickle.dump(ctx, out_file)
+            # replace with `None` to make sure the context is only stored once under this name
+            ctx[ContextStorageEnum.DIRECTORY] = None
+            ctx[ContextStorageEnum.FILE_NAME] = None
 
     @staticmethod
     def _run_args(plugin: AbstractPlugin, ctx: Struct) -> dict[str, Any]:
