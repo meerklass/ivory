@@ -51,7 +51,7 @@ class TestLoop(ContextSensitiveTest):
             assert True
 
     def test_plugin_names(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         loop = Loop([PLUGIN_NAME, PLUGIN_NAME], ctx=mock_ctx)
 
         p = next(loop)
@@ -66,7 +66,7 @@ class TestLoop(ContextSensitiveTest):
             assert True
 
     def test_inner_loop(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
 
         loop = Loop(Loop([PLUGIN_NAME, PLUGIN_NAME], ctx=mock_ctx))
 
@@ -79,7 +79,7 @@ class TestLoop(ContextSensitiveTest):
             assert True
 
     def test_complex_loop(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         loop = Loop([PLUGIN_NAME,
                      Loop([PLUGIN_NAME,
                            PLUGIN_NAME], ctx=mock_ctx),
@@ -96,7 +96,7 @@ class TestLoop(ContextSensitiveTest):
             assert True
 
     def test_loop_iter(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         plugin_list = [PLUGIN_NAME, PLUGIN_NAME]
         loop = Loop(plugin_list, ctx=mock_ctx)
 
@@ -108,7 +108,7 @@ class TestLoop(ContextSensitiveTest):
         assert cnt == len(plugin_list)
 
     def test_loop_max_iter(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         max_iter = 3
         plugin_list = [PLUGIN_NAME, PLUGIN_NAME]
 
@@ -122,7 +122,7 @@ class TestLoop(ContextSensitiveTest):
         assert cnt == len(plugin_list) * max_iter
 
     def test_loop_max_iter_nested(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})}),
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})}),
                            'value': None})
         max_iter = 3
         plugin_list = [SimplePlugin(mock_ctx), SimplePlugin(mock_ctx)]
@@ -143,13 +143,13 @@ class TestLoop(ContextSensitiveTest):
         assert cnt == len(plugin_list) * max_iter * max_iter
 
     def test_loop_ctx(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         loop = Loop(PLUGIN_NAME, ctx=mock_ctx)
         ctx_ = loop_ctx(loop)
         assert isinstance(ctx_, WorkflowStruct)
 
     def test_unknown_plugin(self):
-        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'mock_parameter': 1})})})
+        mock_ctx = Struct({'params': Struct({'SimplePlugin': Struct({'value': 1})})})
         plugin = "unknown.plugin.invalid"
         loop = Loop(plugin, ctx=mock_ctx)
         try:
