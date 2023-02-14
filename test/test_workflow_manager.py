@@ -11,7 +11,7 @@ from ivory.utils.config_section import ConfigSection
 from ivory.utils.struct import Struct
 from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
-from test.plugin.simple_plugin import SimplePlugin
+from test.plugin.simple_plugin import SimplePlugin, SimpleEnum
 
 
 class TestWorkflowManager(ContextSensitiveTest):
@@ -25,6 +25,20 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx() is not None
         assert ctx().params is not None
         assert ctx().params.Pipeline.plugins is not None
+
+    def test_launch_expect_context_stored_to_hard_disc(self):
+        args = ["test.config.workflow_config_store_context"]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
+
+    def test_launch_expect_context_loaded_from_hard_disc(self):
+        args = ["test.config.workflow_config_load_context"]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
 
     def test_parse_args(self):
         args = ["--MockPlugin-a=True",
@@ -161,6 +175,16 @@ class TestWorkflowManager(ContextSensitiveTest):
             config_sections={'Pipeline': ConfigSection({ConfigKeys.PLUGINS.value: [SimplePlugin(Struct())]})}
         )
         assert isinstance(config.Pipeline.plugins, Loop)
+
+    def test_copy_results_from_context(self):
+        from enum import Enum
+        class MockEnum(Enum):
+            mock = 'mock'
+
+        WorkflowManager._copy_results_from_context(context_=Struct({'key': 'value',
+                                                                    MockEnum.mock: 'mock'}))
+        assert 'key' not in ctx()
+        assert MockEnum.mock in ctx()
 
 
 if __name__ == '__main__':
