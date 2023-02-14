@@ -26,6 +26,8 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params is not None
         assert ctx().params.Pipeline.plugins is not None
 
+    # TODO: add test for launch with context loaded from hard disc
+
     def test_parse_args(self):
         args = ["--MockPlugin-a=True",
                 "--MockPlugin-b=False",
@@ -161,6 +163,16 @@ class TestWorkflowManager(ContextSensitiveTest):
             config_sections={'Pipeline': ConfigSection({ConfigKeys.PLUGINS.value: [SimplePlugin(Struct())]})}
         )
         assert isinstance(config.Pipeline.plugins, Loop)
+
+    def test_copy_results_from_context(self):
+        from enum import Enum
+        class MockEnum(Enum):
+            mock = 'mock'
+
+        WorkflowManager._copy_results_from_context(context_=Struct({'key': 'value',
+                                                                    MockEnum.mock: 'mock'}))
+        assert 'key' not in ctx()
+        assert MockEnum.mock in ctx()
 
 
 if __name__ == '__main__':

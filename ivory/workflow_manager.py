@@ -1,4 +1,6 @@
 import importlib
+import pickle
+from enum import Enum
 from getopt import getopt
 from types import ModuleType
 from typing import Optional, Any
@@ -12,7 +14,7 @@ from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
 from ivory.utils.infer_type import InferType
 from ivory.utils.opt_helper import get_all_longopts, get_opt_parameter_dict
-from ivory.utils.struct import ImmutableStruct
+from ivory.utils.struct import ImmutableStruct, Struct
 
 
 class WorkflowManager:
@@ -48,6 +50,11 @@ class WorkflowManager:
 
         ctx().params = context.create_immutable_ctx(**config)
         ctx().plugins = ctx().params.Pipeline.plugins
+
+        if ConfigKeys.CONTEXT.value in config[ConfigKeys.PIPELINE.value]:
+            with open(config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], 'rb') as input_file:
+                context_from_disc = pickle.load(input_file)
+            self._copy_results_from_context(context_=context_from_disc)
 
     def _parse_args(self, argv: list[str]) -> ImmutableStruct:
         """ Parse the command line input `argv` and create and return an immutable context from it. """
@@ -116,3 +123,10 @@ class WorkflowManager:
                 and section_name != ConfigSection.name):
             if isinstance(config_section := getattr(config, section_name), ConfigSection):
                 return config_section
+
+    @staticmethod
+    def _copy_results_from_context(context_: Struct):
+        """ Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys. """
+        for key_, value_ in context_.items():
+            if isinstance(key_, Enum):
+                ctx()[key_] = value_
