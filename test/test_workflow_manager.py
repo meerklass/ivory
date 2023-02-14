@@ -11,7 +11,7 @@ from ivory.utils.config_section import ConfigSection
 from ivory.utils.struct import Struct
 from ivory.workflow_manager import WorkflowManager
 from test.ctx_sensitive_test import ContextSensitiveTest
-from test.plugin.simple_plugin import SimplePlugin
+from test.plugin.simple_plugin import SimplePlugin, SimpleEnum
 
 
 class TestWorkflowManager(ContextSensitiveTest):
@@ -26,7 +26,19 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params is not None
         assert ctx().params.Pipeline.plugins is not None
 
-    # TODO: add test for launch with context loaded from hard disc
+    def test_launch_expect_context_stored_to_hard_disc(self):
+        args = ["test.config.workflow_config_store_context"]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
+
+    def test_launch_expect_context_loaded_from_hard_disc(self):
+        args = ["test.config.workflow_config_load_context"]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
 
     def test_parse_args(self):
         args = ["--MockPlugin-a=True",
