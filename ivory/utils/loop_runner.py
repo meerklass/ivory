@@ -59,12 +59,13 @@ class LoopRunner:
         except KeyError:
             return
         if context_storage_directory is not None and context_file_name is not None:
-            file_name = os.path.join(context_storage_directory.result, context_file_name.result)
-            with open(file_name, "wb") as out_file:
-                pickle.dump(ctx, out_file)
-            # replace with `None` to make sure the context is only stored once under this name
-            ctx[ContextStorageEnum.DIRECTORY] = None
-            ctx[ContextStorageEnum.FILE_NAME] = None
+            if context_storage_directory.result is not None and context_file_name.result is not None:
+                file_name = os.path.join(context_storage_directory.result, context_file_name.result)
+                with open(file_name, "wb") as out_file:
+                    pickle.dump(ctx, out_file)
+                # replace with `None` to make sure the context is only stored once under this name
+                ctx[ContextStorageEnum.DIRECTORY] = None
+                ctx[ContextStorageEnum.FILE_NAME] = None
 
     @staticmethod
     def _run_args(plugin: AbstractPlugin, ctx: Struct) -> dict[str, Any]:
