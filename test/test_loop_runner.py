@@ -57,7 +57,10 @@ class TestLoopRunner(unittest.TestCase):
         self.assertIsNone(LoopRunner._store_ctx(ctx=context))
         mock_os.path.join.assert_called_once_with(mock_directory.result, mock_file_name.result)
         mock_open.assert_called_once_with(mock_os.path.join.return_value, 'wb')
-        mock_pickle.dump.assert_called_once_with(context, mock_open().__enter__())
+        mock_pickle.dump.assert_called_once_with(
+            Struct({ContextStorageEnum.DIRECTORY: None,
+                    ContextStorageEnum.FILE_NAME: None}), mock_open().__enter__()
+        )
 
     @patch('ivory.utils.loop_runner.os')
     def test_store_ctx_when_key_error_expect_nothing_done(self, mock_os):
