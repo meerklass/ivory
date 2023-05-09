@@ -39,7 +39,7 @@ class LoopRunner:
         Nothing is done if an entry is already stored under a `location` in `results` and overwriting is disabled.
         """
         for result in results:
-            if result.location in ctx and not ctx[result.location].allow_overwrite:
+            if result.location in ctx and ctx[result.location] is not None and not ctx[result.location].allow_overwrite:
                 print('Overwriting is not allowed. Discard result...')
                 return
             ctx[result.location] = result
