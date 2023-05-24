@@ -1,8 +1,4 @@
-import os
-
 from setuptools import setup, find_packages
-
-PACKAGE_PATH = os.path.abspath(os.path.join(__file__, os.pardir))
 
 setup(
     name='ivory',
@@ -10,9 +6,9 @@ setup(
     description='Ivory: Simple and flexible workflow engine ',
     author='',
     author_email='',
-    packages=find_packages(PACKAGE_PATH),
+    packages=find_packages(),
     install_requires=[
-        'numpy~=1.23.3',
+        'numpy~=1.23.5',
         'py~=1.11.0',
         'pytest~=7.1.3',
         'setuptools~=59.6.0',
