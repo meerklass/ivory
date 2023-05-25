@@ -16,3 +16,24 @@ Features
 * Helps to design and execute workflows
 * Clear and flexible API
 * Supports very simple to arbitrarily complex workflows
+
+Run
+--------
+The dependencies are listed in `ivory/requirements.txt` and can either be installed with
+
+.. code-block:: bash
+
+    pip install -r ivory/requirements.txt`
+
+
+or using
+
+.. code-block:: bash
+
+    pip install .
+
+from within the `ivory` root directory. `Ivory` is run from the main script `ivory/cli/main.py` and the usage is
+
+.. code-block:: bash
+
+    python ivory/cli/main.py [arguments] configuration

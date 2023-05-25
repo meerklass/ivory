@@ -8,7 +8,7 @@ setup(
     author_email='',
     packages=find_packages(),
     install_requires=[
-        'numpy~=1.23.5',
+        'numpy~=1.23.3',
         'py~=1.11.0',
         'pytest~=7.1.3',
         'setuptools~=59.6.0',
