@@ -43,3 +43,9 @@ output/*/index.html
 
 # Sphinx
 docs/_build
+
+# pycharm
+.idea/*
+
+# test cache files
+test/cache/*
