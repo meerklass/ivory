@@ -49,3 +49,6 @@ docs/_build
 
 # test cache files
 test/cache/*
+
+# VS Code
+.vscode/*
