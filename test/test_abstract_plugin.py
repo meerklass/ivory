@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import MagicMock
 
 import pytest
@@ -17,7 +18,16 @@ class MockPlugin(AbstractPlugin):
                                       result='mock_result'))
 
 
-class TestAbstractPlugin:
+class MockBrokenPluginn(AbstractPlugin):
+
+    def set_requirements(self):
+        pass
+
+    def run(self):
+        pass
+
+
+class TestAbstractPlugin(unittest.TestCase):
     def test_ini(self):
         assert isinstance(MockPlugin(), MockPlugin)
 
@@ -37,6 +47,9 @@ class TestAbstractPlugin:
         mock_plugin.set_result(result=mock_result_1)
         mock_plugin.set_result(result=mock_result_2)
         assert mock_plugin.results == [mock_result_1, mock_result_2]
+
+    def test_ini_when_wrong_name_expect_value_error(self):
+        self.assertRaises(ValueError, MockBrokenPluginn)
 
 
 if __name__ == '__main__':
