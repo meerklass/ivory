@@ -1,6 +1,6 @@
 import importlib
 from types import ModuleType
-from typing import Optional, Any
+from typing import Optional
 
 from ivory.config_keys import ConfigKeys
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
@@ -42,10 +42,11 @@ class PluginFactory:
             return plugin(**config)
 
     @staticmethod
-    def _get_plugin_attribute(module: ModuleType) -> Optional[type[AbstractPlugin]]:
+    def _get_plugin_attribute(module: ModuleType) -> type[AbstractPlugin]:
         """
         Returns the `class` in `module` that ends with 'Plugin' and is not 'AbstractPlugin.
         :raise ValueError: if more than one valid `class` is found
+        :raise ValueError: if no valid `class` is found
         """
         result = None
         already_found = False
@@ -58,4 +59,6 @@ class PluginFactory:
                     raise ValueError(f'Input `module` {module} contains more than one valid `Plugin`.')
                 result = attribute
                 already_found = True
+        if result is None:
+            raise ValueError(f'No valid plugin found in {module}. Typo? Does the class name end on `Plugin`?')
         return result
