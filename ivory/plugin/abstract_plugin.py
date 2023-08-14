@@ -16,6 +16,7 @@ class AbstractPlugin(ABC):
 
     def __init__(self):
         """ Initialise by setting an empty list of `Result`s and setting the requirements of `self.run()`. """
+        self._check_name()
         self.results: list[Result] = []
         self.set_requirements()
 
@@ -51,3 +52,8 @@ class AbstractPlugin(ABC):
         """
         self.set_result(Result(result=context_file_name, location=ContextStorageEnum.FILE_NAME, allow_overwrite=True))
         self.set_result(Result(result=context_directory, location=ContextStorageEnum.DIRECTORY, allow_overwrite=True))
+
+    def _check_name(self):
+        """ Raise a `ValueError` if `self.name` does not end on 'Plugin'. """
+        if not self.name.endswith('Plugin'):
+            raise ValueError(f'All plugins must have a name ending on "Plugin", got {self.name}.')

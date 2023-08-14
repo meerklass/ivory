@@ -38,10 +38,6 @@ class TestPluginFactory:
         mock_get_plugin_attribute().assert_called_once_with(**mock_config)
         assert mock_get_plugin_attribute()() == plugin
 
-    def test_get_plugin_attribute_expect_none(self):
-        mock_module = Mock()
-        assert None == PluginFactory._get_plugin_attribute(module=mock_module)
-
     def test_get_plugin_attribute(self):
         mock_module = Mock()
         mock_module.AbstractPlugin = Mock()  # this must be ignored
@@ -71,12 +67,25 @@ class TestPluginFactory:
         except UnsupportedPluginTypeException as ex:
             assert True
 
-    def test_get_plugin_attribute_expect_value_error(self):
+    def test_get_plugin_attribute_when_two_valid_plugins_expect_value_error(self):
         mock_module = MagicMock(__dir__=MagicMock(return_value=[
             '_invalid',
             'MockPlugin',
             'AbstractInvalidPlugin',
             'SecondMockIsNotSeenPlugin'
+        ]))
+        try:
+            PluginFactory._get_plugin_attribute(module=mock_module)
+            assert False
+        except ValueError:
+            assert True
+
+    def test_get_plugin_attribute_when_no_valid_plugin_expect_value_error(self):
+        mock_module = MagicMock(__dir__=MagicMock(return_value=[
+            '_invalid',
+            'MockPluginn',
+            'AbstractInvalidPlugin',
+            'SecondMockIsNotSeenPluginn'
         ]))
         try:
             PluginFactory._get_plugin_attribute(module=mock_module)
