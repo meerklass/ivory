@@ -22,7 +22,7 @@ class LoopRunner:
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
-            print(f'\n--> Running {str(plugin)}...')
+            print(f'\n--> Running {str(plugin)}...', flush=True)
             plugin.run(**self._run_args(plugin=plugin, ctx=ctx))
             self._store_to_ctx(results=plugin.results, ctx=ctx)
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
@@ -84,6 +84,6 @@ class LoopRunner:
     @staticmethod
     def _print_timings(timings_list: list[SimpleTiming]):
         """" Print a `list` of `SimpleTiming`s nicely. """
-        print('\n--> Timings:')
+        print('\n--> Timings:', flush=True)
         for timing in timings_list:
             print(timing)
