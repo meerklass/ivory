@@ -15,6 +15,10 @@ def _main(*argv):
         _usage()
         return
     argv = list(argv)
+    # Handle help flag before passing to WorkflowManager
+    if '--help' in argv or '-h' in argv:
+        _usage()
+        return
     mgr = WorkflowManager(argv)
     mgr.launch()
 
