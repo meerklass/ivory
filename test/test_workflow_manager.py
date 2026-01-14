@@ -225,6 +225,128 @@ TestSection = ConfigSection(
         with pytest.raises(FileNotFoundError):
             WorkflowManager(args)
 
+    def test_load_config_from_user_directory(self):
+        """Test that config can be loaded from a user-writable directory like home"""
+        import shutil
+        config_content = """
+from ivory.utils.config_section import ConfigSection
+
+Pipeline = ConfigSection(
+    plugins=["test.plugin.simple_plugin"],
+)
+
+SimplePlugin = ConfigSection(
+    value="loaded_from_user_dir",
+)
+"""
+        # Create config in a temporary user directory
+        temp_dir = tempfile.mkdtemp()
+        config_path = os.path.join(temp_dir, "user_config.py")
+        
+        try:
+            # Write config file
+            with open(config_path, 'w') as f:
+                f.write(config_content)
+            
+            # Test loading from the user directory
+            args = [config_path]
+            mgr = WorkflowManager(args)
+            
+            assert ctx().params is not None
+            assert ctx().params.Pipeline.plugins is not None
+            assert ctx().params.SimplePlugin.value == "loaded_from_user_dir"
+        finally:
+            # Clean up
+            shutil.rmtree(temp_dir)
+
+    def test_load_config_with_relative_path(self):
+        """Test that config can be loaded from a relative path"""
+        config_content = """
+from ivory.utils.config_section import ConfigSection
+
+Pipeline = ConfigSection(
+    plugins=["test.plugin.simple_plugin"],
+)
+
+SimplePlugin = ConfigSection(
+    value="relative_path_config",
+)
+"""
+        # Create config in current working directory
+        config_filename = "test_relative_config.py"
+        
+        try:
+            with open(config_filename, 'w') as f:
+                f.write(config_content)
+            
+            # Test loading with relative path
+            args = [f"./{config_filename}"]
+            mgr = WorkflowManager(args)
+            
+            assert ctx().params is not None
+            assert ctx().params.SimplePlugin.value == "relative_path_config"
+        finally:
+            # Clean up
+            if os.path.exists(config_filename):
+                os.unlink(config_filename)
+
+    def test_load_config_with_command_line_overrides(self):
+        """Test that command line arguments properly override file-based config"""
+        config_content = """
+from ivory.utils.config_section import ConfigSection
+
+Pipeline = ConfigSection(
+    plugins=["test.plugin.simple_plugin"],
+)
+
+SimplePlugin = ConfigSection(
+    value="original_value",
+    count=100,
+)
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(config_content)
+            temp_config_path = f.name
+        
+        try:
+            # Test with command line override
+            args = ["--SimplePlugin-value=overridden", "--SimplePlugin-count=200", temp_config_path]
+            mgr = WorkflowManager(args)
+            
+            assert ctx().params.SimplePlugin.value == "overridden"
+            assert ctx().params.SimplePlugin.count == 200
+        finally:
+            os.unlink(temp_config_path)
+
+    def test_load_config_and_run_workflow(self):
+        """Integration test: load config from file and run complete workflow"""
+        config_content = """
+from ivory.utils.config_section import ConfigSection
+
+Pipeline = ConfigSection(
+    plugins=["test.plugin.simple_plugin"],
+)
+
+SimplePlugin = ConfigSection(
+    value="workflow_test",
+)
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(config_content)
+            temp_config_path = f.name
+        
+        try:
+            # Load and launch workflow
+            args = [temp_config_path]
+            mgr = WorkflowManager(args)
+            mgr.launch()
+            
+            # Verify workflow completed successfully
+            assert ctx().timings is not None
+            assert len(ctx().timings) > 0
+        finally:
+            os.unlink(temp_config_path)
+
 
 if __name__ == '__main__':
     pytest.main()

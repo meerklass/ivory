@@ -17,23 +17,46 @@ Features
 * Clear and flexible API
 * Supports very simple to arbitrarily complex workflows
 
-Run
---------
-The dependencies are listed in `ivory/requirements.txt` and can either be installed with
+Installation
+------------
 
-.. code-block:: bash
-
-    pip install -r ivory/requirements.txt`
-
-
-or using
+Install ivory using pip:
 
 .. code-block:: bash
 
     pip install .
 
-from within the `ivory` root directory. `Ivory` is run from the main script `ivory/cli/main.py` and the usage is
+from within the `ivory` root directory.
+
+For development mode:
 
 .. code-block:: bash
 
-    python ivory/cli/main.py [arguments] configuration
+    pip install -e .
+
+Usage
+-----
+
+Ivory can be run from the command line:
+
+.. code-block:: bash
+
+    ivory [arguments] configuration
+
+The configuration can be specified in two ways:
+
+1. **Python module path** (traditional):
+
+   .. code-block:: bash
+
+       ivory --param=value mypackage.config.workflow
+
+2. **File path** (new in v3.0.0):
+
+   .. code-block:: bash
+
+       ivory --param=value /path/to/config.py
+       ivory --param=value ./config.py
+       ivory --param=value ~/my_workflow_config.py
+
+This allows you to place configuration files anywhere without requiring them to be part of an installed Python package.

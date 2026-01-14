@@ -24,11 +24,20 @@ class WorkflowManager:
     """
     Manages the workflow process by loading the passed config and
     parsing the passed arguments and then iterating through the plugins.
+    
+    The configuration can be specified as either:
+    - A Python module name (e.g., 'mypackage.config.workflow')
+    - A file path (e.g., '/path/to/config.py', './config.py', '~/config.py')
+    
+    Configuration files must contain ConfigSection objects defining the pipeline
+    and plugin parameters.
     """
 
     def __init__(self, argv: list[str]):
         """
-        :param argv: command line input
+        Initialize the WorkflowManager with command line arguments.
+        
+        :param argv: command line input, last argument should be config module name or file path
         """
         self._setup(argv=argv)
 

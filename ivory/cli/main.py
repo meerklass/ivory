@@ -25,26 +25,46 @@ def _main(*argv):
 
 def _usage():
     """
-    Return usage of the main ivory call and an example.
+    Return usage of the main ivory call and examples.
     """
 
     usage = """
-    **ivory workflow engine**
+    **Ivory Workflow Engine**
     
     Usage:
-    ivory [arguments] configuration
+        ivory [--argument=value ...] <configuration>
     
-    The configuration can be either:
-    - A Python module path (e.g., ivory.config.workflow)
-    - A file path (e.g., /path/to/config.py or ./config.py)
+    Configuration:
+        The configuration can be specified in two ways:
+        
+        1. Python module path:
+           - Example: ivory.config.workflow
+           - Requires the module to be installed or in PYTHONPATH
+        
+        2. File path (new in v3.0.0):
+           - Absolute path: /home/user/my_config.py
+           - Relative path: ./my_config.py
+           - Home directory: ~/my_config.py
+           - Allows configs to be placed anywhere without installation
     
-    Only arguments already preconfigured in the given configuration will be accepted.
-    Note: Dashed '-' will be converted into underlines '_' for all the arguments
+    Arguments:
+        Command-line arguments override configuration file values.
+        Format: --SectionName-parameter=value
+        
+        Note: Dashes '-' in argument names are converted to underscores '_'
     
     Examples:
-    - ivory --size-x=100 --size-y=100 ivory.config.random
-    - ivory --size-x=100 --size-y=100 /home/user/my_config.py
-    - ivory ./workflow_config.py
+        # Using module path
+        ivory --SimplePlugin-value=100 mypackage.config.workflow
+        
+        # Using file paths
+        ivory --param=value /home/user/config.py
+        ivory ./workflow_config.py
+        ivory ~/my_workflow.py
+        
+    Help:
+        ivory --help    Show this help message
+        ivory -h        Show this help message
     """
     print(usage)
 

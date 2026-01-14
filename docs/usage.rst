@@ -2,63 +2,114 @@
 Usage
 ========
 
+Command Line Usage
+------------------
+
+Ivory can be used from the command line with either module paths or file paths:
+
+**Using a Python module path (traditional)**::
+
+	$ ivory --size-x=100 --size-y=100 mypackage.config.workflow
+
+**Using a file path (new in v3.0.0)**::
+
+	$ ivory --size-x=100 --size-y=100 /path/to/config.py
+	$ ivory --param=value ./my_config.py
+	$ ivory ~/workflow_config.py
+
+The file path approach allows you to place configuration files anywhere on your filesystem
+without requiring them to be part of an installed Python package.
+
+Programmatic Usage
+------------------
+
 To use ivory workflow engine in a project::
 
 	from ivory.workflow_manager import WorkflowManager
-	args = ["--size-x=100",
-		"--size-y=100", 
-		"ufig.config.random"]
-        
+	
+	# Using module path
+	args = ["--size-x=100", "--size-y=100", "mypackage.config.workflow"]
 	mgr = WorkflowManager(args)
 	mgr.launch()
-    
-alternatively ivory can also be used from the command line::
-
-	$ ivory --size-x=100 --size-y=100 ufig.config.random
 	
+	# Using file path
+	args = ["--size-x=100", "--size-y=100", "/path/to/config.py"]
+	mgr = WorkflowManager(args)
+	mgr.launch()
 	
-A configuration can range form very simple to arbitrarily complex. 
 
-In the simplest case the configuration file would look something like::
+Configuration Files
+-------------------
 
-	from ivory.config import base_config
+A configuration can range from very simple to arbitrarily complex.
 
-	plugins = ["test.plugin.simple_plugin",
-           	"test.plugin.simple_plugin"
-                ]
+In the simplest case, the configuration file would look something like::
 
-Importing basic functionality from `base_config` and defining a list of plugins.
+	from ivory.utils.config_section import ConfigSection
+
+	Pipeline = ConfigSection(
+	    plugins=[
+	        "test.plugin.simple_plugin",
+	        "test.plugin.simple_plugin"
+	    ],
+	)
+
+This defines a Pipeline section with a list of plugins to execute.
+
+Each plugin can have its own configuration section::
+
+	SimplePlugin = ConfigSection(
+	    parameter1="value1",
+	    parameter2=100,
+	)
 
 
-A slightly more complex use case would look something like::
+A more complex use case with nested loops would look like::
 
-	from ivory.config import base_config
+	from ivory.utils.config_section import ConfigSection
 	from ivory.loop import Loop
 	from ivory.utils.stop_criteria import RangeStopCriteria
 
-	context_provider = "ivory.context_provider.PickleContextProvider"
-	ctx_file_name = "ivory_cxt.dump"
+	Pipeline = ConfigSection(
+	    plugins=Loop([
+	        "test.plugin.simple_plugin",
+	        Loop([
+	            "test.plugin.simple_plugin",
+	            "test.plugin.simple_plugin"
+	        ], stop=RangeStopCriteria(max_iter=5)),
+	        "test.plugin.simple_plugin"
+	    ], stop=RangeStopCriteria(max_iter=2)),
+	)
 
-	plugins = Loop(["test.plugin.simple_plugin",
-			Loop(["test.plugin.simple_plugin",
-			      "test.plugin.simple_plugin"], 
-			      stop=RangeStopCriteria(max_iter=5)),
-			"test.plugin.simple_plugin"], 
-			stop=RangeStopCriteria(max_iter=2))
+	SimplePlugin = ConfigSection(
+	    a=1.5,
+	    b=["omega", "lambda", "gamma"],
+	    c=None,
+	)
 
-	a=1.5
-	b=["omega", "lambda", "gamma"]
-	c=None
+This creates nested loops where the inner loop executes 5 times and the outer loop twice.
 
-Configures the 'PickleContextProvider' as context provider which ensures that 
-the context is persisted to the file "ivory_ctx.dump" after every execution of a plugin
+The SimplePlugin configuration defines parameters 'a', 'b', and 'c'. Parameter types are
+automatically inferred from values. These can be overridden from the command line::
 
-The list of plugins consists of two nested loops. Each having two plugins. The inner lopp will be 
-executed 5 times and the outer loop twice.
+	$ ivory --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False /path/to/config.py
 
-Furthermore the config defines the attributes 'a', 'b' and c where 'a' is a float and 'b' a list of strings
-and c is a NoneType. The type of c will automatically be inferred from the given value from the command line.
+Note that command-line arguments use the format ``--SectionName-parameter=value``.
 
-Calling this config and overriding the attributes from the command line would look something like this::
+Context Persistence
+-------------------
 
-	$ ivory --a=1.75 --b=zeta,beta,gamma --c=False package.subpackage.module
+To save the workflow context after specific plugins, use the ``store_context_to_disc`` method
+in your plugin's ``run()`` method::
+
+	self.store_context_to_disc(
+	    context_directory='./results/',
+	    context_file_name='workflow_checkpoint.pickle'
+	)
+
+To resume from a saved context, specify it in your Pipeline configuration::
+
+	Pipeline = ConfigSection(
+	    plugins=[...],
+	    context='./results/workflow_checkpoint.pickle',
+	)
