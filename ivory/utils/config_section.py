@@ -1,5 +1,6 @@
 class ConfigSection(dict):
-    """ Class to represent the config file sections. """
+    """Class to represent the config file sections."""
+
     @classmethod
     @property
     def name(self):

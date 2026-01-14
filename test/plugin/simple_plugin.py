@@ -17,14 +17,13 @@ class SimplePlugin(AbstractPlugin):
     def run(self):
         if self.value is not None:
             print(self.value)
-        if self.value == 'store':
+        if self.value == "store":
             self.set_result(result=Result(location=SimpleEnum.simple, result=1))
-            self.store_context_to_disc(context_directory='cache/',
-                                       context_file_name='simple_plugin.pickle')
+            self.store_context_to_disc(context_directory="cache/", context_file_name="simple_plugin.pickle")
 
     def set_requirements(self):
         pass
 
 
 class SimpleEnum(Enum):
-    simple = 'simple'
+    simple = "simple"

@@ -3,7 +3,7 @@ Contributing
 ============
 
 Contributions are welcome, and they are greatly appreciated! Every
-little bit helps, and credit will always be given. 
+little bit helps, and credit will always be given.
 
 You can contribute in many ways:
 
@@ -51,13 +51,69 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.10 and for PyPy.
-   make sure that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.10, 3.11, and 3.12.
+   GitHub Actions will automatically run tests for all supported Python versions.
 
+
+Development Setup
+-----------------
+
+1. Fork the repository and clone your fork
+2. Create a virtual environment and install dependencies::
+
+    $ python -m venv venv
+    $ source venv/bin/activate  # On Windows: venv\Scripts\activate
+    $ pip install -r requirements.txt
+
+3. Set up pre-commit hooks (recommended)::
+
+    $ pip install pre-commit
+    $ pre-commit install
+
+   This will automatically run linting and formatting checks before each commit.
+
+4. Run the test suite::
+
+    $ pytest
+
+5. Manual code quality checks::
+
+    $ ruff check ivory/ test/          # Check for issues
+    $ ruff check --fix ivory/ test/    # Auto-fix issues
+    $ ruff format ivory/ test/         # Format code
+    $ pre-commit run --all-files       # Run all pre-commit hooks
+
+6. Build the documentation::
+
+    $ cd docs
+    $ pip install -r requirements.txt
+    $ make html
 
 Tips
 ----
 
 To run a subset of tests::
 
-	 $ py.test test/test_ivory.py
+    $ pytest test/test_ivory.py
+
+To run tests with coverage::
+
+    $ pytest --cov=ivory --cov-report=html
+
+Continuous Integration
+----------------------
+
+GitHub Actions automatically runs on every pull request:
+
+- **Tests**: Runs the test suite on Python 3.10, 3.11, and 3.12
+- **Linting**: Checks code style with ruff (both linting and formatting)
+- **Documentation**: Verifies that documentation builds successfully
+
+All checks must pass before a pull request can be merged.
+
+Documentation
+-------------
+
+Documentation is hosted at https://ivory.readthedocs.io/
+
+For information about setting up Read the Docs access, see ``docs/READTHEDOCS_SETUP.md``

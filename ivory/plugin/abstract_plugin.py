@@ -15,33 +15,33 @@ class AbstractPlugin(ABC):
     requirements: list[Requirement] = []
 
     def __init__(self):
-        """ Initialise by setting an empty list of `Result`s and setting the requirements of `self.run()`. """
+        """Initialise by setting an empty list of `Result`s and setting the requirements of `self.run()`."""
         self._check_name()
         self.results: list[Result] = []
         self.set_requirements()
 
     def __str__(self):
-        """ Returns the name of the plugin class. """
+        """Returns the name of the plugin class."""
         return self.name
 
     @abstractmethod
     def run(self, **kwargs):
-        """ Run the plugin and store results. """
+        """Run the plugin and store results."""
         pass
 
     @abstractmethod
     def set_requirements(self):
-        """ Set the requirements of `self`, i.e. the arguments of `self.run()`. """
+        """Set the requirements of `self`, i.e. the arguments of `self.run()`."""
         self.requirements = []
 
     @classmethod
     @property
     def name(self):
-        """ Returns the name of `self`. """
+        """Returns the name of `self`."""
         return self.__name__
 
     def set_result(self, result: Result):
-        """ Appends `result` to `self.result`. """
+        """Appends `result` to `self.result`."""
         self.results.append(result)
 
     def store_context_to_disc(self, context_file_name: str, context_directory: str):
@@ -54,6 +54,6 @@ class AbstractPlugin(ABC):
         self.set_result(Result(result=context_directory, location=ContextStorageEnum.DIRECTORY, allow_overwrite=True))
 
     def _check_name(self):
-        """ Raise a `ValueError` if `self.name` does not end on 'Plugin'. """
-        if not self.name.endswith('Plugin'):
+        """Raise a `ValueError` if `self.name` does not end on 'Plugin'."""
+        if not self.name.endswith("Plugin"):
             raise ValueError(f'All plugins must have a name ending on "Plugin", got {self.name}.')

@@ -6,6 +6,4 @@ Pipeline = ConfigSection(
     plugins=["test.plugin.simple_plugin"],
 )
 
-SimplePlugin = ConfigSection(
-    value=1
-)
+SimplePlugin = ConfigSection(value=1)
