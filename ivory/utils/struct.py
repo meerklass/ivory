@@ -5,10 +5,10 @@ from ivory.exceptions.exceptions import IllegalAccessException
 
 
 class WorkflowState(Enum):
-    RUN = 'RUN'
-    STOP = 'STOP'
-    EXIT = 'EXIT'
-    RESUME = 'RESUME'
+    RUN = "RUN"
+    STOP = "STOP"
+    EXIT = "EXIT"
+    RESUME = "RESUME"
 
 
 class ImmutableStruct(abc.MutableMapping):
@@ -58,7 +58,7 @@ class ImmutableStruct(abc.MutableMapping):
             self.__dict__[key] = value
 
     def __setitem__(self, key, value):
-        raise IllegalAccessException("Trying to modify immutable struct with: %s=%s" % (str(key), str(value)))
+        raise IllegalAccessException(f"Trying to modify immutable struct with: {str(key)}={str(value)}")
 
     def __delitem__(self, key):
         raise IllegalAccessException(f'Trying to delete item "{key}" of immutable struct.')
@@ -67,7 +67,7 @@ class ImmutableStruct(abc.MutableMapping):
         raise IllegalAccessException(f'Trying to delete attribute "{key}" of immutable struct.')
 
     def __setattr__(self, key, value):
-        raise IllegalAccessException(f'Trying to modify immutable struct {key}={value}.')
+        raise IllegalAccessException(f"Trying to modify immutable struct {key}={value}.")
 
     def __getitem__(self, key):
         return self.__dict__[key]
@@ -76,15 +76,14 @@ class ImmutableStruct(abc.MutableMapping):
         return len(self.__dict__)
 
     def __iter__(self):
-        for i in self.__dict__:
-            yield i
+        yield from self.__dict__
 
     def __str__(self):
-        """ Returns a nicely formatted `str` of `self`. """
-        str = '{\n'
+        """Returns a nicely formatted `str` of `self`."""
+        str = "{\n"
         for key, value in self.items():
-            str += f'{key}={value}\n'
-        str += '}'
+            str += f"{key}={value}\n"
+        str += "}"
         return str
 
     def copy(self):

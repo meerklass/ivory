@@ -17,7 +17,7 @@ def execute(args):
     """
     Runs a workflow for the given arguments.
     :param args: list of arguments which should be passed to ivory. The last argument has to be the config
-    
+
     :returns: the global_ctx
     """
     mgr = WorkflowManager(args)

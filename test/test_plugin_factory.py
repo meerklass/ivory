@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -13,27 +13,27 @@ PLUGIN_NAME = "test.plugin.simple_plugin"
 
 
 class TestPluginFactory:
-
-    @patch('ivory.plugin.plugin_factory.importlib')
-    @patch.object(PluginFactory, '_get_plugin_attribute')
+    @patch("ivory.plugin.plugin_factory.importlib")
+    @patch.object(PluginFactory, "_get_plugin_attribute")
     def test_create_instance_when_context_empty(self, mock_get_plugin_attribute, mock_importlib):
-        plugin = PluginFactory.create_instance(plugin_name='plugin_name', ctx=Struct())
-        mock_importlib.import_module.assert_called_once_with('plugin_name')
+        plugin = PluginFactory.create_instance(plugin_name="plugin_name", ctx=Struct())
+        mock_importlib.import_module.assert_called_once_with("plugin_name")
         mock_get_plugin_attribute.assert_called_once_with(mock_importlib.import_module())
         mock_get_plugin_attribute().assert_called_once()
         assert mock_get_plugin_attribute()() == plugin
 
-    @patch('ivory.plugin.plugin_factory.importlib')
-    @patch.object(PluginFactory, '_get_plugin_attribute')
+    @patch("ivory.plugin.plugin_factory.importlib")
+    @patch.object(PluginFactory, "_get_plugin_attribute")
     def test_create_instance(self, mock_get_plugin_attribute, mock_importlib):
-        mock_config = {'mock': Mock()}
-        context = Struct({
-            ConfigKeys.PARAMS.value: {'plugin_name': mock_config},
-
-        })
-        mock_get_plugin_attribute.return_value.name = 'plugin_name'
-        plugin = PluginFactory.create_instance(plugin_name='plugin_name', ctx=context)
-        mock_importlib.import_module.assert_called_once_with('plugin_name')
+        mock_config = {"mock": Mock()}
+        context = Struct(
+            {
+                ConfigKeys.PARAMS.value: {"plugin_name": mock_config},
+            }
+        )
+        mock_get_plugin_attribute.return_value.name = "plugin_name"
+        plugin = PluginFactory.create_instance(plugin_name="plugin_name", ctx=context)
+        mock_importlib.import_module.assert_called_once_with("plugin_name")
         mock_get_plugin_attribute.assert_called_once_with(mock_importlib.import_module())
         mock_get_plugin_attribute().assert_called_once_with(**mock_config)
         assert mock_get_plugin_attribute()() == plugin
@@ -52,28 +52,27 @@ class TestPluginFactory:
     def test_unknown_module(self):
         plugin_name = "unknown.plugin.invalid"
         try:
-            plugin = PluginFactory.create_instance(plugin_name, ctx())
+            PluginFactory.create_instance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
-        except UnsupportedPluginTypeException as ex:
+        except UnsupportedPluginTypeException:
             assert True
 
     def test_invalid_module(self):
         plugin_name = "ivory.plugin.AbstractPlugin"
         try:
-            plugin = PluginFactory.create_instance(plugin_name, ctx())
+            PluginFactory.create_instance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
-        except UnsupportedPluginTypeException as ex:
+        except UnsupportedPluginTypeException:
             assert True
 
     def test_get_plugin_attribute_when_two_valid_plugins_expect_value_error(self):
-        mock_module = MagicMock(__dir__=MagicMock(return_value=[
-            '_invalid',
-            'MockPlugin',
-            'AbstractInvalidPlugin',
-            'SecondMockIsNotSeenPlugin'
-        ]))
+        mock_module = MagicMock(
+            __dir__=MagicMock(
+                return_value=["_invalid", "MockPlugin", "AbstractInvalidPlugin", "SecondMockIsNotSeenPlugin"]
+            )
+        )
         try:
             PluginFactory._get_plugin_attribute(module=mock_module)
             assert False
@@ -81,12 +80,11 @@ class TestPluginFactory:
             assert True
 
     def test_get_plugin_attribute_when_no_valid_plugin_expect_value_error(self):
-        mock_module = MagicMock(__dir__=MagicMock(return_value=[
-            '_invalid',
-            'MockPluginn',
-            'AbstractInvalidPlugin',
-            'SecondMockIsNotSeenPluginn'
-        ]))
+        mock_module = MagicMock(
+            __dir__=MagicMock(
+                return_value=["_invalid", "MockPluginn", "AbstractInvalidPlugin", "SecondMockIsNotSeenPluginn"]
+            )
+        )
         try:
             PluginFactory._get_plugin_attribute(module=mock_module)
             assert False
@@ -94,5 +92,5 @@ class TestPluginFactory:
             assert True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

@@ -1,5 +1,4 @@
-from pickle import dumps
-from pickle import loads
+from pickle import dumps, loads
 
 import pytest
 
@@ -34,12 +33,12 @@ class TestPickle:
         struct.params = Struct(backend="multiprocessing")
 
         dumps_struct = dumps(struct)
-        struct2 = loads(dumps_struct)
+        loads(dumps_struct)
 
     def test_context_pickle(self):
         l_ctx = ctx()
         s_l_ctx = dumps(l_ctx)
-        l_ctx2 = loads(s_l_ctx)
+        loads(s_l_ctx)
 
     def test_iter_list_can_pickle(self):
         list_iter_expect = iter(["a", "b", "c"])
@@ -52,5 +51,5 @@ class TestPickle:
             assert expect == value
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

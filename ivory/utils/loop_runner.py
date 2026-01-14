@@ -12,17 +12,17 @@ from ivory.utils.timing import SimpleTiming
 
 
 class LoopRunner:
-    """ Runs all plugins in a loop. """
+    """Runs all plugins in a loop."""
 
     def __init__(self, loop: Loop):
         self.loop = loop
 
     def __call__(self, ctx: Struct) -> Struct:
-        """ Runs all plugins in `self.loop` on `ctx` and returns `ctx` afterwards. """
+        """Runs all plugins in `self.loop` on `ctx` and returns `ctx` afterwards."""
         self.loop.ctx = ctx
         for plugin in self.loop:
             start = time.time()
-            print(f'\n--> Running {str(plugin)}...', flush=True)
+            print(f"\n--> Running {str(plugin)}...", flush=True)
             plugin.run(**self._run_args(plugin=plugin, ctx=ctx))
             self._store_to_ctx(results=plugin.results, ctx=ctx)
             ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
@@ -39,9 +39,10 @@ class LoopRunner:
         Nothing is done if an entry is already stored under a `location` in `results` and overwriting is disabled.
         """
         for result in results:
-            if result.location in ctx and (ctx[result.location] is not None
-                                           and not ctx[result.location].allow_overwrite):
-                print('Overwriting is not allowed. Discard result...')
+            if result.location in ctx and (
+                ctx[result.location] is not None and not ctx[result.location].allow_overwrite
+            ):
+                print("Overwriting is not allowed. Discard result...")
                 return
             ctx[result.location] = result
 
@@ -77,13 +78,13 @@ class LoopRunner:
         arguments = {}
         for requirement in plugin.requirements:
             if requirement.location not in ctx:
-                raise ValueError(f'Requirement {requirement.location} of {plugin.name} is not met.')
+                raise ValueError(f"Requirement {requirement.location} of {plugin.name} is not met.")
             arguments[requirement.variable] = ctx[requirement.location].result
         return arguments
 
     @staticmethod
     def _print_timings(timings_list: list[SimpleTiming]):
-        """" Print a `list` of `SimpleTiming`s nicely. """
-        print('\n--> Timings:', flush=True)
+        """ " Print a `list` of `SimpleTiming`s nicely."""
+        print("\n--> Timings:", flush=True)
         for timing in timings_list:
             print(timing)

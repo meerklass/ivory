@@ -1,6 +1,5 @@
 import importlib
 from types import ModuleType
-from typing import Optional
 
 from ivory.config_keys import ConfigKeys
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
@@ -15,7 +14,7 @@ class PluginFactory:
     """
 
     @staticmethod
-    def create_instance(plugin_name: str, ctx: Struct) -> Optional[AbstractPlugin]:
+    def create_instance(plugin_name: str, ctx: Struct) -> AbstractPlugin | None:
         """
         Instantiates the given plugin from its module string (like a python import).
         Expects that this module contains exactly one class with name starting on a capital letter and ending on
@@ -28,11 +27,11 @@ class PluginFactory:
         try:
             module = importlib.import_module(plugin_name)
         except ImportError as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be loaded" % plugin_name, ex)
-        except AttributeError as ex:
-            raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % plugin_name)
+            raise UnsupportedPluginTypeException(f"Module '{plugin_name}' could not be loaded", ex)
+        except AttributeError:
+            raise UnsupportedPluginTypeException(f"Module '{plugin_name}' has no class definition 'Plugin(ctx)'")
         except Exception as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % plugin_name, ex)
+            raise UnsupportedPluginTypeException(f"Module '{plugin_name}' could not be instantiated'", ex)
         plugin = PluginFactory._get_plugin_attribute(module)
         if ConfigKeys.PARAMS.value in ctx and plugin.name in ctx.params:
             config = ctx.params[plugin.name]
@@ -51,14 +50,14 @@ class PluginFactory:
         result = None
         already_found = False
         for attribute in dir(module):
-            if attribute.endswith('Plugin') and not attribute.startswith('Abstract') and not attribute.startswith('_'):
+            if attribute.endswith("Plugin") and not attribute.startswith("Abstract") and not attribute.startswith("_"):
                 attribute = getattr(module, attribute)
                 if isinstance(attribute, ConfigSection):
                     continue
                 if already_found:
-                    raise ValueError(f'Input `module` {module} contains more than one valid `Plugin`.')
+                    raise ValueError(f"Input `module` {module} contains more than one valid `Plugin`.")
                 result = attribute
                 already_found = True
         if result is None:
-            raise ValueError(f'No valid plugin found in {module}. Typo? Does the class name end on `Plugin`?')
+            raise ValueError(f"No valid plugin found in {module}. Typo? Does the class name end on `Plugin`?")
         return result

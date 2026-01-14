@@ -1,10 +1,10 @@
-from typing import Generator, Any
+from collections.abc import Generator
+from typing import Any
 
 from ivory.plugin.abstract_parallel_joblib_plugin import AbstractParallelJoblibPlugin
 
 
 class MockPlugin(AbstractParallelJoblibPlugin):
-
     def run_job(self, anything: Any) -> Any:
         pass
 

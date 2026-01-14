@@ -1,28 +1,30 @@
-from typing import List, Optional
+from __future__ import annotations
 
 from ivory import context
 from ivory.context import loop_ctx
-from ivory.exceptions.exceptions import InvalidLoopException
-from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.exceptions.exceptions import InvalidLoopException, UnsupportedPluginTypeException
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.plugin.plugin_factory import PluginFactory
-from ivory.utils.stop_criteria import SimpleStopCriteria, AbstractStopCriteria
-from ivory.utils.struct import WorkflowState, Struct
+from ivory.utils.stop_criteria import AbstractStopCriteria, SimpleStopCriteria
+from ivory.utils.struct import Struct, WorkflowState
 
 
 class Loop:
     """
-    Implementation of a loop. 
-    
+    Implementation of a loop.
+
     :param plugin_list: List of plugin or inner :class:`Loop`
     :param stop: (optional) stop criteria
     """
 
     _current_plugin = None
 
-    def __init__(self, plugin_list: str | List[str] | AbstractPlugin | List[AbstractPlugin] | 'Loop',
-                 stop: AbstractStopCriteria = None,
-                 ctx: Optional[Struct] = None):
+    def __init__(
+        self,
+        plugin_list: str | list[str] | AbstractPlugin | list[AbstractPlugin] | Loop,
+        stop: AbstractStopCriteria | None = None,
+        ctx: Struct | None = None,
+    ):
         """
         Very broad options for input `plugin_list`. If they come as some form of `str`, the input `ctx` must be given
         to instantiate them.
@@ -49,23 +51,23 @@ class Loop:
         self.ctx = ctx
 
     def __str__(self):
-        """ Information summary `str`. """
-        result = 'loop: {\n'
+        """Information summary `str`."""
+        result = "loop: {\n"
         for plugin in self.plugin_list:
             if isinstance(plugin, AbstractPlugin):
-                string_to_add = f'{plugin.name}\n'
+                string_to_add = f"{plugin.name}\n"
             elif isinstance(plugin, str):
-                string_to_add = f'{plugin}\n'
+                string_to_add = f"{plugin}\n"
             elif isinstance(plugin, Loop):
-                string_to_add = f'{str(plugin)}\n'
+                string_to_add = f"{str(plugin)}\n"
             else:
-                raise ValueError(f'`plugin` must be either `AbstractPlugin`, `str` or `Loop`. Got {plugin}')
+                raise ValueError(f"`plugin` must be either `AbstractPlugin`, `str` or `Loop`. Got {plugin}")
             result += string_to_add
-        result += f'hash {self.__hash__()}\n}}'
+        result += f"hash {self.__hash__()}\n}}"
         return result
 
     def __gt__(self, other):
-        """ Overload of > for alphabetical order to enable `dir(loop)`. """
+        """Overload of > for alphabetical order to enable `dir(loop)`."""
         if isinstance(other, str):
             return self.__str__() > other
 
@@ -86,7 +88,7 @@ class Loop:
         """
 
         try:
-            if (self._stop_criteria.is_stop()):
+            if self._stop_criteria.is_stop():
                 raise StopIteration
 
             if self._current_plugin is None:
@@ -108,7 +110,7 @@ class Loop:
                     plugin = next(inner_loop)
                     return plugin
                 except StopIteration:
-                    if (loop_ctx(inner_loop).state == WorkflowState.EXIT):
+                    if loop_ctx(inner_loop).state == WorkflowState.EXIT:
                         raise StopIteration
                     # inner
                     loop_ctx(inner_loop).reset()

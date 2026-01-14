@@ -11,12 +11,12 @@ def run():
 
 
 def _main(*argv):
-    if (argv is None or len(argv) < 1):
+    if argv is None or len(argv) < 1:
         _usage()
         return
     argv = list(argv)
     # Handle help flag before passing to WorkflowManager
-    if '--help' in argv or '-h' in argv:
+    if "--help" in argv or "-h" in argv:
         _usage()
         return
     mgr = WorkflowManager(argv)
@@ -25,20 +25,46 @@ def _main(*argv):
 
 def _usage():
     """
-    Return usage of the main ivory call and an example.
+    Return usage of the main ivory call and examples.
     """
 
     usage = """
-    **ivory workflow engine**
-    
+    **Ivory Workflow Engine**
+
     Usage:
-    ivory [arguments] configuration
-    
-    Only arguments already preconfigured in the given configuration will be accepted.
-    Note: Dashed '-' will be converted into underlines '_' for all the arguments
-    
-    example:
-    - ivory --size-x=100 --size-y=100 ufig.config.random
+        ivory [--argument=value ...] <configuration>
+
+    Configuration:
+        The configuration can be specified in two ways:
+
+        1. Python module path:
+           - Example: ivory.config.workflow
+           - Requires the module to be installed or in PYTHONPATH
+
+        2. File path (new in v3.0.0):
+           - Absolute path: /home/user/my_config.py
+           - Relative path: ./my_config.py
+           - Home directory: ~/my_config.py
+           - Allows configs to be placed anywhere without installation
+
+    Arguments:
+        Command-line arguments override configuration file values.
+        Format: --SectionName-parameter=value
+
+        Note: Dashes '-' in argument names are converted to underscores '_'
+
+    Examples:
+        # Using module path
+        ivory --SimplePlugin-value=100 mypackage.config.workflow
+
+        # Using file paths
+        ivory --param=value /home/user/config.py
+        ivory ./workflow_config.py
+        ivory ~/my_workflow.py
+
+    Help:
+        ivory --help    Show this help message
+        ivory -h        Show this help message
     """
     print(usage)
 
