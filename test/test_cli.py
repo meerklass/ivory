@@ -7,7 +7,6 @@ from test.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestCli(ContextSensitiveTest):
-
     def test_launch_empty(self):
         _main(*[])
         assert context.global_ctx is None  # empty
@@ -18,5 +17,5 @@ class TestCli(ContextSensitiveTest):
         assert len(ctx().timings) == 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

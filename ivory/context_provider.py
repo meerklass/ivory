@@ -1,5 +1,4 @@
-from ivory.utils.struct import ImmutableStruct
-from ivory.utils.struct import Struct
+from ivory.utils.struct import ImmutableStruct, Struct
 
 
 class DefaultContextProvider:

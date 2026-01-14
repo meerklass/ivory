@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, call, Mock
+from unittest.mock import MagicMock, Mock, call, patch
 
 from ivory.enum.context_storage_enum import ContextStorageEnum
 from ivory.utils.loop_runner import LoopRunner
@@ -18,9 +18,7 @@ class TestLoopRunner(unittest.TestCase):
     def test_call(self, mock_print_timings, mock_store_ctx):
         mock_plugin_1 = MagicMock(results=[Result(result="a", location="a")])
         mock_plugin_2 = MagicMock(results=[Result(result="b", location="b")])
-        self.loop_runner.loop.__iter__ = MagicMock(
-            return_value=iter([mock_plugin_1, mock_plugin_2])
-        )
+        self.loop_runner.loop.__iter__ = MagicMock(return_value=iter([mock_plugin_1, mock_plugin_2]))
         context = Struct({"timings": []})
         result_context = self.loop_runner(ctx=context)
         self.assertEqual(2, mock_store_ctx.call_count)
@@ -61,14 +59,10 @@ class TestLoopRunner(unittest.TestCase):
             }
         )
         self.assertIsNone(LoopRunner._store_ctx(ctx=context))
-        mock_os.path.join.assert_called_once_with(
-            mock_directory.result, mock_file_name.result
-        )
+        mock_os.path.join.assert_called_once_with(mock_directory.result, mock_file_name.result)
         mock_open.assert_called_once_with(mock_os.path.join.return_value, "wb")
         mock_pickle.dump.assert_called_once_with(
-            Struct(
-                {ContextStorageEnum.DIRECTORY: None, ContextStorageEnum.FILE_NAME: None}
-            ),
+            Struct({ContextStorageEnum.DIRECTORY: None, ContextStorageEnum.FILE_NAME: None}),
             mock_open().__enter__(),
         )
 
@@ -80,9 +74,7 @@ class TestLoopRunner(unittest.TestCase):
 
     @patch("ivory.utils.loop_runner.os")
     def test_store_ctx_when_storage_directories_none_expect_nothing_done(self, mock_os):
-        context = Struct(
-            {ContextStorageEnum.DIRECTORY: None, ContextStorageEnum.FILE_NAME: None}
-        )
+        context = Struct({ContextStorageEnum.DIRECTORY: None, ContextStorageEnum.FILE_NAME: None})
         self.assertIsNone(LoopRunner._store_ctx(ctx=context))
         mock_os.path.join.assert_not_called()
 

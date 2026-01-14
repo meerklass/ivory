@@ -1,23 +1,20 @@
 import pytest
 
 from ivory import context
-from ivory.context import loop_ctx
-from ivory.context import register
+from ivory.context import loop_ctx, register
 from ivory.exceptions.exceptions import InvalidLoopException
 from ivory.loop import Loop
-from ivory.utils.struct import ImmutableStruct
-from ivory.utils.struct import Struct
+from ivory.utils.struct import ImmutableStruct, Struct
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestContext(ContextSensitiveTest):
-
     def test_register(self):
         loop = Loop("plugin")
         try:
             register(loop)
             pytest.fail("Loop registered twice")
-        except InvalidLoopException as ex:
+        except InvalidLoopException:
             assert True
 
         lctx = loop_ctx(loop)

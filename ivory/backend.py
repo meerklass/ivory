@@ -12,5 +12,5 @@ class SequentialBackend:
         self.ctx = ctx
 
     def run(self, loop: Loop) -> list[Struct]:
-        """ Run the sequential backend. """
+        """Run the sequential backend."""
         return [LoopRunner(loop)(self.ctx)]

@@ -1,13 +1,11 @@
 import pytest
 
 from ivory.context_provider import DefaultContextProvider
-from ivory.utils.struct import ImmutableStruct
-from ivory.utils.struct import Struct
+from ivory.utils.struct import ImmutableStruct, Struct
 from test.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestContextProvider(ContextSensitiveTest):
-
     def test_create_ctx(self):
         ctx = DefaultContextProvider.create_context()
         assert isinstance(ctx, Struct)
@@ -35,5 +33,5 @@ class TestContextProvider(ContextSensitiveTest):
         assert ctx.a == 3
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

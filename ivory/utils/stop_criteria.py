@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from ivory.context import loop_ctx
 from ivory.exceptions.exceptions import InvalidAttributeException
@@ -30,7 +30,7 @@ class RangeStopCriteria(AbstractStopCriteria):
 
     def is_stop(self):
         ctx = loop_ctx(self.parent)
-        if (ctx.iter >= self.max_iter):
+        if ctx.iter >= self.max_iter:
             ctx.stop()
 
         return ctx.state == WorkflowState.STOP
@@ -42,4 +42,4 @@ class SimpleStopCriteria(RangeStopCriteria):
     """
 
     def __init__(self):
-        super(SimpleStopCriteria, self).__init__(max_iter=1)
+        super().__init__(max_iter=1)

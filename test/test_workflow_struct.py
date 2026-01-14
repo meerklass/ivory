@@ -1,11 +1,9 @@
 import pytest
 
-from ivory.utils.struct import WorkflowState
-from ivory.utils.struct import WorkflowStruct
+from ivory.utils.struct import WorkflowState, WorkflowStruct
 
 
 class TestWorkflowStruct:
-
     def test_states(self):
         ctx = WorkflowStruct()
 
@@ -33,5 +31,5 @@ class TestWorkflowStruct:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

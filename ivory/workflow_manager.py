@@ -6,7 +6,7 @@ import sys
 from enum import Enum
 from getopt import getopt
 from types import ModuleType
-from typing import Optional, Any
+from typing import Any
 
 from ivory import context
 from ivory.backend import SequentialBackend
@@ -24,11 +24,11 @@ class WorkflowManager:
     """
     Manages the workflow process by loading the passed config and
     parsing the passed arguments and then iterating through the plugins.
-    
+
     The configuration can be specified as either:
     - A Python module name (e.g., 'mypackage.config.workflow')
     - A file path (e.g., '/path/to/config.py', './config.py', '~/config.py')
-    
+
     Configuration files must contain ConfigSection objects defining the pipeline
     and plugin parameters.
     """
@@ -36,7 +36,7 @@ class WorkflowManager:
     def __init__(self, argv: list[str]):
         """
         Initialize the WorkflowManager with command line arguments.
-        
+
         :param argv: command line input, last argument should be config module name or file path
         """
         self._setup(argv=argv)
@@ -51,7 +51,7 @@ class WorkflowManager:
         executor.run(ctx().params.Pipeline.plugins)
 
     def _setup(self, argv: list[str]):
-        """ Get ready for `launch`. """
+        """Get ready for `launch`."""
         config = self._parse_args(argv=argv)
 
         if ConfigKeys.PIPELINE.value not in config:
@@ -64,27 +64,26 @@ class WorkflowManager:
         ctx().plugins = ctx().params.Pipeline.plugins
 
         if ConfigKeys.CONTEXT.value in config[ConfigKeys.PIPELINE.value]:
-            with open(config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], 'rb') as input_file:
+            with open(config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], "rb") as input_file:
                 context_from_disc = pickle.load(input_file)
             self._copy_results_from_context(context_=context_from_disc)
 
     def _parse_args(self, argv: list[str]) -> ImmutableStruct:
-        """ Parse the command line input `argv` and create and return an immutable context from it. """
+        """Parse the command line input `argv` and create and return an immutable context from it."""
         if argv is None or len(argv) < 1:
-            raise ValueError(f'Input `argv` must not be empty `list` or `None`, got {argv}.')
+            raise ValueError(f"Input `argv` must not be empty `list` or `None`, got {argv}.")
         config_sections = self._get_config_sections(config_name=argv[-1])
 
         # overwrite parameters by command line options
         all_longopts = get_all_longopts(config_sections=config_sections)
-        opt_list, positional = getopt(argv, '', all_longopts)
+        opt_list, positional = getopt(argv, "", all_longopts)
         if positional_len := len(positional) != 1:
-            raise InvalidAttributeException(f'There must be exactly one config file given, got {positional_len}.')
+            raise InvalidAttributeException(f"There must be exactly one config file given, got {positional_len}.")
         return self._config_immutable(config_sections, get_opt_parameter_dict(opt_list=opt_list))
 
     @staticmethod
     def _config_immutable(
-            config_sections: dict[str, ConfigSection],
-            opt_parameter_dict: Optional[dict[str, ConfigSection]] = None
+        config_sections: dict[str, ConfigSection], opt_parameter_dict: dict[str, ConfigSection] | None = None
     ) -> ImmutableStruct:
         """
         Returns an `ImmutableStruct` created from `config_section` and overwriting its entries with everything
@@ -105,9 +104,11 @@ class WorkflowManager:
                 if section_name_is_in_opts and config_key in opt_parameter_dict[section_name]:
                     opt_value = opt_parameter_dict[section_name][config_key]
                     config_value = InferType.infer_type(opt_value, config_value)
-                if (section_name == ConfigKeys.PIPELINE.value
-                        and config_key == ConfigKeys.PLUGINS.value
-                        and isinstance(config_value, list)):
+                if (
+                    section_name == ConfigKeys.PIPELINE.value
+                    and config_key == ConfigKeys.PLUGINS.value
+                    and isinstance(config_value, list)
+                ):
                     config_value = Loop(config_value)
                 section_dict[config_key] = config_value
             if len(section_dict) > 0:  # otherwise no entries were inside
@@ -134,17 +135,17 @@ class WorkflowManager:
         :return: The loaded module
         """
         # Check if it looks like a file path (contains path separators or ends with .py)
-        if os.path.sep in config_name or config_name.endswith('.py'):
+        if os.path.sep in config_name or config_name.endswith(".py"):
             # Treat as file path
             config_path = os.path.abspath(os.path.expanduser(config_name))
             if not os.path.exists(config_path):
-                raise FileNotFoundError(f'Configuration file not found: {config_path}')
-            
+                raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
             # Load the module from the file path
             spec = importlib.util.spec_from_file_location("config_module", config_path)
             if spec is None or spec.loader is None:
-                raise ImportError(f'Could not load configuration from {config_path}')
-            
+                raise ImportError(f"Could not load configuration from {config_path}")
+
             config = importlib.util.module_from_spec(spec)
             sys.modules["config_module"] = config
             spec.loader.exec_module(config)
@@ -154,21 +155,23 @@ class WorkflowManager:
             return importlib.import_module(config_name)
 
     @staticmethod
-    def _get_config_section(config: ModuleType, section_name: str) -> Optional[Any]:
+    def _get_config_section(config: ModuleType, section_name: str) -> Any | None:
         """
         Returns the attribute `section_name` in `config`
         if `section_name` belongs to a valid configuration file section
         and if the attribute is of `ConfigSection` type.
         """
-        if (not section_name.startswith("__")
-                and section_name[0].upper() == section_name[0]
-                and section_name != ConfigSection.name):
+        if (
+            not section_name.startswith("__")
+            and section_name[0].upper() == section_name[0]
+            and section_name != ConfigSection.name
+        ):
             if isinstance(config_section := getattr(config, section_name), ConfigSection):
                 return config_section
 
     @staticmethod
     def _copy_results_from_context(context_: Struct):
-        """ Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys. """
+        """Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys."""
         for key_, value_ in context_.items():
             if isinstance(key_, Enum):
                 ctx()[key_] = value_

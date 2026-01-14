@@ -6,8 +6,7 @@ Pipeline = ConfigSection(
     cpu_count=1,
     valuesMin=1,
     valuesMax=16,
-
-    plugins=ParallelPluginCollection(["ivory.test.simple_square_plugin"],
-                                     "ivory.test.range_map_plugin",
-                                     "ivory.test.sum_reduce_plugin")
+    plugins=ParallelPluginCollection(
+        ["ivory.test.simple_square_plugin"], "ivory.test.range_map_plugin", "ivory.test.sum_reduce_plugin"
+    ),
 )
