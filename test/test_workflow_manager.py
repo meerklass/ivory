@@ -1,5 +1,7 @@
 from getopt import GetoptError
 from operator import eq
+import os
+import tempfile
 
 import pytest
 
@@ -185,6 +187,43 @@ class TestWorkflowManager(ContextSensitiveTest):
                                                                     MockEnum.mock: 'mock'}))
         assert 'key' not in ctx()
         assert MockEnum.mock in ctx()
+
+    def test_load_config_from_file_path(self):
+        """Test that configuration can be loaded from a file path instead of module name"""
+        # Create a temporary config file
+        config_content = """
+from ivory.utils.config_section import ConfigSection
+
+Pipeline = ConfigSection(
+    plugins=["test.plugin.simple_plugin"],
+)
+
+TestSection = ConfigSection(
+    test_param="from_file",
+)
+"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(config_content)
+            temp_config_path = f.name
+        
+        try:
+            # Test loading from absolute path
+            args = [temp_config_path]
+            mgr = WorkflowManager(args)
+            
+            assert ctx().params is not None
+            assert ctx().params.Pipeline.plugins is not None
+            assert ctx().params.TestSection.test_param == "from_file"
+        finally:
+            # Clean up
+            os.unlink(temp_config_path)
+    
+    def test_load_config_file_not_found(self):
+        """Test that loading a non-existent file path raises appropriate error"""
+        args = ["/non/existent/path/config.py"]
+        
+        with pytest.raises(FileNotFoundError):
+            WorkflowManager(args)
 
 
 if __name__ == '__main__':

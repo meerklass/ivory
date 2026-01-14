@@ -30,11 +30,17 @@ def _usage():
     Usage:
     ivory [arguments] configuration
     
+    The configuration can be either:
+    - A Python module path (e.g., ivory.config.workflow)
+    - A file path (e.g., /path/to/config.py or ./config.py)
+    
     Only arguments already preconfigured in the given configuration will be accepted.
     Note: Dashed '-' will be converted into underlines '_' for all the arguments
     
-    example:
-    - ivory --size-x=100 --size-y=100 ufig.config.random
+    Examples:
+    - ivory --size-x=100 --size-y=100 ivory.config.random
+    - ivory --size-x=100 --size-y=100 /home/user/my_config.py
+    - ivory ./workflow_config.py
     """
     print(usage)
 
