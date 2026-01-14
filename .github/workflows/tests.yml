@@ -60,16 +60,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e .
-        pip install flake8
+        pip install ruff
 
-    - name: Lint with flake8
+    - name: Lint with ruff
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 ivory --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings
-        flake8 ivory --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      continue-on-error: true
+        ruff check ivory/ test/
 
   docs:
     name: Build Documentation
@@ -94,7 +89,6 @@ jobs:
       run: |
         cd docs
         make html
-      continue-on-error: true
 
     - name: Upload documentation artifact
       if: github.event_name == 'pull_request'
