@@ -2,12 +2,30 @@
 Ivory workflow engine
 =============================
 
+.. image:: https://github.com/meerklass/ivory/workflows/CI/badge.svg
+    :target: https://github.com/meerklass/ivory/actions
+    :alt: CI Status
+
+.. image:: https://readthedocs.org/projects/ivory/badge/?version=latest
+    :target: https://ivory.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. image:: https://img.shields.io/pypi/v/ivory.svg
+    :target: https://pypi.org/project/ivory/
+    :alt: PyPI version
+
+.. image:: https://img.shields.io/pypi/pyversions/ivory.svg
+    :target: https://pypi.org/project/ivory/
+    :alt: Python versions
+
 Simple and flexible workflow engine
 
 This **ivory** package has been developed at the `Centre for Radio Cosmology` at UWC and at the `Jodrell Bank Centre for Astrophysics` at `UoM`.
 It is based on the original `python 2.7` **ivy** package developed at ETH Zurich in the `Software Lab of the Cosmology Research Group <http://www.cosmology.ethz.ch/research/software-lab.html>`_ of the `ETH Institute of Astronomy <http://www.astro.ethz.ch>`_.
 
-The development is coordinated on `GitHub <https://github.com/meerklass/ivory>`_ and contributions are welcome. The documentation of **ivory** is not yet available at `readthedocs.org <http://ivory.readthedocs.io/>`_ .
+The development is coordinated on `GitHub <https://github.com/meerklass/ivory>`_ and contributions are welcome.
+
+**Documentation:** https://ivory.readthedocs.io/
 
 
 Features
