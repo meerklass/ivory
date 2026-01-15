@@ -1,5 +1,6 @@
 from getopt import GetoptError
 from operator import eq
+from pathlib import Path
 
 import pytest
 
@@ -15,6 +16,11 @@ from test.plugin.simple_plugin import SimplePlugin, SimpleEnum
 
 
 class TestWorkflowManager(ContextSensitiveTest):
+    @classmethod
+    def setup_class(cls):
+        # Ensure cache directory exists for tests that require it
+        cache_dir = Path(__file__).parent.parent / "cache"
+        cache_dir.mkdir(exist_ok=True)
 
     def test_launch(self):
         args = ["test.config.workflow_config"]
