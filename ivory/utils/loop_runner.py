@@ -3,12 +3,14 @@ import pickle
 import time
 from typing import Any
 
+import psutil
+
 from ivory.enum.context_storage_enum import ContextStorageEnum
 from ivory.loop import Loop
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.result import Result
 from ivory.utils.struct import Struct
-from ivory.utils.timing import SimpleTiming
+from ivory.utils.timing import SimpleTiming, ResourceTiming
 
 
 class LoopRunner:
@@ -20,12 +22,44 @@ class LoopRunner:
     def __call__(self, ctx: Struct) -> Struct:
         """ Runs all plugins in `self.loop` on `ctx` and returns `ctx` afterwards. """
         self.loop.ctx = ctx
+        process = psutil.Process()
+        
         for plugin in self.loop:
             start = time.time()
             print(f'\n--> Running {str(plugin)}...', flush=True)
+            
+            # Track memory and CPU before plugin execution
+            try:
+                process.cpu_percent(interval=None)  # Initialize CPU sampling
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+            
+            peak_memory_gb = 0.0
+            peak_cpu_percent = 0.0
+            
+            # Run the plugin
             plugin.run(**self._run_args(plugin=plugin, ctx=ctx))
+            
+            # Capture peak resources after execution
+            try:
+                peak_memory_gb = process.memory_info().rss / (1024 ** 3)  # Convert to GB
+                peak_cpu_percent = process.cpu_percent(interval=None)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                # If we can't access psutil data, continue without it
+                pass
+            
             self._store_to_ctx(results=plugin.results, ctx=ctx)
-            ctx.timings.append(SimpleTiming(str(plugin), time.time() - start))
+            duration = time.time() - start
+            
+            # Store resource timing
+            ctx.timings.append(
+                ResourceTiming(
+                    str(plugin),
+                    duration,
+                    peak_memory_gb=peak_memory_gb,
+                    peak_cpu_percent=peak_cpu_percent
+                )
+            )
             self._store_ctx(ctx=ctx)
 
         self.loop.reset()
@@ -82,8 +116,8 @@ class LoopRunner:
         return arguments
 
     @staticmethod
-    def _print_timings(timings_list: list[SimpleTiming]):
-        """" Print a `list` of `SimpleTiming`s nicely. """
+    def _print_timings(timings_list: list):
+        """" Print a list of SimpleTiming or ResourceTiming objects nicely. """
         print('\n--> Timings:', flush=True)
         for timing in timings_list:
             print(timing)
