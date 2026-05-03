@@ -52,14 +52,17 @@ class LoopRunner:
             duration = time.time() - start
             
             # Store resource timing
-            ctx.timings.append(
-                ResourceTiming(
-                    str(plugin),
-                    duration,
-                    peak_memory_gb=peak_memory_gb,
-                    peak_cpu_percent=peak_cpu_percent
-                )
+            resource_timing = ResourceTiming(
+                str(plugin),
+                duration,
+                peak_memory_gb=peak_memory_gb,
+                peak_cpu_percent=peak_cpu_percent
             )
+            ctx.timings.append(resource_timing)
+            
+            # Print step summary
+            print(f'    {resource_timing}', flush=True)
+            
             self._store_ctx(ctx=ctx)
 
         self.loop.reset()
