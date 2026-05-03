@@ -10,7 +10,7 @@ from ivory.loop import Loop
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.utils.result import Result
 from ivory.utils.struct import Struct
-from ivory.utils.timing import SimpleTiming, ResourceTiming
+from ivory.utils.timing import ResourceTiming
 
 
 class LoopRunner:
@@ -20,49 +20,59 @@ class LoopRunner:
         self.loop = loop
 
     def __call__(self, ctx: Struct) -> Struct:
-        """ Runs all plugins in `self.loop` on `ctx` and returns `ctx` afterwards. """
+        """Run all plugins in self.loop on ctx and return ctx afterwards."""
         self.loop.ctx = ctx
         process = psutil.Process()
-        
+
         for plugin in self.loop:
             start = time.time()
             print(f'\n--> Running {str(plugin)}...', flush=True)
-            
-            # Track memory and CPU before plugin execution
+
+            # Initialize CPU sampling
             try:
-                process.cpu_percent(interval=None)  # Initialize CPU sampling
+                process.cpu_percent(interval=None)
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
-            
-            peak_memory_gb = 0.0
-            peak_cpu_percent = 0.0
-            
+
+            # Collect samples during execution
+            memory_samples = []
+            cpu_samples = []
+
             # Run the plugin
             plugin.run(**self._run_args(plugin=plugin, ctx=ctx))
-            
-            # Capture peak resources after execution
+
+            # Capture resources after execution
             try:
-                peak_memory_gb = process.memory_info().rss / (1024 ** 3)  # Convert to GB
-                peak_cpu_percent = process.cpu_percent(interval=None)
+                memory_info = process.memory_info().rss / (1024 ** 3)  # Convert to GB
+                cpu_percent = process.cpu_percent(interval=None)
+                memory_samples.append(memory_info)
+                cpu_samples.append(cpu_percent)
             except (psutil.NoSuchProcess, psutil.AccessDenied):
-                # If we can't access psutil data, continue without it
                 pass
-            
+
             self._store_to_ctx(results=plugin.results, ctx=ctx)
             duration = time.time() - start
-            
+
+            # Calculate average and peak from samples
+            avg_memory_gb = sum(memory_samples) / len(memory_samples) if memory_samples else 0.0
+            peak_memory_gb = max(memory_samples) if memory_samples else 0.0
+            avg_cpu_percent = sum(cpu_samples) / len(cpu_samples) if cpu_samples else 0.0
+            peak_cpu_percent = max(cpu_samples) if cpu_samples else 0.0
+
             # Store resource timing
             resource_timing = ResourceTiming(
                 str(plugin),
                 duration,
                 peak_memory_gb=peak_memory_gb,
-                peak_cpu_percent=peak_cpu_percent
+                peak_cpu_percent=peak_cpu_percent,
+                avg_memory_gb=avg_memory_gb,
+                avg_cpu_percent=avg_cpu_percent,
             )
             ctx.timings.append(resource_timing)
-            
+
             # Print step summary
             print(f'    {resource_timing}', flush=True)
-            
+
             self._store_ctx(ctx=ctx)
 
         self.loop.reset()
