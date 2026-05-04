@@ -8,18 +8,15 @@ from ivory.utils.result import Result
 
 
 class MockPlugin(AbstractPlugin):
-
     def set_requirements(self):
         pass
 
     def run(self):
         mock_location = MagicMock()
-        self.set_result(result=Result(location=mock_location,
-                                      result='mock_result'))
+        self.set_result(result=Result(location=mock_location, result="mock_result"))
 
 
 class MockBrokenPluginn(AbstractPlugin):
-
     def set_requirements(self):
         pass
 
@@ -32,12 +29,12 @@ class TestAbstractPlugin(unittest.TestCase):
         assert isinstance(MockPlugin(), MockPlugin)
 
     def test_str(self):
-        assert 'MockPlugin' == str(MockPlugin())
+        assert "MockPlugin" == str(MockPlugin())
 
     def test_run(self):
         mock_plugin = MockPlugin()
         mock_plugin.run()
-        assert 'mock_result' == mock_plugin.results[0].result
+        assert "mock_result" == mock_plugin.results[0].result
         assert isinstance(mock_plugin.results[0].location, MagicMock)
 
     def test_set_result(self):
@@ -52,5 +49,5 @@ class TestAbstractPlugin(unittest.TestCase):
         self.assertRaises(ValueError, MockBrokenPluginn)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

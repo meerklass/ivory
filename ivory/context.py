@@ -9,9 +9,9 @@ global_ctx = None
 def ctx():
     """
     Returns the current global namespace context.
-    
+
     :return: reference to the context module
-    
+
     """
     global global_ctx
     if global_ctx is None:
@@ -42,4 +42,5 @@ def _create_ctx(**args):
 
 def get_context_provider():
     from ivory.context_provider import DefaultContextProvider
+
     return DefaultContextProvider

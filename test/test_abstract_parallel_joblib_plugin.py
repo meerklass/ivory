@@ -4,7 +4,6 @@ from ivory.plugin.abstract_parallel_joblib_plugin import AbstractParallelJoblibP
 
 
 class MockPlugin(AbstractParallelJoblibPlugin):
-
     def run_job(self, anything: Any) -> Any:
         pass
 

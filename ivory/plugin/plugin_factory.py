@@ -28,11 +28,17 @@ class PluginFactory:
         try:
             module = importlib.import_module(plugin_name)
         except ImportError as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be loaded" % plugin_name, ex)
-        except AttributeError as ex:
-            raise UnsupportedPluginTypeException("Module '%s' has no class definition 'Plugin(ctx)'" % plugin_name)
+            raise UnsupportedPluginTypeException(
+                "Module '%s' could not be loaded" % plugin_name, ex
+            )
+        except AttributeError:
+            raise UnsupportedPluginTypeException(
+                "Module '%s' has no class definition 'Plugin(ctx)'" % plugin_name
+            )
         except Exception as ex:
-            raise UnsupportedPluginTypeException("Module '%s' could not be instantiated'" % plugin_name, ex)
+            raise UnsupportedPluginTypeException(
+                "Module '%s' could not be instantiated'" % plugin_name, ex
+            )
         plugin = PluginFactory._get_plugin_attribute(module)
         if ConfigKeys.PARAMS.value in ctx and plugin.name in ctx.params:
             config = ctx.params[plugin.name]
@@ -51,14 +57,22 @@ class PluginFactory:
         result = None
         already_found = False
         for attribute in dir(module):
-            if attribute.endswith('Plugin') and not attribute.startswith('Abstract') and not attribute.startswith('_'):
+            if (
+                attribute.endswith("Plugin")
+                and not attribute.startswith("Abstract")
+                and not attribute.startswith("_")
+            ):
                 attribute = getattr(module, attribute)
                 if isinstance(attribute, ConfigSection):
                     continue
                 if already_found:
-                    raise ValueError(f'Input `module` {module} contains more than one valid `Plugin`.')
+                    raise ValueError(
+                        f"Input `module` {module} contains more than one valid `Plugin`."
+                    )
                 result = attribute
                 already_found = True
         if result is None:
-            raise ValueError(f'No valid plugin found in {module}. Typo? Does the class name end on `Plugin`?')
+            raise ValueError(
+                f"No valid plugin found in {module}. Typo? Does the class name end on `Plugin`?"
+            )
         return result

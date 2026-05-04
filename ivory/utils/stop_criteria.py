@@ -30,7 +30,7 @@ class RangeStopCriteria(AbstractStopCriteria):
 
     def is_stop(self):
         ctx = loop_ctx(self.parent)
-        if (ctx.iter >= self.max_iter):
+        if ctx.iter >= self.max_iter:
             ctx.stop()
 
         return ctx.state == WorkflowState.STOP

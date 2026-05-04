@@ -14,7 +14,7 @@ from ivory.utils.timing import ResourceTiming
 
 
 class LoopRunner:
-    """ Runs all plugins in a loop. """
+    """Runs all plugins in a loop."""
 
     def __init__(self, loop: Loop):
         self.loop = loop
@@ -26,7 +26,7 @@ class LoopRunner:
 
         for plugin in self.loop:
             start = time.time()
-            print(f'\n--> Running {str(plugin)}...', flush=True)
+            print(f"\n--> Running {str(plugin)}...", flush=True)
 
             # Initialize CPU sampling
             try:
@@ -43,7 +43,7 @@ class LoopRunner:
 
             # Capture resources after execution
             try:
-                memory_info = process.memory_info().rss / (1024 ** 3)  # Convert to GB
+                memory_info = process.memory_info().rss / (1024**3)  # Convert to GB
                 cpu_percent = process.cpu_percent(interval=None)
                 memory_samples.append(memory_info)
                 cpu_samples.append(cpu_percent)
@@ -54,9 +54,13 @@ class LoopRunner:
             duration = time.time() - start
 
             # Calculate average and peak from samples
-            avg_memory_gb = sum(memory_samples) / len(memory_samples) if memory_samples else 0.0
+            avg_memory_gb = (
+                sum(memory_samples) / len(memory_samples) if memory_samples else 0.0
+            )
             peak_memory_gb = max(memory_samples) if memory_samples else 0.0
-            avg_cpu_percent = sum(cpu_samples) / len(cpu_samples) if cpu_samples else 0.0
+            avg_cpu_percent = (
+                sum(cpu_samples) / len(cpu_samples) if cpu_samples else 0.0
+            )
             peak_cpu_percent = max(cpu_samples) if cpu_samples else 0.0
 
             # Store resource timing
@@ -71,7 +75,7 @@ class LoopRunner:
             ctx.timings.append(resource_timing)
 
             # Print step summary
-            print(f'    {resource_timing}', flush=True)
+            print(f"    {resource_timing}", flush=True)
 
             self._store_ctx(ctx=ctx)
 
@@ -86,9 +90,11 @@ class LoopRunner:
         Nothing is done if an entry is already stored under a `location` in `results` and overwriting is disabled.
         """
         for result in results:
-            if result.location in ctx and (ctx[result.location] is not None
-                                           and not ctx[result.location].allow_overwrite):
-                print('Overwriting is not allowed. Discard result...')
+            if result.location in ctx and (
+                ctx[result.location] is not None
+                and not ctx[result.location].allow_overwrite
+            ):
+                print("Overwriting is not allowed. Discard result...")
                 return
             ctx[result.location] = result
 
@@ -107,8 +113,13 @@ class LoopRunner:
         except KeyError:
             return
         if context_storage_directory is not None and context_file_name is not None:
-            if context_storage_directory.result is not None and context_file_name.result is not None:
-                file_name = os.path.join(context_storage_directory.result, context_file_name.result)
+            if (
+                context_storage_directory.result is not None
+                and context_file_name.result is not None
+            ):
+                file_name = os.path.join(
+                    context_storage_directory.result, context_file_name.result
+                )
                 # replace with `None` to make sure the context is only stored once under this name
                 ctx[ContextStorageEnum.DIRECTORY] = None
                 ctx[ContextStorageEnum.FILE_NAME] = None
@@ -124,13 +135,15 @@ class LoopRunner:
         arguments = {}
         for requirement in plugin.requirements:
             if requirement.location not in ctx:
-                raise ValueError(f'Requirement {requirement.location} of {plugin.name} is not met.')
+                raise ValueError(
+                    f"Requirement {requirement.location} of {plugin.name} is not met."
+                )
             arguments[requirement.variable] = ctx[requirement.location].result
         return arguments
 
     @staticmethod
     def _print_timings(timings_list: list):
-        """" Print a list of SimpleTiming or ResourceTiming objects nicely. """
-        print('\n--> Timings:', flush=True)
+        """ " Print a list of SimpleTiming or ResourceTiming objects nicely."""
+        print("\n--> Timings:", flush=True)
         for timing in timings_list:
             print(timing)

@@ -7,7 +7,6 @@ from ivory.utils.stop_criteria import RangeStopCriteria
 
 
 class TestStopCriteria:
-
     def test_range_stop_criteria(self):
         try:
             RangeStopCriteria(0)
