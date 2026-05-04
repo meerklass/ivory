@@ -58,7 +58,7 @@ class WorkflowManager:
         if context_file is not None:
             with open(context_file, "rb") as input_file:
                 context_from_disc = pickle.load(input_file)
-            self._copy_results_from_context(context_=context_from_disc)
+            self._load_context_into_ctx(context_=context_from_disc)
 
     def _parse_args(self, argv: list[str]) -> ImmutableStruct:
         """Parse the command line input `argv` and create and return an immutable context from it."""
@@ -146,8 +146,8 @@ class WorkflowManager:
                 return config_section
 
     @staticmethod
-    def _copy_results_from_context(context_: Struct):
-        """Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys."""
+    def _load_context_into_ctx(context_: Struct):
+        """Load results into ctx(). Results are identified by having `Enum`s as keys."""
         for key_, value_ in context_.items():
             if isinstance(key_, Enum):
                 ctx()[key_] = value_
