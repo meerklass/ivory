@@ -52,5 +52,5 @@ class TestPickle:
             assert expect == value
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

@@ -39,7 +39,7 @@ class WorkflowManager:
         executor.run(ctx().params.Pipeline.plugins)
 
     def _setup(self, argv: list[str]):
-        """ Get ready for `launch`. """
+        """Get ready for `launch`."""
         config = self._parse_args(argv=argv)
 
         if ConfigKeys.PIPELINE.value not in config:
@@ -52,27 +52,35 @@ class WorkflowManager:
         ctx().plugins = ctx().params.Pipeline.plugins
 
         if ConfigKeys.CONTEXT.value in config[ConfigKeys.PIPELINE.value]:
-            with open(config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], 'rb') as input_file:
+            with open(
+                config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], "rb"
+            ) as input_file:
                 context_from_disc = pickle.load(input_file)
             self._copy_results_from_context(context_=context_from_disc)
 
     def _parse_args(self, argv: list[str]) -> ImmutableStruct:
-        """ Parse the command line input `argv` and create and return an immutable context from it. """
+        """Parse the command line input `argv` and create and return an immutable context from it."""
         if argv is None or len(argv) < 1:
-            raise ValueError(f'Input `argv` must not be empty `list` or `None`, got {argv}.')
+            raise ValueError(
+                f"Input `argv` must not be empty `list` or `None`, got {argv}."
+            )
         config_sections = self._get_config_sections(config_name=argv[-1])
 
         # overwrite parameters by command line options
         all_longopts = get_all_longopts(config_sections=config_sections)
-        opt_list, positional = getopt(argv, '', all_longopts)
+        opt_list, positional = getopt(argv, "", all_longopts)
         if positional_len := len(positional) != 1:
-            raise InvalidAttributeException(f'There must be exactly one config file given, got {positional_len}.')
-        return self._config_immutable(config_sections, get_opt_parameter_dict(opt_list=opt_list))
+            raise InvalidAttributeException(
+                f"There must be exactly one config file given, got {positional_len}."
+            )
+        return self._config_immutable(
+            config_sections, get_opt_parameter_dict(opt_list=opt_list)
+        )
 
     @staticmethod
     def _config_immutable(
-            config_sections: dict[str, ConfigSection],
-            opt_parameter_dict: Optional[dict[str, ConfigSection]] = None
+        config_sections: dict[str, ConfigSection],
+        opt_parameter_dict: Optional[dict[str, ConfigSection]] = None,
     ) -> ImmutableStruct:
         """
         Returns an `ImmutableStruct` created from `config_section` and overwriting its entries with everything
@@ -90,20 +98,27 @@ class WorkflowManager:
             section_dict = {}
             for config_key, config_value in config_dict.items():
                 # overwrite config file entry with command line input if available
-                if section_name_is_in_opts and config_key in opt_parameter_dict[section_name]:
+                if (
+                    section_name_is_in_opts
+                    and config_key in opt_parameter_dict[section_name]
+                ):
                     opt_value = opt_parameter_dict[section_name][config_key]
                     config_value = InferType.infer_type(opt_value, config_value)
-                if (section_name == ConfigKeys.PIPELINE.value
-                        and config_key == ConfigKeys.PLUGINS.value
-                        and isinstance(config_value, list)):
+                if (
+                    section_name == ConfigKeys.PIPELINE.value
+                    and config_key == ConfigKeys.PLUGINS.value
+                    and isinstance(config_value, list)
+                ):
                     config_value = Loop(config_value)
                 section_dict[config_key] = config_value
             if len(section_dict) > 0:  # otherwise no entries were inside
-                attribute_dict[section_name] = context.create_immutable_ctx(**section_dict)
+                attribute_dict[section_name] = context.create_immutable_ctx(
+                    **section_dict
+                )
         return context.create_immutable_ctx(**attribute_dict)
 
     def _get_config_sections(self, config_name: str) -> dict[str, ConfigSection]:
-        """ Returns a potentially empty `dict` of config section names and `ConfigSection`s. """
+        """Returns a potentially empty `dict` of config section names and `ConfigSection`s."""
         result = {}
         config = importlib.import_module(config_name)
         for section_name in dir(config):
@@ -118,15 +133,19 @@ class WorkflowManager:
         if `section_name` belongs to a valid configuration file section
         and if the attribute is of `ConfigSection` type.
         """
-        if (not section_name.startswith("__")
-                and section_name[0].upper() == section_name[0]
-                and section_name != ConfigSection.name):
-            if isinstance(config_section := getattr(config, section_name), ConfigSection):
+        if (
+            not section_name.startswith("__")
+            and section_name[0].upper() == section_name[0]
+            and section_name != ConfigSection.name
+        ):
+            if isinstance(
+                config_section := getattr(config, section_name), ConfigSection
+            ):
                 return config_section
 
     @staticmethod
     def _copy_results_from_context(context_: Struct):
-        """ Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys. """
+        """Copies the results in `context_` to `ctx()`. Results are identified by having `Enum`s as keys."""
         for key_, value_ in context_.items():
             if isinstance(key_, Enum):
                 ctx()[key_] = value_

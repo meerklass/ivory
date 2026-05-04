@@ -11,13 +11,12 @@ from test.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestContext(ContextSensitiveTest):
-
     def test_register(self):
         loop = Loop("plugin")
         try:
             register(loop)
             pytest.fail("Loop registered twice")
-        except InvalidLoopException as ex:
+        except InvalidLoopException:
             assert True
 
         lctx = loop_ctx(loop)

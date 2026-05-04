@@ -6,7 +6,7 @@ from ivory.utils.struct import Struct
 
 
 class TestSequentialBackend(unittest.TestCase):
-    @patch('ivory.backend.LoopRunner')
+    @patch("ivory.backend.LoopRunner")
     def test_run(self, mock_loop_runner):
         mock_loop = MagicMock()
         sequential_backend = SequentialBackend(ctx=Struct())
@@ -15,5 +15,5 @@ class TestSequentialBackend(unittest.TestCase):
         mock_loop_runner().assert_called_once_with(Struct())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -11,12 +11,12 @@ def run():
 
 
 def _main(*argv):
-    if (argv is None or len(argv) < 1):
+    if argv is None or len(argv) < 1:
         _usage()
         return
     argv = list(argv)
     # Handle help flag before passing to WorkflowManager
-    if '--help' in argv or '-h' in argv:
+    if "--help" in argv or "-h" in argv:
         _usage()
         return
     mgr = WorkflowManager(argv)
