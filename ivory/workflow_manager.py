@@ -51,10 +51,12 @@ class WorkflowManager:
         ctx().params = context.create_immutable_ctx(**config)
         ctx().plugins = ctx().params.Pipeline.plugins
 
-        if ConfigKeys.CONTEXT.value in config[ConfigKeys.PIPELINE.value]:
-            with open(
-                config[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value], "rb"
-            ) as input_file:
+        # Load context if provided (defaults to None if not specified, allowing CLI override)
+        context_file = config[ConfigKeys.PIPELINE.value].get(
+            ConfigKeys.CONTEXT.value, None
+        )
+        if context_file is not None:
+            with open(context_file, "rb") as input_file:
                 context_from_disc = pickle.load(input_file)
             self._copy_results_from_context(context_=context_from_disc)
 
