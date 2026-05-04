@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `ivory.__version__` attribute to package for version reporting
 - Resource tracking for plugin execution: tracks peak and average memory (GB) and CPU (%) usage per plugin
 - Per-step resource summary output during pipeline execution
 - `ResourceTiming` class to store and display memory and CPU metrics alongside execution timing
@@ -18,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `LoopRunner` now captures resource metrics using `psutil` for each plugin execution
 - Plugin execution output now includes per-step resource usage in addition to execution time
+
+### Fixed
+
+- Changed setuptool-scm mode from toml to simple so that version is reflected correctly
 
 ## [2.0.0] (2026-01-15)
 
