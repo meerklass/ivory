@@ -126,6 +126,12 @@ class WorkflowManager:
         for section_name in dir(config):
             if config_section := self._get_config_section(config, section_name):
                 result[section_name] = config_section
+        
+        # Ensure Pipeline always has context key to allow CLI override
+        if ConfigKeys.PIPELINE.value in result:
+            if ConfigKeys.CONTEXT.value not in result[ConfigKeys.PIPELINE.value]:
+                result[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value] = None
+        
         return result
 
     @staticmethod
