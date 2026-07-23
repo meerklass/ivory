@@ -113,17 +113,26 @@ SimplePlugin = ConfigSection(value="load")
 ## CLI overrides
 
 Any config value can be overridden from the shell with `--<SectionName>-<param>=<value>` (dashes in
-the parameter name become underscores):
+the parameter name become underscores). Note there is currently no packaged `ivory` console script (see
+[Known issues and limitations](known-issues-and-limitations.md)), so invoke via `python -m
+ivory.cli.main` unless a downstream project provides its own wrapper, as MuSEEK's `museek` command does:
 
 ```bash
-ivory --a=1.75 --b=zeta,beta,gamma --c=False package.subpackage.module
+python -m ivory.cli.main --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
 museek --InPlugin-block-name=1675632179 museek.config.process_uhf_band
 ```
 
+Only parameters already present in the target config's sections can be overridden this way —
+`get_all_longopts` (`ivory/utils/opt_helper.py`) builds the accepted `getopt` longopts strictly from the
+keys already defined in the config's `ConfigSection`s, so passing an override for a key that doesn't
+exist in the config raises a `getopt` error rather than adding a new key.
+
 The override's type is inferred from the *existing* default's type in the config
-(`InferType.infer_type`, `ivory/utils/infer_type.py`), trying, in order: bool (`true`/`false`,
-case-insensitive) → int → float → comma-separated list → `None` (`none`/`null`) → falls back to `str`.
-If no matching default exists for a key, the same trial order is used directly on the CLI string.
+(`InferType.infer_type`, `ivory/utils/infer_type.py`). If the default value is anything other than
+`None`, the override string is cast directly to that value's type (`str`, `bool`, `list`, `int`, or
+`float`). Only when the default value **is** `None` does `InferType` fall back to trial-casting the
+override string, in order: bool (`true`/`false`, case-insensitive) → int → float → comma-separated
+list → `None` (`none`/`null`) → falls back to `str`.
 
 ## Other example/test configs worth knowing about
 

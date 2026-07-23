@@ -38,9 +38,16 @@ Ivory can be run from the command line or as a Python module.
 
 ### Command Line
 
+There is currently no packaged `ivory` console script (no `[project.scripts]` entry in
+`pyproject.toml` — see [Known issues and limitations](docs/known-issues-and-limitations.md)), so invoke
+Ivory's CLI module directly:
+
 ```bash
-ivory [arguments] configuration
+python -m ivory.cli.main [arguments] configuration
 ```
+
+Downstream projects typically wrap this in their own console script — e.g. MuSEEK's `museek` command
+delegates straight into `ivory.cli.main.run()`.
 
 ### Python Module
 
@@ -119,7 +126,7 @@ Calling this config and overriding `SimplePlugin`'s attributes from the command 
 parameter name joined with a dash; dashes in the parameter name itself become underscores):
 
 ```bash
-ivory --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
+python -m ivory.cli.main --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
 ```
 
 ## Documentation

@@ -20,9 +20,10 @@ assume away if you don't know about them.
 - **`psutil`** is imported directly in `ivory/utils/loop_runner.py` (for the resource-tracking feature)
   but is not listed in `pyproject.toml`'s `dependencies` — a packaging gap. It happens to already be
   present in environments that install it transitively or have it from another package.
-- **No `[project.scripts]` entry point** in `pyproject.toml`, despite README documenting a bare
-  `ivory [arguments] configuration` shell command. Nothing currently installs an `ivory` console script;
-  downstream code has to call `ivory.cli.main.run()` directly (as MuSEEK's `museek/cli/main.py` does).
+- **No `[project.scripts]` entry point** in `pyproject.toml`, so nothing currently installs an `ivory`
+  console script. Invoke via `python -m ivory.cli.main [arguments] configuration` instead, or let a
+  downstream project wrap it — MuSEEK's `museek/cli/main.py` calls `ivory.cli.main.run()` directly and
+  exposes that as the `museek` console script.
 - **`ipyparallel`** is listed as a dependency in `pyproject.toml` but is not referenced anywhere in the
   current source — likely vestigial from a planned or removed parallel backend (only
   `SequentialBackend` exists today).
@@ -61,10 +62,11 @@ into if you assume more flexibility than exists.
 - **Single global mutable context.** `ctx()` (`ivory/context.py`) is a module-level singleton. Ivory is
   not designed for running multiple independent pipelines concurrently within one process.
 - **Silent partial-drop on overwrite conflicts.** Covered in detail in
-  [Plugins](plugins.md#how-the-engine-wires-plugins-together): if `Result.allow_overwrite=False` and the
-  target context key is already set, `LoopRunner._store_to_ctx` prints a message and returns immediately
-  — silently discarding any of that plugin's remaining, not-yet-stored `Result`s rather than raising or
-  continuing to store the rest.
+  [Plugins](plugins.md#how-the-engine-wires-plugins-together): the overwrite guard checks
+  `allow_overwrite` on the *existing* `Result` already stored under a context key, not on the new
+  `Result` being stored. If that already-stored value has `allow_overwrite=False`,
+  `LoopRunner._store_to_ctx` prints a message and returns immediately — silently discarding any of that
+  plugin's remaining, not-yet-stored `Result`s rather than raising or continuing to store the rest.
 - **No structured logging.** All engine-level output (per-step progress, resource timings) goes through
   plain `print()` calls in `LoopRunner`, not the `logging` module — there's no log level control, and
   capturing/redirecting engine output means capturing stdout.

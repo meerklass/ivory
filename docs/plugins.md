@@ -56,7 +56,10 @@ module path as a string** in the config's `Pipeline.plugins` list, e.g.
 1. `importlib.import_module(plugin_name)` — imports the module.
 2. `_get_plugin_attribute(module)` scans `dir(module)` for exactly one attribute whose name ends in
    `"Plugin"` but doesn't start with `"Abstract"` or `"_"` — this excludes the base classes and private
-   helpers. Zero matches or more than one match raises `ValueError`.
+   helpers. It also explicitly skips any matching attribute that is itself a `ConfigSection` instance
+   (rather than a class), so a stray `FooPlugin = ConfigSection(...)` constant sitting in the module
+   namespace won't be mistaken for the plugin class or trigger the "more than one valid Plugin" error.
+   Zero matches or more than one match raises `ValueError`.
 3. Instantiates that class with kwargs taken from `ctx.params[<PluginClassName>]` — i.e. the config's
    `ConfigSection` whose name exactly matches the plugin class name. If no such section exists, it's
    instantiated with no arguments.
@@ -100,11 +103,14 @@ declares a `Requirement` for a key that plugin A is supposed to publish, that on
 moment B tries to run — not before the pipeline starts. Keep your plugin list ordered correctly by
 convention; nothing validates it for you.
 
-**Sharp edge — silent partial drop on overwrite conflict.** If `Result.allow_overwrite=False` and the
-target key already has a non-`None` value in `ctx`, `LoopRunner._store_to_ctx` prints
-`"Overwriting is not allowed. Discard result..."` and returns *immediately* — discarding not just that
-one result, but any other `Result`s later in the same plugin's `self.results` list that hadn't been
-stored yet. This is worth knowing when debugging a plugin that seems to be missing some of its outputs.
+**Sharp edge — silent partial drop on overwrite conflict.** The guard checks the flag on the *existing*
+`Result` already stored in `ctx` under that key, not on the new `Result` being stored. If a key already
+holds a non-`None` value and that stored `Result` has `allow_overwrite=False`, `LoopRunner._store_to_ctx`
+prints `"Overwriting is not allowed. Discard result..."` and returns *immediately* — discarding not just
+that one result, but any other `Result`s later in the same plugin's `self.results` list that hadn't been
+stored yet. Setting `allow_overwrite=False` on the new result you're publishing does nothing to protect
+it from being overwritten later; it's the previously-stored value's flag that matters. This is worth
+knowing when debugging a plugin that seems to be missing some of its outputs.
 
 ## Parallel plugins
 
