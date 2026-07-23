@@ -49,6 +49,18 @@ class TestWorkflowManager(ContextSensitiveTest):
         mgr.launch()
         assert ctx()[SimpleEnum.simple].result == 1
 
+    def test_launch_expect_context_overridden_via_cli(self):
+        # `workflow_config_cli_context` does not set `Pipeline.context`, so this
+        # only loads the previously stored context if the CLI override works.
+        args = [
+            "--Pipeline-context=cache/simple_plugin.pickle",
+            "test.config.workflow_config_cli_context",
+        ]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
+
     def test_parse_args(self):
         args = [
             "--MockPlugin-a=True",
@@ -194,13 +206,13 @@ class TestWorkflowManager(ContextSensitiveTest):
         )
         assert isinstance(config.Pipeline.plugins, Loop)
 
-    def test_copy_results_from_context(self):
+    def test_load_context_into_ctx(self):
         from enum import Enum
 
         class MockEnum(Enum):
             mock = "mock"
 
-        WorkflowManager._copy_results_from_context(
+        WorkflowManager._load_context_into_ctx(
             context_=Struct({"key": "value", MockEnum.mock: "mock"})
         )
         assert "key" not in ctx()

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- CLI override support for Pipeline context: `--Pipeline-context=/path/to/pickle` now works on all configs
+- Automatic context parameter initialization in Pipeline for seamless CLI overrides
+
+### Changed
+
+- Pipeline configuration now automatically defaults `context=None` if not explicitly set
+- Renamed `_copy_results_from_context` to `_load_context_into_ctx` for improved clarity
+
+### Fixed
+
+- Context loading now uses defensive `.get()` for robust null handling
+- Workflow context can now be loaded and overridden via command-line arguments without config modifications
+
 ## [2.1.0] (2026-05-04)
 
 ### Added
