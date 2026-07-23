@@ -49,6 +49,18 @@ class TestWorkflowManager(ContextSensitiveTest):
         mgr.launch()
         assert ctx()[SimpleEnum.simple].result == 1
 
+    def test_launch_expect_context_overridden_via_cli(self):
+        # `workflow_config_cli_context` does not set `Pipeline.context`, so this
+        # only loads the previously stored context if the CLI override works.
+        args = [
+            "--Pipeline-context=cache/simple_plugin.pickle",
+            "test.config.workflow_config_cli_context",
+        ]
+
+        mgr = WorkflowManager(args)
+        mgr.launch()
+        assert ctx()[SimpleEnum.simple].result == 1
+
     def test_parse_args(self):
         args = [
             "--MockPlugin-a=True",
