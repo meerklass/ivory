@@ -53,3 +53,9 @@ test/cache/*
 
 # VS Code
 .vscode/*
+
+# others
+claude.md
+CLAUDE.md
+uv.lock
+*.pickle
