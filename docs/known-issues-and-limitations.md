@@ -5,8 +5,8 @@ This page used to track a set of stale/broken references found during the initia
 referencing a nonexistent `PickleContextProvider`, missing/vestigial `pyproject.toml` dependencies, no
 packaged console script, and an incomplete `packages` declaration). All of those were fixed and the
 stale files removed in [PR #32](https://github.com/meerklass/ivory/pull/32) — see `CHANGELOG.md`'s
-Unreleased section for the itemized history. What's left below are structural design limitations:
-things that are working as intended, but easy to assume away if you don't know about them.
+`[2.2.0]` entry for the itemized history. What's left below are structural design limitations: things
+that are working as intended, but easy to assume away if you don't know about them.
 
 ## Structural / design limitations
 
