@@ -194,13 +194,13 @@ class TestWorkflowManager(ContextSensitiveTest):
         )
         assert isinstance(config.Pipeline.plugins, Loop)
 
-    def test_copy_results_from_context(self):
+    def test_load_context_into_ctx(self):
         from enum import Enum
 
         class MockEnum(Enum):
             mock = "mock"
 
-        WorkflowManager._copy_results_from_context(
+        WorkflowManager._load_context_into_ctx(
             context_=Struct({"key": "value", MockEnum.mock: "mock"})
         )
         assert "key" not in ctx()
