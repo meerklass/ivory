@@ -12,6 +12,7 @@ The development is coordinated on [GitHub](https://github.com/meerklass/ivory) a
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
 
@@ -60,62 +61,76 @@ A configuration can range from very simple to arbitrarily complex.
 In the simplest case the configuration file would look something like:
 
 ```python
-from ivory.config import base_config
+from ivory.utils.config_section import ConfigSection
 
-plugins = [
-    "test.plugin.simple_plugin",
-    "test.plugin.simple_plugin"
-]
+Pipeline = ConfigSection(
+    plugins=[
+        "test.plugin.simple_plugin",
+        "test.plugin.simple_plugin"
+    ]
+)
 ```
 
-Importing basic functionality from `base_config` and defining a list of plugins.
+Every configuration must define a `Pipeline` section (a `ConfigSection`) with a `plugins` key, listing
+the plugins to run in order by their dotted module path.
 
 #### Complex Configuration
 
 A slightly more complex use case would look something like:
 
 ```python
-from ivory.config import base_config
 from ivory.loop import Loop
+from ivory.utils.config_section import ConfigSection
 from ivory.utils.stop_criteria import RangeStopCriteria
 
-context_provider = "ivory.context_provider.PickleContextProvider"
-ctx_file_name = "ivory_cxt.dump"
-
-plugins = Loop(
-    [
-        "test.plugin.simple_plugin",
-        Loop(
-            [
-                "test.plugin.simple_plugin",
-                "test.plugin.simple_plugin"
-            ],
-            stop=RangeStopCriteria(max_iter=5)
-        ),
-        "test.plugin.simple_plugin"
-    ],
-    stop=RangeStopCriteria(max_iter=2)
+Pipeline = ConfigSection(
+    plugins=Loop(
+        [
+            "test.plugin.simple_plugin",
+            Loop(
+                [
+                    "test.plugin.simple_plugin",
+                    "test.plugin.simple_plugin"
+                ],
+                stop=RangeStopCriteria(max_iter=5)
+            ),
+            "test.plugin.simple_plugin"
+        ],
+        stop=RangeStopCriteria(max_iter=2)
+    )
 )
 
-a = 1.5
-b = ["omega", "lambda", "gamma"]
-c = None
+SimplePlugin = ConfigSection(a=1.5, b=["omega", "lambda", "gamma"], c=None)
 ```
 
 This configuration:
 
-- Configures the `PickleContextProvider` as context provider which ensures that the context is persisted to the file `ivory_ctx.dump` after every execution of a plugin
 - Defines a list of plugins consisting of two nested loops, each having two plugins. The inner loop will be executed 5 times and the outer loop twice
-- Defines the attributes `a`, `b` and `c` where `a` is a float, `b` is a list of strings, and `c` is a NoneType
-- The type of `c` will automatically be inferred from the given value from the command line
+- Defines a `SimplePlugin` section with attributes `a`, `b` and `c`, passed to `SimplePlugin.__init__()` as keyword arguments, where `a` is a float, `b` is a list of strings, and `c` is a NoneType
+- The type of an overridden attribute is automatically inferred from the type of its default value in the config
+
+A pipeline can also be resumed from a previously saved run by setting `Pipeline.context` to the path of
+a context file saved via a plugin's `store_context_to_disc()` call — see the
+[internal documentation](#documentation) for details on checkpointing.
 
 #### Command Line Usage
 
-Calling this config and overriding the attributes from the command line:
+Calling this config and overriding `SimplePlugin`'s attributes from the command line (section and
+parameter name joined with a dash; dashes in the parameter name itself become underscores):
 
 ```bash
-ivory --a=1.75 --b=zeta,beta,gamma --c=False package.subpackage.module
+ivory --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
 ```
+
+## Documentation
+
+For a deeper look at how Ivory works internally — the execution model, the plugin contract, the
+configuration format, and known issues/limitations — see the docs in [`docs/`](docs/README.md):
+
+- [Architecture](docs/architecture.md) — how a pipeline run executes end to end, and how the context/state model works
+- [Plugins](docs/plugins.md) — the plugin contract, discovery/loading, and how to write a new plugin
+- [Configuration](docs/configuration.md) — the config file format, CLI overrides, and worked examples
+- [Known issues and limitations](docs/known-issues-and-limitations.md) — stale/broken spots and structural design limitations
 
 ## Contributing
 
