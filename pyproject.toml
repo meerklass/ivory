@@ -6,12 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "ivory"
 dynamic = ["version"]
 description = "Ivory: Simple and flexible workflow engine"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy>=2.0.0",
     "joblib",
-    "ipyparallel",
+    "psutil",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -19,8 +19,11 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 
+[project.scripts]
+ivory = "ivory.cli.main:run"
+
 [project.optional-dependencies]
 test = ["pytest"]
 
-[tool.setuptools]
-packages = ["ivory"]
+[tool.setuptools.packages.find]
+include = ["ivory*"]
