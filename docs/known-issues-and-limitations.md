@@ -1,39 +1,12 @@
 # Known issues and limitations
 
-Two different kinds of things to know before working on Ivory: bugs/stale references that should
-probably just be fixed, and structural design limitations that are working as intended but easy to
-assume away if you don't know about them.
-
-## Stale or broken references (bugs)
-
-- **`ivory/examples/config/workflow_config_parallel.py`** imports
-  `ivory.plugin.parallel_plugin_collection.ParallelPluginCollection`. That module/class does not exist
-  anywhere in the current repository — this example is currently broken and shouldn't be used as a
-  template.
-- **`test/config/workflow_config_cust.py`** sets
-  `context_provider="ivory.context_provider.PickleContextProvider"` in its `Pipeline` section. No such
-  class exists in `ivory/context_provider.py` (only `DefaultContextProvider` does), and
-  `context.get_context_provider()` (`ivory/context.py`) is hardcoded to always return
-  `DefaultContextProvider` regardless of this config key — so this key is silently ignored, not
-  honored. Real context persistence works via `AbstractPlugin.store_context_to_disc()` +
-  `Pipeline.context`, described in [Architecture](architecture.md#checkpointing-saving-and-resuming-context).
-- **`psutil`** is imported directly in `ivory/utils/loop_runner.py` (for the resource-tracking feature)
-  but is not listed in `pyproject.toml`'s `dependencies` — a packaging gap. It happens to already be
-  present in environments that install it transitively or have it from another package.
-- **No `[project.scripts]` entry point** in `pyproject.toml`, so nothing currently installs an `ivory`
-  console script. Invoke via `python -m ivory.cli.main [arguments] configuration` instead, or let a
-  downstream project wrap it — MuSEEK's `museek/cli/main.py` calls `ivory.cli.main.run()` directly and
-  exposes that as the `museek` console script.
-- **`ipyparallel`** is listed as a dependency in `pyproject.toml` but is not referenced anywhere in the
-  current source — likely vestigial from a planned or removed parallel backend (only
-  `SequentialBackend` exists today).
-- **`pyproject.toml` declares `readme = "README.rst"`**, but the actual file in the repo is
-  `README.md` — this mismatch could break metadata rendering on PyPI or similar if this package is ever
-  published there.
-- **`pyproject.toml` only declares `packages = ["ivory"]`** under `[tool.setuptools]`, not the
-  subpackages (`ivory.cli`, `ivory.plugin`, `ivory.utils`, `ivory.enum`, `ivory.exceptions`) —
-  potentially a packaging gap for sdist/wheel builds depending on how setuptools' package discovery is
-  configured elsewhere.
+This page used to track a set of stale/broken references found during the initial documentation pass
+(a broken `workflow_config_parallel.py` example, a `test/config/workflow_config_cust.py` fixture
+referencing a nonexistent `PickleContextProvider`, missing/vestigial `pyproject.toml` dependencies, no
+packaged console script, and an incomplete `packages` declaration). All of those were fixed and the
+stale files removed in [PR #32](https://github.com/meerklass/ivory/pull/32) — see `CHANGELOG.md`'s
+Unreleased section for the itemized history. What's left below are structural design limitations:
+things that are working as intended, but easy to assume away if you don't know about them.
 
 ## Structural / design limitations
 
@@ -42,10 +15,15 @@ into if you assume more flexibility than exists.
 
 - **Pickle-based checkpointing only.** `AbstractPlugin.store_context_to_disc()` and `Pipeline.context`
   round-trip the *entire* context object via raw `pickle` (`LoopRunner._store_ctx`,
-  `WorkflowManager._copy_results_from_context`). There's no JSON/HDF5/other serialization option, no
+  `WorkflowManager._load_context_into_ctx`). There's no JSON/HDF5/other serialization option, no
   schema or version checking on load, and pickles are neither safe to load from an untrusted source nor
   guaranteed to stay compatible across Python or library version changes. A checkpoint saved under one
   environment may fail to load, or fail silently in a confusing way, under another.
+- **Context provider seam is not actually pluggable.** `context.get_context_provider()`
+  (`ivory/context.py`) is hardcoded to always return `DefaultContextProvider` — there's no config option
+  that changes this, and no alternative provider implementation exists in the codebase. If you need
+  different context-creation or persistence behavior, you currently have to modify this function
+  directly rather than configure it (see [Architecture](architecture.md#the-context-how-data-flows-between-plugins)).
 - **Sequential-only execution across plugins.** `SequentialBackend` is the only backend; plugins always
   run one at a time, in list order, in a single process. Parallelism only exists *within* a single
   plugin's `run()` call, via `AbstractParallelJoblibPlugin`/`joblib` (see

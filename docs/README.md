@@ -11,5 +11,5 @@ Suggested reading order:
 2. [Plugins](plugins.md) — the plugin contract, how plugins are discovered and wired together, and how
    to write a new one.
 3. [Configuration](configuration.md) — the config file format, CLI overrides, and worked examples.
-4. [Known issues and limitations](known-issues-and-limitations.md) — stale/broken spots in the current
-   codebase, plus structural limitations that are working as intended but worth knowing up front.
+4. [Known issues and limitations](known-issues-and-limitations.md) — structural limitations that are
+   working as intended but worth knowing up front.

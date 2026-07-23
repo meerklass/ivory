@@ -21,12 +21,12 @@ Ivory is primarily used as a workflow engine for [MuSEEK](https://github.com/mee
   of CLI-style argument strings, calls `.launch()`, and returns the resulting global context.
 - **CLI function**: `ivory.cli.main.run()` reads `sys.argv[1:]` and delegates to `_main()`, which
   handles `--help`/`-h` and otherwise does `WorkflowManager(argv).launch()`.
-- **In practice, there is no packaged `ivory` shell command** in this version — `pyproject.toml` has no
-  `[project.scripts]` entry, so nothing installs a console-script named `ivory` (see
-  [Known issues and limitations](known-issues-and-limitations.md)). Downstream projects call
-  `ivory.cli.main.run()` directly instead. MuSEEK's own CLI (`museek/cli/main.py`) does exactly this:
-  it sets `sys.argv = ["museek"] + list(args)` and calls Ivory's `run()`, so the `museek` command *is*
-  Ivory under the hood.
+- **Packaged console script**: `pyproject.toml` declares `ivory = "ivory.cli.main:run"` under
+  `[project.scripts]`, so once installed, `ivory [arguments] configuration` works directly from the
+  shell. Downstream projects can also call `ivory.cli.main.run()` directly and wrap it in their own
+  console script — MuSEEK's `museek/cli/main.py` does exactly this: it sets
+  `sys.argv = ["museek"] + list(args)` and calls Ivory's `run()`, so the `museek` command *is* Ivory
+  under the hood.
 
 ## Execution flow
 
@@ -42,7 +42,10 @@ WorkflowManager.__init__(argv)
 WorkflowManager._setup(argv)
    ├─ _parse_args(argv)
    │    ├─ import the config module (last positional arg) and collect its
-   │    │  ConfigSection-typed module attributes as "sections"
+   │    │  ConfigSection-typed module attributes as "sections"; if a "Pipeline"
+   │    │  section exists and doesn't already set "context", auto-seed
+   │    │  Pipeline.context=None so --Pipeline-context=... is always a valid
+   │    │  CLI override, even for configs that never mention context at all
    │    ├─ getopt() the remaining args against longopts derived from those
    │    │  sections, i.e. --SectionName-param=value
    │    └─ _config_immutable(): merge CLI overrides over file defaults
@@ -51,8 +54,9 @@ WorkflowManager._setup(argv)
    ├─ validate a "Pipeline" section with a "plugins" key exists
    ├─ ctx().params = <the immutable config>
    ├─ ctx().plugins = ctx().params.Pipeline.plugins
-   └─ if Pipeline.context is set: unpickle that file and copy its
-      Enum-keyed entries into the live ctx() (resume-from-checkpoint)
+   └─ context_file = Pipeline.get("context", None); if not None: unpickle that
+      file and copy its Enum-keyed entries into the live ctx() via
+      _load_context_into_ctx() (resume-from-checkpoint)
         │
         ▼
 WorkflowManager.launch()            (static method)
@@ -95,13 +99,11 @@ single shared, mutable, dict-with-attribute-access object called the **context**
 
 There is a pluggable seam for how the context is created — `context.get_context_provider()`
 (`ivory/context.py`) — but it currently **always returns `DefaultContextProvider`**
-(`ivory/context_provider.py`), regardless of anything you put in your config. `DefaultContextProvider`
-just builds a plain `Struct`/`ImmutableStruct` and does not persist anything on its own. A
-`context_provider = "ivory.context_provider.PickleContextProvider"` config key appears in one test
-fixture (`test/config/workflow_config_cust.py`), but that class **does not exist** anywhere in the
-codebase — don't use it as a reference (see
-[Known issues and limitations](known-issues-and-limitations.md)). The real way to persist/resume
-context is described below.
+(`ivory/context_provider.py`), regardless of anything you put in your config; no alternative provider
+implementation exists in the codebase, so this seam isn't actually usable today (see
+[Known issues and limitations](known-issues-and-limitations.md)). `DefaultContextProvider` just builds
+a plain `Struct`/`ImmutableStruct` and does not persist anything on its own. The real way to
+persist/resume context is described below.
 
 ## `Loop`: sequencing and repetition
 
@@ -138,9 +140,19 @@ keys are present and non-`None`; if so, it `pickle.dump()`s the whole `ctx` obje
 trigger a second dump on a later loop iteration.
 
 To resume from a saved context on a later run, set `Pipeline.context = "<path to the pickle file>"` in
-your config. During `WorkflowManager._setup`, Ivory unpickles that file and copies every `Enum`-keyed
-entry from it into the live `ctx()` (`WorkflowManager._copy_results_from_context`) — i.e. it restores
-previously published `Result`s, not arbitrary state, before the pipeline starts running.
+your config — or, since `_get_config_sections` auto-seeds `Pipeline.context=None` for every config that
+declares a `Pipeline` section, pass it on the command line instead without touching the config file at
+all:
+
+```bash
+ivory --Pipeline-context=cache/simple_plugin.pickle package.subpackage.module
+```
+
+During `WorkflowManager._setup`, Ivory reads `Pipeline.get("context", None)` (defensive, so a config
+that never mentions `context` still works) and, if it's not `None`, unpickles that file and copies every
+`Enum`-keyed entry from it into the live `ctx()` (`WorkflowManager._load_context_into_ctx`, renamed from
+`_copy_results_from_context`) — i.e. it restores previously published `Result`s, not arbitrary state,
+before the pipeline starts running.
 
 This whole mechanism is pickle-based with no schema or versioning — see
 [Known issues and limitations](known-issues-and-limitations.md) for the implications.

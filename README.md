@@ -38,16 +38,12 @@ Ivory can be run from the command line or as a Python module.
 
 ### Command Line
 
-There is currently no packaged `ivory` console script (no `[project.scripts]` entry in
-`pyproject.toml` — see [Known issues and limitations](docs/known-issues-and-limitations.md)), so invoke
-Ivory's CLI module directly:
-
 ```bash
-python -m ivory.cli.main [arguments] configuration
+ivory [arguments] configuration
 ```
 
-Downstream projects typically wrap this in their own console script — e.g. MuSEEK's `museek` command
-delegates straight into `ivory.cli.main.run()`.
+Downstream projects can also wrap `ivory.cli.main.run()` in their own console script — e.g. MuSEEK's
+`museek` command delegates straight into it.
 
 ### Python Module
 
@@ -117,8 +113,10 @@ This configuration:
 - The type of an overridden attribute is automatically inferred from the type of its default value in the config
 
 A pipeline can also be resumed from a previously saved run by setting `Pipeline.context` to the path of
-a context file saved via a plugin's `store_context_to_disc()` call — see the
-[internal documentation](#documentation) for details on checkpointing.
+a context file saved via a plugin's `store_context_to_disc()` call — or by passing
+`--Pipeline-context=<path>` on the command line without touching the config file at all, since `context`
+defaults to `None` and is always overridable. See the [internal documentation](#documentation) for
+details on checkpointing.
 
 #### Command Line Usage
 
@@ -126,7 +124,7 @@ Calling this config and overriding `SimplePlugin`'s attributes from the command 
 parameter name joined with a dash; dashes in the parameter name itself become underscores):
 
 ```bash
-python -m ivory.cli.main --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
+ivory --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
 ```
 
 ## Documentation
@@ -137,7 +135,7 @@ configuration format, and known issues/limitations — see the docs in [`docs/`]
 - [Architecture](docs/architecture.md) — how a pipeline run executes end to end, and how the context/state model works
 - [Plugins](docs/plugins.md) — the plugin contract, discovery/loading, and how to write a new plugin
 - [Configuration](docs/configuration.md) — the config file format, CLI overrides, and worked examples
-- [Known issues and limitations](docs/known-issues-and-limitations.md) — stale/broken spots and structural design limitations
+- [Known issues and limitations](docs/known-issues-and-limitations.md) — structural design limitations worth knowing up front
 
 ## Contributing
 

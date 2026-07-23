@@ -113,19 +113,26 @@ SimplePlugin = ConfigSection(value="load")
 ## CLI overrides
 
 Any config value can be overridden from the shell with `--<SectionName>-<param>=<value>` (dashes in
-the parameter name become underscores). Note there is currently no packaged `ivory` console script (see
-[Known issues and limitations](known-issues-and-limitations.md)), so invoke via `python -m
-ivory.cli.main` unless a downstream project provides its own wrapper, as MuSEEK's `museek` command does:
+the parameter name become underscores). `pyproject.toml` declares `ivory = "ivory.cli.main:run"` as a
+console script, so once installed you can invoke it directly:
 
 ```bash
-python -m ivory.cli.main --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
+ivory --SimplePlugin-a=1.75 --SimplePlugin-b=zeta,beta,gamma --SimplePlugin-c=False package.subpackage.module
 museek --InPlugin-block-name=1675632179 museek.config.process_uhf_band
 ```
 
-Only parameters already present in the target config's sections can be overridden this way —
-`get_all_longopts` (`ivory/utils/opt_helper.py`) builds the accepted `getopt` longopts strictly from the
-keys already defined in the config's `ConfigSection`s, so passing an override for a key that doesn't
-exist in the config raises a `getopt` error rather than adding a new key.
+In general, only parameters already present in the target config's sections can be overridden this way
+— `get_all_longopts` (`ivory/utils/opt_helper.py`) builds the accepted `getopt` longopts strictly from
+the keys already defined in the config's `ConfigSection`s, so passing an override for a key that doesn't
+exist in the config raises a `getopt` error rather than adding a new key. **`Pipeline.context` is a
+built-in exception to this**: `WorkflowManager._get_config_sections` auto-seeds `Pipeline.context=None`
+for every config that declares a `Pipeline` section but doesn't already set `context` itself, so
+`--Pipeline-context=<path>` is always a valid override, even for configs that never mention `context`
+at all (see [Architecture](architecture.md#checkpointing-saving-and-resuming-context)):
+
+```bash
+ivory --Pipeline-context=cache/simple_plugin.pickle test.config.workflow_config_cli_context
+```
 
 The override's type is inferred from the *existing* default's type in the config
 (`InferType.infer_type`, `ivory/utils/infer_type.py`). If the default value is anything other than
@@ -141,10 +148,5 @@ useful to see edge cases):
 
 - `workflow_config_missing_plugins.py`, `workflow_config_empty.py` — negative-path configs, used to
   test validation errors (missing `Pipeline` section, missing `plugins` key).
-- `workflow_config_cust.py` — references `ivory.context_provider.PickleContextProvider`, which
-  **does not exist** in the current codebase; don't copy this pattern (see
-  [Known issues and limitations](known-issues-and-limitations.md)).
-- `ivory/examples/config/workflow_config_parallel.py` — references a `ParallelPluginCollection` class
-  that also does not exist; likewise not usable as a reference (see
-  [Known issues and limitations](known-issues-and-limitations.md)). For real parallel plugins, use
-  `AbstractParallelJoblibPlugin` instead (see [Plugins](plugins.md#parallel-plugins)).
+- `workflow_config_cli_context.py` — a `Pipeline` section with no `context` key at all, used to test
+  that `--Pipeline-context=<path>` still works via the auto-seeded default described above.
