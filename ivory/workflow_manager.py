@@ -1,7 +1,12 @@
 import importlib
+import importlib.util
+import os
 import pickle
+import sys
+import uuid
 from enum import Enum
 from getopt import getopt
+from pathlib import Path
 from types import ModuleType
 from typing import Optional, Any
 
@@ -122,7 +127,7 @@ class WorkflowManager:
     def _get_config_sections(self, config_name: str) -> dict[str, ConfigSection]:
         """Returns a potentially empty `dict` of config section names and `ConfigSection`s."""
         result = {}
-        config = importlib.import_module(config_name)
+        config = self._load_config(config_name)
         for section_name in dir(config):
             if config_section := self._get_config_section(config, section_name):
                 result[section_name] = config_section
@@ -133,6 +138,31 @@ class WorkflowManager:
                 result[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value] = None
         
         return result
+
+    @staticmethod
+    def _load_config(config_name: str) -> ModuleType:
+        """
+        Load a config either as a dotted module name (e.g. 'museek.config.demo') or as a
+        filesystem path to a `.py` file (absolute, relative, or `~`-expanded), which does not
+        need to be part of an installed/importable package.
+        """
+        path_separators = (sep for sep in (os.sep, os.altsep) if sep)
+        looks_like_path = any(sep in config_name for sep in path_separators) or config_name.endswith(
+            ".py"
+        )
+        if looks_like_path:
+            config_path = Path(config_name).expanduser().resolve()
+            if not config_path.is_file():
+                raise FileNotFoundError(f"Configuration file not found: {config_path}")
+            module_name = f"ivory_dynamic_config_{uuid.uuid4().hex}"
+            spec = importlib.util.spec_from_file_location(module_name, config_path)
+            if spec is None or spec.loader is None:
+                raise ImportError(f"Could not load configuration from {config_path}")
+            config = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = config
+            spec.loader.exec_module(config)
+            return config
+        return importlib.import_module(config_name)
 
     @staticmethod
     def _get_config_section(config: ModuleType, section_name: str) -> Optional[Any]:

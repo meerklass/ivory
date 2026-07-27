@@ -2,12 +2,35 @@
 
 ## Config files are plain Python modules
 
-Ivory configs are **not** YAML/TOML/JSON — they're ordinary Python modules, imported by dotted path
-(e.g. `museek.config.demo`, passed as the last positional CLI argument). A config module defines
+Ivory configs are **not** YAML/TOML/JSON — they're ordinary Python modules. A config module defines
 module-level variables whose names start with an uppercase letter, holding instances of
 `ivory.utils.config_section.ConfigSection` — a plain `dict` subclass. `WorkflowManager` picks these up
 automatically by scanning `dir(module)` for capitalized, `ConfigSection`-typed attributes
 (`WorkflowManager._get_config_section`).
+
+The last positional CLI argument identifies the config, and can be either:
+
+- a **dotted module path** (e.g. `museek.config.demo`), imported the normal way via
+  `importlib.import_module` — the module must already be importable (i.e. on `sys.path`, typically
+  inside an installed/editable package); or
+- a **filesystem path** to a `.py` file (absolute, relative, or `~`-expanded, e.g. `./my_config.py`,
+  `~/configs/my_config.py`) — this does **not** need to be part of an installed/importable package, so
+  configs can live anywhere on disk (e.g. alongside data on a scratch directory).
+
+`WorkflowManager._load_config` picks between the two based on the argument: anything containing a path
+separator or ending in `.py` is treated as a file path, otherwise it's treated as a dotted module name.
+
+Either way, Ivory still needs a live Python *module object* to scan for `ConfigSection` attributes,
+because config files are executable Python rather than declarative data — a file path is just a second
+way to obtain that module object (`importlib.util.spec_from_file_location` + `exec_module`), rather than
+a way to bypass loading it as a module. Each file-based load registers the module in `sys.modules` under
+a fresh, randomly generated (`uuid4`-based) name, so that loading two different file-based configs in
+the same process (e.g. across tests) can't overwrite each other's `sys.modules` entry.
+
+```bash
+ivory --size-x=100 --size-y=100 ./my_config.py
+ivory --size-x=100 --size-y=100 ~/configs/my_config.py
+```
 
 **Required section**: `Pipeline`, with a `plugins` key — either a list of dotted plugin-module strings,
 or a pre-built `ivory.loop.Loop` (see [Architecture](architecture.md#loop-sequencing-and-repetition)).
