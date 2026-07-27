@@ -1,3 +1,5 @@
+import os
+import tempfile
 from getopt import GetoptError
 from operator import eq
 from pathlib import Path
@@ -205,6 +207,84 @@ class TestWorkflowManager(ContextSensitiveTest):
             }
         )
         assert isinstance(config.Pipeline.plugins, Loop)
+
+    def test_load_config_from_file_path_absolute(self):
+        config_content = (
+            "from ivory.utils.config_section import ConfigSection\n\n"
+            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "TestSection = ConfigSection(test_param='from_absolute_file')\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(config_content)
+            temp_config_path = f.name
+
+        try:
+            mgr = WorkflowManager([temp_config_path])
+            assert ctx().params is not None
+            assert ctx().params.Pipeline.plugins is not None
+            assert ctx().params.TestSection.test_param == "from_absolute_file"
+        finally:
+            os.unlink(temp_config_path)
+
+    def test_load_config_from_file_path_relative(self):
+        config_content = (
+            "from ivory.utils.config_section import ConfigSection\n\n"
+            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "TestSection = ConfigSection(test_param='from_relative_file')\n"
+        )
+        config_filename = "test_relative_workflow_config.py"
+        try:
+            with open(config_filename, "w") as f:
+                f.write(config_content)
+            mgr = WorkflowManager([f"./{config_filename}"])
+            assert ctx().params.TestSection.test_param == "from_relative_file"
+        finally:
+            if os.path.exists(config_filename):
+                os.unlink(config_filename)
+
+    def test_load_config_file_not_found(self):
+        args = ["/non/existent/path/config.py"]
+        with pytest.raises(FileNotFoundError):
+            WorkflowManager(args)
+
+    def test_load_config_module_name_still_works(self):
+        # Regression: dotted module names must still resolve via the module branch,
+        # not be misclassified as a file path.
+        args = ["test.config.workflow_config"]
+        mgr = WorkflowManager(args)
+        assert ctx().params.Pipeline.plugins is not None
+
+    def test_load_config_two_file_based_configs_do_not_collide(self):
+        content_a = (
+            "from ivory.utils.config_section import ConfigSection\n\n"
+            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "TestSection = ConfigSection(test_param='config_a')\n"
+        )
+        content_b = (
+            "from ivory.utils.config_section import ConfigSection\n\n"
+            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "TestSection = ConfigSection(test_param='config_b')\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(content_a)
+            path_a = f.name
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(content_b)
+            path_b = f.name
+
+        try:
+            module_a = WorkflowManager._load_config(path_a)
+            module_b = WorkflowManager._load_config(path_b)
+            assert module_a is not module_b
+            assert module_a.TestSection["test_param"] == "config_a"
+            assert module_b.TestSection["test_param"] == "config_b"
+        finally:
+            os.unlink(path_a)
+            os.unlink(path_b)
+
+    def test_load_config_via_load_config_static_method(self):
+        module = WorkflowManager._load_config("test.config.workflow_config")
+        assert module.Pipeline["plugins"] is not None
 
     def test_load_context_into_ctx(self):
         from enum import Enum
