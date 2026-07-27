@@ -5,10 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [2.2.0] (2026-07-23)
 
 ### Added
 
+- Internal developer documentation in `docs/`: architecture, plugin contract, configuration format, and known issues/limitations
+- `ivory` console-script entry point, so `ivory [arguments] configuration` works directly from the shell after install
 - CLI override support for Pipeline context: `--Pipeline-context=/path/to/pickle` now works on all configs
 - Automatic context parameter initialization in Pipeline for seamless CLI overrides
 
@@ -16,11 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pipeline configuration now automatically defaults `context=None` if not explicitly set
 - Renamed `_copy_results_from_context` to `_load_context_into_ctx` for improved clarity
+- Declared `psutil` as a direct dependency (previously imported but undeclared) and dropped the unused `ipyparallel` dependency
+- Corrected `pyproject.toml` readme path from `README.rst` to `README.md`
+- Switched `pyproject.toml` package declaration to auto-discovery so subpackages are no longer silently dropped from the build
 
 ### Fixed
 
 - Context loading now uses defensive `.get()` for robust null handling
 - Workflow context can now be loaded and overridden via command-line arguments without config modifications
+- Removed broken `ivory/examples/config/workflow_config_parallel.py` example, which referenced a long-removed `ParallelPluginCollection` class
+- Removed stale `test/config/workflow_config_cust.py` fixture, which referenced a nonexistent `PickleContextProvider`
+- Removed unused `.settings/` Eclipse/PyDev IDE metadata
 
 ## [2.1.0] (2026-05-04)
 
