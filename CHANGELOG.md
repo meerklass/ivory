@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Support for loading pipeline configs from a filesystem path (absolute, relative, or `~`-expanded
+  `.py` file), in addition to the existing dotted module path — configs no longer need to be part of an
+  installed/importable package (`WorkflowManager._load_config`)
+- `test/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
+  exercise the `ivory` CLI end-to-end
+
+### Changed
+
+- CLI usage text and `docs/configuration.md` updated to document file-path configs
+
 ## [2.2.0] (2026-07-23)
 
 ### Added

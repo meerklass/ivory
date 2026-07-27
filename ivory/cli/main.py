@@ -30,15 +30,20 @@ def _usage():
 
     usage = """
     **ivory workflow engine**
-    
+
     Usage:
     ivory [arguments] configuration
-    
+
+    The configuration can be either a dotted module path (e.g. ufig.config.random) or a
+    filesystem path to a .py file (absolute, relative, or ~-expanded), which does not need to
+    be part of an installed package.
+
     Only arguments already preconfigured in the given configuration will be accepted.
     Note: Dashed '-' will be converted into underlines '_' for all the arguments
-    
+
     example:
     - ivory --size-x=100 --size-y=100 ufig.config.random
+    - ivory --size-x=100 --size-y=100 ./my_config.py
     """
     print(usage)
 
