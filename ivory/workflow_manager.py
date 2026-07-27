@@ -6,6 +6,7 @@ import sys
 import uuid
 from enum import Enum
 from getopt import getopt
+from pathlib import Path
 from types import ModuleType
 from typing import Optional, Any
 
@@ -145,9 +146,13 @@ class WorkflowManager:
         filesystem path to a `.py` file (absolute, relative, or `~`-expanded), which does not
         need to be part of an installed/importable package.
         """
-        if os.path.sep in config_name or config_name.endswith(".py"):
-            config_path = os.path.abspath(os.path.expanduser(config_name))
-            if not os.path.exists(config_path):
+        path_separators = (sep for sep in (os.sep, os.altsep) if sep)
+        looks_like_path = any(sep in config_name for sep in path_separators) or config_name.endswith(
+            ".py"
+        )
+        if looks_like_path:
+            config_path = Path(config_name).expanduser().resolve()
+            if not config_path.is_file():
                 raise FileNotFoundError(f"Configuration file not found: {config_path}")
             module_name = f"ivory_dynamic_config_{uuid.uuid4().hex}"
             spec = importlib.util.spec_from_file_location(module_name, config_path)

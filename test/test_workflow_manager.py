@@ -232,15 +232,17 @@ class TestWorkflowManager(ContextSensitiveTest):
             "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='from_relative_file')\n"
         )
-        config_filename = "test_relative_workflow_config.py"
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".py", dir=".", delete=False
+        ) as f:
+            f.write(config_content)
+            config_path = Path(f.name)
+
         try:
-            with open(config_filename, "w") as f:
-                f.write(config_content)
-            mgr = WorkflowManager([f"./{config_filename}"])
+            mgr = WorkflowManager([f"./{config_path.name}"])
             assert ctx().params.TestSection.test_param == "from_relative_file"
         finally:
-            if os.path.exists(config_filename):
-                os.unlink(config_filename)
+            config_path.unlink(missing_ok=True)
 
     def test_load_config_file_not_found(self):
         args = ["/non/existent/path/config.py"]
