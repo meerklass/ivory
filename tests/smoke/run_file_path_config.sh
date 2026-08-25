@@ -6,7 +6,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${script_dir}/../.." && pwd)"
 
-# The smoke config below reuses the repo's `test.plugin.simple_plugin` test
+# The smoke config below reuses the repo's `tests.plugin.simple_plugin` test
 # fixture, which is only importable with the repo root on PYTHONPATH (it is
 # not part of the installed `ivory` distribution). See docs/configuration.md
 # for why file-based configs still load through Python's module machinery.
@@ -19,7 +19,7 @@ config_path="${temp_dir}/standalone_config.py"
 cat > "${config_path}" <<'EOF'
 from ivory.utils.config_section import ConfigSection
 
-Pipeline = ConfigSection(plugins=["test.plugin.simple_plugin"])
+Pipeline = ConfigSection(plugins=["tests.plugin.simple_plugin"])
 SimplePlugin = ConfigSection(value="hello from a file-path config")
 EOF
 

@@ -16,8 +16,8 @@ from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
 from ivory.utils.struct import Struct
 from ivory.workflow_manager import WorkflowManager
-from test.ctx_sensitive_test import ContextSensitiveTest
-from test.plugin.simple_plugin import SimplePlugin, SimpleEnum
+from tests.ctx_sensitive_test import ContextSensitiveTest
+from tests.plugin.simple_plugin import SimplePlugin, SimpleEnum
 
 
 class TestWorkflowManager(ContextSensitiveTest):
@@ -28,7 +28,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         cache_dir.mkdir(exist_ok=True)
 
     def test_launch(self):
-        args = ["test.config.workflow_config"]
+        args = ["tests.config.workflow_config"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
@@ -38,14 +38,14 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params.Pipeline.plugins is not None
 
     def test_launch_expect_context_stored_to_hard_disc(self):
-        args = ["test.config.workflow_config_store_context"]
+        args = ["tests.config.workflow_config_store_context"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
         assert ctx()[SimpleEnum.simple].result == 1
 
     def test_launch_expect_context_loaded_from_hard_disc(self):
-        args = ["test.config.workflow_config_load_context"]
+        args = ["tests.config.workflow_config_load_context"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
@@ -56,7 +56,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         # only loads the previously stored context if the CLI override works.
         args = [
             "--Pipeline-context=cache/simple_plugin.pickle",
-            "test.config.workflow_config_cli_context",
+            "tests.config.workflow_config_cli_context",
         ]
 
         mgr = WorkflowManager(args)
@@ -79,7 +79,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             "--MockPlugin-bool2=False",
             "--MockPlugin-bool3=True",
             "--MockPlugin-bool4=False",
-            "test.config.workflow_config",
+            "tests.config.workflow_config",
         ]
 
         mgr = WorkflowManager(args)
@@ -100,7 +100,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert all(map(eq, ctx().params.MockPlugin.j, [1, 2, 3, 4]))
 
     def test_simple_launch(self):
-        args = ["test.config.workflow_config_simple"]
+        args = ["tests.config.workflow_config_simple"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
@@ -111,7 +111,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert isinstance(ctx().params.Pipeline.plugins, Loop)
 
     def test_workflow_manager_when_config_empty_expect_value_error(self):
-        args = ["test.config.workflow_config_empty"]
+        args = ["tests.config.workflow_config_empty"]
         try:
             WorkflowManager(args)
             pytest.fail("config without plugins not allowed", True)
@@ -119,7 +119,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             assert True
 
     def test_missing_plugins(self):
-        args = ["test.config.workflow_config_missing_plugins"]
+        args = ["tests.config.workflow_config_missing_plugins"]
 
         try:
             mgr = WorkflowManager(args)
@@ -142,8 +142,8 @@ class TestWorkflowManager(ContextSensitiveTest):
 
     def test_invalid_config(self):
         args = [
-            "test.config.workflow_config_simple",
-            "test.config.workflow_config_simple",
+            "tests.config.workflow_config_simple",
+            "tests.config.workflow_config_simple",
         ]
         try:
             mgr = WorkflowManager(args)
@@ -152,7 +152,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             assert True
 
     def test_invalid_args(self):
-        args = ["-a=1", "test.config.workflow_config_simple"]
+        args = ["-a=1", "tests.config.workflow_config_simple"]
         try:
             mgr = WorkflowManager(args)
             pytest.fail("wrong argument format", True)
@@ -160,7 +160,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             assert True
 
     def test_unknown_args(self):
-        args = ["--a=1", "test.config.workflow_config_simple"]
+        args = ["--a=1", "tests.config.workflow_config_simple"]
         try:
             mgr = WorkflowManager(args)
             pytest.fail("wrong argument format", True)
@@ -211,7 +211,7 @@ class TestWorkflowManager(ContextSensitiveTest):
     def test_load_config_from_file_path_absolute(self):
         config_content = (
             "from ivory.utils.config_section import ConfigSection\n\n"
-            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "Pipeline = ConfigSection(plugins=['tests.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='from_absolute_file')\n"
         )
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
@@ -229,7 +229,7 @@ class TestWorkflowManager(ContextSensitiveTest):
     def test_load_config_from_file_path_relative(self):
         config_content = (
             "from ivory.utils.config_section import ConfigSection\n\n"
-            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "Pipeline = ConfigSection(plugins=['tests.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='from_relative_file')\n"
         )
         with tempfile.NamedTemporaryFile(
@@ -252,19 +252,19 @@ class TestWorkflowManager(ContextSensitiveTest):
     def test_load_config_module_name_still_works(self):
         # Regression: dotted module names must still resolve via the module branch,
         # not be misclassified as a file path.
-        args = ["test.config.workflow_config"]
+        args = ["tests.config.workflow_config"]
         mgr = WorkflowManager(args)
         assert ctx().params.Pipeline.plugins is not None
 
     def test_load_config_two_file_based_configs_do_not_collide(self):
         content_a = (
             "from ivory.utils.config_section import ConfigSection\n\n"
-            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "Pipeline = ConfigSection(plugins=['tests.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='config_a')\n"
         )
         content_b = (
             "from ivory.utils.config_section import ConfigSection\n\n"
-            "Pipeline = ConfigSection(plugins=['test.plugin.simple_plugin'])\n"
+            "Pipeline = ConfigSection(plugins=['tests.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='config_b')\n"
         )
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
@@ -285,7 +285,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             os.unlink(path_b)
 
     def test_load_config_via_load_config_static_method(self):
-        module = WorkflowManager._load_config("test.config.workflow_config")
+        module = WorkflowManager._load_config("tests.config.workflow_config")
         assert module.Pipeline["plugins"] is not None
 
     def test_load_context_into_ctx(self):

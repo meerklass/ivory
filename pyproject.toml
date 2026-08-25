@@ -7,15 +7,19 @@ name = "ivory"
 dynamic = ["version"]
 description = "Ivory: Simple and flexible workflow engine"
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "numpy>=2.0.0",
     "joblib",
-    "psutil",
+    "psutil>=5.9.0",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 
@@ -26,4 +30,11 @@ ivory = "ivory.cli.main:run"
 test = ["pytest"]
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["ivory*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.3",
+]

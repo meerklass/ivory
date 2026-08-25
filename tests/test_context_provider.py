@@ -3,7 +3,7 @@ import pytest
 from ivory.context_provider import DefaultContextProvider
 from ivory.utils.struct import ImmutableStruct
 from ivory.utils.struct import Struct
-from test.ctx_sensitive_test import ContextSensitiveTest
+from tests.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestContextProvider(ContextSensitiveTest):

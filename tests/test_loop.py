@@ -6,10 +6,10 @@ from ivory.exceptions.exceptions import UnsupportedPluginTypeException
 from ivory.loop import Loop
 from ivory.utils.stop_criteria import RangeStopCriteria
 from ivory.utils.struct import Struct, WorkflowStruct
-from test.ctx_sensitive_test import ContextSensitiveTest
-from test.plugin.simple_plugin import SimplePlugin
+from tests.ctx_sensitive_test import ContextSensitiveTest
+from tests.plugin.simple_plugin import SimplePlugin
 
-PLUGIN_NAME = "test.plugin.simple_plugin"
+PLUGIN_NAME = "tests.plugin.simple_plugin"
 
 
 class TestLoop(ContextSensitiveTest):

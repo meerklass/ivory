@@ -49,7 +49,7 @@ docs/_build
 .idea/*
 
 # test cache files
-test/cache/*
+tests/cache/*
 
 # VS Code
 .vscode/*

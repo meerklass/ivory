@@ -3,7 +3,7 @@ import pytest
 from ivory import context
 from ivory.cli.main import _main
 from ivory.context import ctx
-from test.ctx_sensitive_test import ContextSensitiveTest
+from tests.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestCli(ContextSensitiveTest):
@@ -12,7 +12,7 @@ class TestCli(ContextSensitiveTest):
         assert context.global_ctx is None  # empty
 
     def test_launch_loop(self):
-        _main(*["test.config.workflow_config_cli"])
+        _main(*["tests.config.workflow_config_cli"])
         assert ctx().params.Pipeline.plugins is not None
         assert len(ctx().timings) == 2
 

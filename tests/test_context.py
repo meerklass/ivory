@@ -7,7 +7,7 @@ from ivory.exceptions.exceptions import InvalidLoopException
 from ivory.loop import Loop
 from ivory.utils.struct import ImmutableStruct
 from ivory.utils.struct import Struct
-from test.ctx_sensitive_test import ContextSensitiveTest
+from tests.ctx_sensitive_test import ContextSensitiveTest
 
 
 class TestContext(ContextSensitiveTest):

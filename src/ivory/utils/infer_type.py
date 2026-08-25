@@ -32,7 +32,7 @@ class InferType:
     def infer_type(cls, string_: str, config_value: Optional[str] = None):
         """Guesses the str representation of the `string_` type with help of its type in the config."""
         if config_value is not None:
-            return cls._type_converter_dict[type(config_value)](string_)
+            return cls._type_converter_dict()[type(config_value)](string_)
         string_ = (
             str(string_).replace("'", "").replace(" ", "")
         )  # important if the parameters aren't strings...
@@ -44,7 +44,6 @@ class InferType:
         return string_
 
     @classmethod
-    @property
     def _type_converter_dict(cls):
         """Dict to convert types."""
         return {

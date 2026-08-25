@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from ivory.enum.context_storage_enum import ContextStorageEnum
+from ivory.utils.classproperty import classproperty
 from ivory.utils.requirement import Requirement
 from ivory.utils.result import Result
 
@@ -34,11 +35,10 @@ class AbstractPlugin(ABC):
         """Set the requirements of `self`, i.e. the arguments of `self.run()`."""
         self.requirements = []
 
-    @classmethod
-    @property
-    def name(self):
+    @classproperty
+    def name(cls):
         """Returns the name of `self`."""
-        return self.__name__
+        return cls.__name__
 
     def set_result(self, result: Result):
         """Appends `result` to `self.result`."""

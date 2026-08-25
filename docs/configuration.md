@@ -46,11 +46,11 @@ plugin's `__init__` keyword arguments (via `PluginFactory.create_instance`, see
 ## Minimal example
 
 ```python
-# test/config/workflow_config_simple.py
+# tests/config/workflow_config_simple.py
 from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
-    plugins=["test.plugin.simple_plugin", "test.plugin.simple_plugin"]
+    plugins=["tests.plugin.simple_plugin", "tests.plugin.simple_plugin"]
 )
 ```
 
@@ -112,22 +112,22 @@ Run it with `museek museek.config.demo` (MuSEEK wraps `ivory.cli.main.run()` —
 ## Checkpoint/resume example
 
 ```python
-# test/config/workflow_config_store_context.py
+# tests/config/workflow_config_store_context.py
 from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
 
-Pipeline = ConfigSection(plugins=Loop(["test.plugin.simple_plugin"]))
+Pipeline = ConfigSection(plugins=Loop(["tests.plugin.simple_plugin"]))
 SimplePlugin = ConfigSection(value="store")   # triggers store_context_to_disc(...) in the plugin
 ```
 
 ```python
-# test/config/workflow_config_load_context.py
+# tests/config/workflow_config_load_context.py
 import os
 from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
-    plugins=Loop(["test.plugin.simple_plugin"]),
+    plugins=Loop(["tests.plugin.simple_plugin"]),
     context=os.path.join(os.getcwd(), "cache/simple_plugin.pickle"),
 )
 SimplePlugin = ConfigSection(value="load")
@@ -154,7 +154,7 @@ for every config that declares a `Pipeline` section but doesn't already set `con
 at all (see [Architecture](architecture.md#checkpointing-saving-and-resuming-context)):
 
 ```bash
-ivory --Pipeline-context=cache/simple_plugin.pickle test.config.workflow_config_cli_context
+ivory --Pipeline-context=cache/simple_plugin.pickle tests.config.workflow_config_cli_context
 ```
 
 The override's type is inferred from the *existing* default's type in the config
@@ -166,7 +166,7 @@ list → `None` (`none`/`null`) → falls back to `str`.
 
 ## Other example/test configs worth knowing about
 
-All under `test/config/` (used by Ivory's own test suite, not meant as production references, but
+All under `tests/config/` (used by Ivory's own test suite, not meant as production references, but
 useful to see edge cases):
 
 - `workflow_config_missing_plugins.py`, `workflow_config_empty.py` — negative-path configs, used to

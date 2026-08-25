@@ -7,7 +7,7 @@ from ivory.context import ctx
 from ivory.loop import Loop
 from ivory.utils.struct import Struct
 
-PLUGIN_NAME = "test.plugin.simple_plugin"
+PLUGIN_NAME = "tests.plugin.simple_plugin"
 
 
 class TestPickle:

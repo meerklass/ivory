@@ -68,8 +68,8 @@ from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
     plugins=[
-        "test.plugin.simple_plugin",
-        "test.plugin.simple_plugin"
+        "tests.plugin.simple_plugin",
+        "tests.plugin.simple_plugin"
     ]
 )
 ```
@@ -89,15 +89,15 @@ from ivory.utils.stop_criteria import RangeStopCriteria
 Pipeline = ConfigSection(
     plugins=Loop(
         [
-            "test.plugin.simple_plugin",
+            "tests.plugin.simple_plugin",
             Loop(
                 [
-                    "test.plugin.simple_plugin",
-                    "test.plugin.simple_plugin"
+                    "tests.plugin.simple_plugin",
+                    "tests.plugin.simple_plugin"
                 ],
                 stop=RangeStopCriteria(max_iter=5)
             ),
-            "test.plugin.simple_plugin"
+            "tests.plugin.simple_plugin"
         ],
         stop=RangeStopCriteria(max_iter=2)
     )

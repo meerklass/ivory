@@ -7,9 +7,9 @@ from ivory.context import ctx
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
 from ivory.plugin.plugin_factory import PluginFactory
 from ivory.utils.struct import Struct
-from test.plugin import simple_plugin
+from tests.plugin import simple_plugin
 
-PLUGIN_NAME = "test.plugin.simple_plugin"
+PLUGIN_NAME = "tests.plugin.simple_plugin"
 
 
 class TestPluginFactory:

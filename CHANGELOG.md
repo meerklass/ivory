@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for loading pipeline configs from a filesystem path (absolute, relative, or `~`-expanded
   `.py` file), in addition to the existing dotted module path — configs no longer need to be part of an
   installed/importable package (`WorkflowManager._load_config`)
-- `test/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
+- `tests/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
   exercise the `ivory` CLI end-to-end
 
 ### Changed
