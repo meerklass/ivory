@@ -1,4 +1,5 @@
 import os
+import pickle
 import tempfile
 from getopt import GetoptError
 from operator import eq
@@ -9,23 +10,40 @@ import pytest
 from ivory.config_keys import ConfigKeys
 from ivory.context import ctx
 from ivory.exceptions.exceptions import (
-    InvalidAttributeException,
     IllegalAccessException,
+    InvalidAttributeException,
 )
 from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
+from ivory.utils.result import Result
 from ivory.utils.struct import Struct
 from ivory.workflow_manager import WorkflowManager
 from tests.ctx_sensitive_test import ContextSensitiveTest
-from tests.plugin.simple_plugin import SimplePlugin, SimpleEnum
+from tests.plugin.simple_plugin import SimpleEnum, SimplePlugin
 
 
 class TestWorkflowManager(ContextSensitiveTest):
-    @classmethod
-    def setup_class(cls):
-        # Ensure cache directory exists for tests that require it
-        cache_dir = Path(__file__).parent.parent / "cache"
+    @staticmethod
+    def _write_stored_context_pickle(tmp_path: Path) -> Path:
+        """
+        Writes a checkpoint pickle equivalent to what `workflow_config_store_context`
+        produces at `tmp_path/cache/simple_plugin.pickle`, without going through
+        `WorkflowManager.launch()` a second time. `tests.config.workflow_config_store_context`
+        is a module-level singleton (Python caches it on first import) whose `Loop` object
+        registers itself against whichever global context is live at import time; reusing
+        that cached module's `launch()` across more than one test breaks once the context
+        singleton is reset between tests, so tests that just need an existing checkpoint on
+        disc synthesize it directly instead of re-running the store pipeline.
+        """
+        cache_dir = tmp_path / "cache"
         cache_dir.mkdir(exist_ok=True)
+        pickle_path = cache_dir / "simple_plugin.pickle"
+        stored_ctx = Struct(
+            {SimpleEnum.simple: Result(location=SimpleEnum.simple, result=1)}
+        )
+        with open(pickle_path, "wb") as out_file:
+            pickle.dump(stored_ctx, out_file)
+        return pickle_path
 
     def test_launch(self):
         args = ["tests.config.workflow_config"]
@@ -37,21 +55,28 @@ class TestWorkflowManager(ContextSensitiveTest):
         assert ctx().params is not None
         assert ctx().params.Pipeline.plugins is not None
 
-    def test_launch_expect_context_stored_to_hard_disc(self):
+    def test_launch_expect_context_stored_to_hard_disc(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "cache").mkdir(exist_ok=True)
         args = ["tests.config.workflow_config_store_context"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
         assert ctx()[SimpleEnum.simple].result == 1
+        assert (tmp_path / "cache" / "simple_plugin.pickle").is_file()
 
-    def test_launch_expect_context_loaded_from_hard_disc(self):
+    def test_launch_expect_context_loaded_from_hard_disc(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._write_stored_context_pickle(tmp_path)
         args = ["tests.config.workflow_config_load_context"]
 
         mgr = WorkflowManager(args)
         mgr.launch()
         assert ctx()[SimpleEnum.simple].result == 1
 
-    def test_launch_expect_context_overridden_via_cli(self):
+    def test_launch_expect_context_overridden_via_cli(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._write_stored_context_pickle(tmp_path)
         # `workflow_config_cli_context` does not set `Pipeline.context`, so this
         # only loads the previously stored context if the CLI override works.
         args = [
@@ -219,30 +244,25 @@ class TestWorkflowManager(ContextSensitiveTest):
             temp_config_path = f.name
 
         try:
-            mgr = WorkflowManager([temp_config_path])
+            WorkflowManager([temp_config_path])
             assert ctx().params is not None
             assert ctx().params.Pipeline.plugins is not None
             assert ctx().params.TestSection.test_param == "from_absolute_file"
         finally:
             os.unlink(temp_config_path)
 
-    def test_load_config_from_file_path_relative(self):
+    def test_load_config_from_file_path_relative(self, tmp_path, monkeypatch):
         config_content = (
             "from ivory.utils.config_section import ConfigSection\n\n"
             "Pipeline = ConfigSection(plugins=['tests.plugin.simple_plugin'])\n"
             "TestSection = ConfigSection(test_param='from_relative_file')\n"
         )
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", dir=".", delete=False
-        ) as f:
-            f.write(config_content)
-            config_path = Path(f.name)
+        config_path = tmp_path / "relative_config.py"
+        config_path.write_text(config_content)
+        monkeypatch.chdir(tmp_path)
 
-        try:
-            mgr = WorkflowManager([f"./{config_path.name}"])
-            assert ctx().params.TestSection.test_param == "from_relative_file"
-        finally:
-            config_path.unlink(missing_ok=True)
+        WorkflowManager([f"./{config_path.name}"])
+        assert ctx().params.TestSection.test_param == "from_relative_file"
 
     def test_load_config_file_not_found(self):
         args = ["/non/existent/path/config.py"]

@@ -25,11 +25,6 @@ class TestWorkflowStruct:
         ctx.increment()
         assert ctx.iter == 1
 
-    def teardown(self):
-        # tidy up
-        print("tearing down " + __name__)
-        pass
-
 
 if __name__ == "__main__":
     pytest.main()

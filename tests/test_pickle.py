@@ -35,10 +35,17 @@ class TestPickle:
         dumps_struct = dumps(struct)
         struct2 = loads(dumps_struct)
 
+        assert isinstance(struct2, Struct)
+        assert struct2.value1 == 1
+        assert struct2.params.backend == "multiprocessing"
+
     def test_context_pickle(self):
         l_ctx = ctx()
         s_l_ctx = dumps(l_ctx)
         l_ctx2 = loads(s_l_ctx)
+
+        assert isinstance(l_ctx2, type(l_ctx))
+        assert dict(l_ctx2) == dict(l_ctx)
 
     def test_iter_list_can_pickle(self):
         list_iter_expect = iter(["a", "b", "c"])
