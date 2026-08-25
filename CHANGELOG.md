@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] (2026-08-25)
+
 ### Added
 
 - Support for loading pipeline configs from a filesystem path (absolute, relative, or `~`-expanded
@@ -14,10 +16,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   installed/importable package (`WorkflowManager._load_config`)
 - `tests/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
   exercise the `ivory` CLI end-to-end
+- Support for Python 3.13 and 3.14
+- `classproperty` descriptor (`ivory/utils/classproperty.py`) for attributes that need to work on both
+  the class and an instance
+- `ResourceSampler` (`ivory/utils/resource_sampler.py`): background-thread poller that samples memory
+  and CPU throughout a plugin's execution, aggregating RSS across the main process and all of its live
+  child processes
 
 ### Changed
 
+- Refactored package layout to `src/ivory`, and renamed `test/` to `tests/`
 - CLI usage text and `docs/configuration.md` updated to document file-path configs
+- Widened `requires-python` to `>=3.10,<3.15` and added Python 3.11-3.14 classifiers
+- Pinned `psutil` to `>=5.9.0`
+- Declared `ruff` and `pytest` as explicit dev dependencies
+
+### Fixed
+
+- Replaced the deprecated `@classmethod @property` stacking pattern, removed in Python 3.13, in
+  `ConfigSection.name` and `AbstractPlugin.name` with the new `classproperty` descriptor;
+  `InferType._type_converter_dict` converted to a plain `@classmethod`
+- Memory reporting was inaccurate: `LoopRunner` took a single memory/CPU snapshot of the main process
+  only, taken after each plugin had already finished running. It now uses `ResourceSampler` to sample
+  continuously during execution and includes memory used by child processes (e.g. `joblib`/`loky`
+  workers spawned by `AbstractParallelJoblibPlugin`), which was previously invisible to the reported peak
 
 ## [2.2.0] (2026-07-23)
 
