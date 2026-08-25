@@ -1,5 +1,6 @@
 import sys
 
+import ivory
 from ivory.workflow_manager import WorkflowManager
 
 
@@ -15,9 +16,12 @@ def _main(*argv):
         _usage()
         return
     argv = list(argv)
-    # Handle help flag before passing to WorkflowManager
+    # Handle help/version flags before passing to WorkflowManager
     if "--help" in argv or "-h" in argv:
         _usage()
+        return
+    if "--version" in argv or "-V" in argv:
+        _version()
         return
     mgr = WorkflowManager(argv)
     mgr.launch()
@@ -41,11 +45,22 @@ def _usage():
     Only arguments already preconfigured in the given configuration will be accepted.
     Note: Dashed '-' will be converted into underlines '_' for all the arguments
 
+    Other options:
+    -h, --help       show this help message and exit
+    -V, --version    show the installed ivory version and exit
+
     example:
     - ivory --size-x=100 --size-y=100 myproject.config.module
     - ivory --size-x=100 --size-y=100 ./my_config.py
     """
     print(usage)
+
+
+def _version():
+    """
+    Print the installed ivory version.
+    """
+    print(ivory.__version__)
 
 
 if __name__ == "__main__":
