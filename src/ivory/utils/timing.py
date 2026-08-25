@@ -11,7 +11,7 @@ class SimpleTiming:
         self.duration = duration
 
     def __str__(self):
-        return "{0!s:30}: {1:>7.0f} s".format(self.name, self.duration)
+        return f"{self.name!s:30}: {self.duration:>7.0f} s"
 
 
 class ResourceTiming(SimpleTiming):
@@ -39,22 +39,15 @@ class ResourceTiming(SimpleTiming):
 
     def __str__(self):
         return (
-            "{0!s:30}: {1:>7.0f} s | "
-            "Mem(Avg/Peak): {2:>6.2f}/{3:>6.2f} GB | "
-            "CPU(Avg/Peak): {4:>5.1f}/{5:>5.1f}%".format(
-                self.name,
-                self.duration,
-                self.avg_memory_gb,
-                self.peak_memory_gb,
-                self.avg_cpu_percent,
-                self.peak_cpu_percent,
-            )
+            f"{self.name!s:30}: {self.duration:>7.0f} s | "
+            f"Mem(Avg/Peak): {self.avg_memory_gb:>6.2f}/{self.peak_memory_gb:>6.2f} GB | "
+            f"CPU(Avg/Peak): {self.avg_cpu_percent:>5.1f}/{self.peak_cpu_percent:>5.1f}%"
         )
 
 
 class TimingCollection(SimpleTiming):
     def __init__(self, parent):
-        super(TimingCollection, self).__init__(parent, 0)
+        super().__init__(parent, 0)
         self.timings = OrderedDict()
 
     def add_timing(self, timing):
@@ -66,14 +59,7 @@ class TimingCollection(SimpleTiming):
     def __str__(self):
         s = ""
         for name, durations in self.timings.items():
-            s += "   {0!s:30}({1}): mean:{2:>7.3f}s sum:{3:>7.3f}s min:{4:>7.3f}s max:{5:>7.3f}s\n".format(
-                name,
-                len(durations),
-                sum(durations) / len(durations),
-                sum(durations),
-                min(durations),
-                max(durations),
-            )
+            s += f"   {name!s:30}({len(durations)}): mean:{sum(durations) / len(durations):>7.3f}s sum:{sum(durations):>7.3f}s min:{min(durations):>7.3f}s max:{max(durations):>7.3f}s\n"
 
         return s
 
@@ -84,7 +70,7 @@ class ResourceTimingCollection(SimpleTiming):
     """
 
     def __init__(self, parent):
-        super(ResourceTimingCollection, self).__init__(parent, 0)
+        super().__init__(parent, 0)
         self.timings = OrderedDict()
 
     def add_timing(self, timing):
@@ -104,20 +90,9 @@ class ResourceTimingCollection(SimpleTiming):
             avg_cpus = [t.avg_cpu_percent for t in timings_list]
             peak_cpus = [t.peak_cpu_percent for t in timings_list]
             s += (
-                "   {0!s:30}({1}): "
-                "Time - mean:{2:>7.3f}s sum:{3:>7.3f}s | "
-                "Mem(Avg/Peak) - mean:{4:>6.2f}/{5:>6.2f}GB max:{6:>6.2f}GB | "
-                "CPU(Avg/Peak) - mean:{7:>5.1f}/{8:>5.1f}% max:{9:>5.1f}%\n".format(
-                    name,
-                    len(timings_list),
-                    sum(durations) / len(durations),
-                    sum(durations),
-                    sum(avg_memories) / len(avg_memories),
-                    sum(peak_memories) / len(peak_memories),
-                    max(peak_memories),
-                    sum(avg_cpus) / len(avg_cpus),
-                    sum(peak_cpus) / len(peak_cpus),
-                    max(peak_cpus),
-                )
+                f"   {name!s:30}({len(timings_list)}): "
+                f"Time - mean:{sum(durations) / len(durations):>7.3f}s sum:{sum(durations):>7.3f}s | "
+                f"Mem(Avg/Peak) - mean:{sum(avg_memories) / len(avg_memories):>6.2f}/{sum(peak_memories) / len(peak_memories):>6.2f}GB max:{max(peak_memories):>6.2f}GB | "
+                f"CPU(Avg/Peak) - mean:{sum(avg_cpus) / len(avg_cpus):>5.1f}/{sum(peak_cpus) / len(peak_cpus):>5.1f}% max:{max(peak_cpus):>5.1f}%\n"
             )
         return s

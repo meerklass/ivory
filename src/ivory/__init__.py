@@ -1,7 +1,7 @@
 # register custom reduce method for type MethodType
 import copyreg
 import types
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 from ivory import context
 from ivory.workflow_manager import WorkflowManager

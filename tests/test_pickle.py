@@ -1,5 +1,4 @@
-from pickle import dumps
-from pickle import loads
+from pickle import dumps, loads
 
 import pytest
 

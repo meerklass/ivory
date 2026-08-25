@@ -82,7 +82,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             "tests.config.workflow_config",
         ]
 
-        mgr = WorkflowManager(args)
+        WorkflowManager(args)
 
         assert ctx().params.MockPlugin.a
         assert not ctx().params.MockPlugin.b
@@ -122,20 +122,20 @@ class TestWorkflowManager(ContextSensitiveTest):
         args = ["tests.config.workflow_config_missing_plugins"]
 
         try:
-            mgr = WorkflowManager(args)
+            WorkflowManager(args)
             pytest.fail("config without plugins not allowed", True)
         except InvalidAttributeException:
             assert True
 
     def test_missing_config(self):
         try:
-            mgr = WorkflowManager(None)
+            WorkflowManager(None)
             pytest.fail("missing config not allowed", True)
         except ValueError:
             assert True
 
         try:
-            mgr = WorkflowManager([])
+            WorkflowManager([])
             pytest.fail("missing config not allowed", True)
         except ValueError:
             assert True
@@ -146,7 +146,7 @@ class TestWorkflowManager(ContextSensitiveTest):
             "tests.config.workflow_config_simple",
         ]
         try:
-            mgr = WorkflowManager(args)
+            WorkflowManager(args)
             pytest.fail("two configs not allowed", True)
         except InvalidAttributeException:
             assert True
@@ -154,7 +154,7 @@ class TestWorkflowManager(ContextSensitiveTest):
     def test_invalid_args(self):
         args = ["-a=1", "tests.config.workflow_config_simple"]
         try:
-            mgr = WorkflowManager(args)
+            WorkflowManager(args)
             pytest.fail("wrong argument format", True)
         except GetoptError:
             assert True
@@ -162,7 +162,7 @@ class TestWorkflowManager(ContextSensitiveTest):
     def test_unknown_args(self):
         args = ["--a=1", "tests.config.workflow_config_simple"]
         try:
-            mgr = WorkflowManager(args)
+            WorkflowManager(args)
             pytest.fail("wrong argument format", True)
         except GetoptError:
             assert True
@@ -253,7 +253,7 @@ class TestWorkflowManager(ContextSensitiveTest):
         # Regression: dotted module names must still resolve via the module branch,
         # not be misclassified as a file path.
         args = ["tests.config.workflow_config"]
-        mgr = WorkflowManager(args)
+        WorkflowManager(args)
         assert ctx().params.Pipeline.plugins is not None
 
     def test_load_config_two_file_based_configs_do_not_collide(self):

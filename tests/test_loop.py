@@ -1,8 +1,10 @@
 import pytest
 
 from ivory.context import loop_ctx
-from ivory.exceptions.exceptions import InvalidLoopException
-from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.exceptions.exceptions import (
+    InvalidLoopException,
+    UnsupportedPluginTypeException,
+)
 from ivory.loop import Loop
 from ivory.utils.stop_criteria import RangeStopCriteria
 from ivory.utils.struct import Struct, WorkflowStruct

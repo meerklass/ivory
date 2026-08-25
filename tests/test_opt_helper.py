@@ -2,9 +2,9 @@ import pytest
 
 from ivory.utils.config_section import ConfigSection
 from ivory.utils.opt_helper import (
+    get_all_longopts,
     get_opt_parameter_dict,
     get_section_parameter_name_from_opt,
-    get_all_longopts,
 )
 
 

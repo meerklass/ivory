@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, call, Mock
+from unittest.mock import MagicMock, Mock, call, patch
 
 from ivory.enum.context_storage_enum import ContextStorageEnum
 from ivory.utils.loop_runner import LoopRunner

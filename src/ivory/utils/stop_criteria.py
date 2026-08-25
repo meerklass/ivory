@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from ivory.context import loop_ctx
 from ivory.exceptions.exceptions import InvalidAttributeException
@@ -42,4 +42,4 @@ class SimpleStopCriteria(RangeStopCriteria):
     """
 
     def __init__(self):
-        super(SimpleStopCriteria, self).__init__(max_iter=1)
+        super().__init__(max_iter=1)

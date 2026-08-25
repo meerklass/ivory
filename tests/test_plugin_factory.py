@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -60,7 +60,7 @@ class TestPluginFactory:
     def test_unknown_module(self):
         plugin_name = "unknown.plugin.invalid"
         try:
-            plugin = PluginFactory.create_instance(plugin_name, ctx())
+            PluginFactory.create_instance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
         except UnsupportedPluginTypeException:
@@ -69,7 +69,7 @@ class TestPluginFactory:
     def test_invalid_module(self):
         plugin_name = "ivory.plugin.AbstractPlugin"
         try:
-            plugin = PluginFactory.create_instance(plugin_name, ctx())
+            PluginFactory.create_instance(plugin_name, ctx())
             pytest.fail("UnsupportedPluginTypeException expected", False)
             assert False
         except UnsupportedPluginTypeException:

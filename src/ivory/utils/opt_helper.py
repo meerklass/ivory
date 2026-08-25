@@ -19,9 +19,7 @@ def get_section_parameter_name_from_opt(opt: tuple[str]) -> tuple[str, str, str]
     """
     opt_string, parameter_value = opt
     if opt_string[:2] != "--":
-        raise InvalidAttributeException(
-            "invalid option name: {:}".format(opt_string[0])
-        )
+        raise InvalidAttributeException(f"invalid option name: {opt_string[0]}")
     list_of_parts = opt_string[2:].split("-")
     parameter_name = list_of_parts[1]
     for part in list_of_parts[2:]:

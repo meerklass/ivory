@@ -59,7 +59,7 @@ class ImmutableStruct(abc.MutableMapping):
 
     def __setitem__(self, key, value):
         raise IllegalAccessException(
-            "Trying to modify immutable struct with: %s=%s" % (str(key), str(value))
+            f"Trying to modify immutable struct with: {key!s}={value!s}"
         )
 
     def __delitem__(self, key):
@@ -84,8 +84,7 @@ class ImmutableStruct(abc.MutableMapping):
         return len(self.__dict__)
 
     def __iter__(self):
-        for i in self.__dict__:
-            yield i
+        yield from self.__dict__
 
     def __str__(self):
         """Returns a nicely formatted `str` of `self`."""

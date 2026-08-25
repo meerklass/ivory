@@ -8,7 +8,7 @@ from enum import Enum
 from getopt import getopt
 from pathlib import Path
 from types import ModuleType
-from typing import Optional, Any
+from typing import Any
 
 from ivory import context
 from ivory.backend import SequentialBackend
@@ -50,7 +50,7 @@ class WorkflowManager:
         if ConfigKeys.PIPELINE.value not in config:
             raise ValueError('The loaded config must contain a section "Pipeline".')
 
-        if ConfigKeys.PLUGINS.value not in config.Pipeline.keys():
+        if ConfigKeys.PLUGINS.value not in config.Pipeline:
             raise InvalidAttributeException("plugins definition is missing")
 
         ctx().params = context.create_immutable_ctx(**config)
@@ -87,7 +87,7 @@ class WorkflowManager:
     @staticmethod
     def _config_immutable(
         config_sections: dict[str, ConfigSection],
-        opt_parameter_dict: Optional[dict[str, ConfigSection]] = None,
+        opt_parameter_dict: dict[str, ConfigSection] | None = None,
     ) -> ImmutableStruct:
         """
         Returns an `ImmutableStruct` created from `config_section` and overwriting its entries with everything
@@ -131,12 +131,14 @@ class WorkflowManager:
         for section_name in dir(config):
             if config_section := self._get_config_section(config, section_name):
                 result[section_name] = config_section
-        
+
         # Ensure Pipeline always has context key to allow CLI override
-        if ConfigKeys.PIPELINE.value in result:
-            if ConfigKeys.CONTEXT.value not in result[ConfigKeys.PIPELINE.value]:
-                result[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value] = None
-        
+        if (
+            ConfigKeys.PIPELINE.value in result
+            and ConfigKeys.CONTEXT.value not in result[ConfigKeys.PIPELINE.value]
+        ):
+            result[ConfigKeys.PIPELINE.value][ConfigKeys.CONTEXT.value] = None
+
         return result
 
     @staticmethod
@@ -147,9 +149,9 @@ class WorkflowManager:
         need to be part of an installed/importable package.
         """
         path_separators = (sep for sep in (os.sep, os.altsep) if sep)
-        looks_like_path = any(sep in config_name for sep in path_separators) or config_name.endswith(
-            ".py"
-        )
+        looks_like_path = any(
+            sep in config_name for sep in path_separators
+        ) or config_name.endswith(".py")
         if looks_like_path:
             config_path = Path(config_name).expanduser().resolve()
             if not config_path.is_file():
@@ -165,7 +167,7 @@ class WorkflowManager:
         return importlib.import_module(config_name)
 
     @staticmethod
-    def _get_config_section(config: ModuleType, section_name: str) -> Optional[Any]:
+    def _get_config_section(config: ModuleType, section_name: str) -> Any | None:
         """
         Returns the attribute `section_name` in `config`
         if `section_name` belongs to a valid configuration file section
@@ -175,11 +177,11 @@ class WorkflowManager:
             not section_name.startswith("__")
             and section_name[0].upper() == section_name[0]
             and section_name != ConfigSection.name
-        ):
-            if isinstance(
+            and isinstance(
                 config_section := getattr(config, section_name), ConfigSection
-            ):
-                return config_section
+            )
+        ):
+            return config_section
 
     @staticmethod
     def _load_context_into_ctx(context_: Struct):

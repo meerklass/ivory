@@ -1,13 +1,15 @@
-from typing import List, Optional
+from __future__ import annotations
 
 from ivory import context
 from ivory.context import loop_ctx
-from ivory.exceptions.exceptions import InvalidLoopException
-from ivory.exceptions.exceptions import UnsupportedPluginTypeException
+from ivory.exceptions.exceptions import (
+    InvalidLoopException,
+    UnsupportedPluginTypeException,
+)
 from ivory.plugin.abstract_plugin import AbstractPlugin
 from ivory.plugin.plugin_factory import PluginFactory
-from ivory.utils.stop_criteria import SimpleStopCriteria, AbstractStopCriteria
-from ivory.utils.struct import WorkflowState, Struct
+from ivory.utils.stop_criteria import AbstractStopCriteria, SimpleStopCriteria
+from ivory.utils.struct import Struct, WorkflowState
 
 
 class Loop:
@@ -22,9 +24,9 @@ class Loop:
 
     def __init__(
         self,
-        plugin_list: str | List[str] | AbstractPlugin | List[AbstractPlugin] | "Loop",
+        plugin_list: str | list[str] | AbstractPlugin | list[AbstractPlugin] | Loop,
         stop: AbstractStopCriteria = None,
-        ctx: Optional[Struct] = None,
+        ctx: Struct | None = None,
     ):
         """
         Very broad options for input `plugin_list`. If they come as some form of `str`, the input `ctx` must be given
@@ -60,9 +62,11 @@ class Loop:
             elif isinstance(plugin, str):
                 string_to_add = f"{plugin}\n"
             elif isinstance(plugin, Loop):
-                string_to_add = f"{str(plugin)}\n"
+                string_to_add = f"{plugin!s}\n"
             else:
-                raise ValueError(
+                # Kept as `ValueError` (not `TypeError`) intentionally: `test_unknown_plugin`
+                # in `tests/test_loop.py` asserts on this exact exception type.
+                raise ValueError(  # noqa: TRY004
                     f"`plugin` must be either `AbstractPlugin`, `str` or `Loop`. Got {plugin}"
                 )
             result += string_to_add

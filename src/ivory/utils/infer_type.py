@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class InferType:
     """Helper class to read types correctly from command line."""
 
@@ -29,7 +26,7 @@ class InferType:
         return [cls.infer_type(element, None) for element in string_.split(",")]
 
     @classmethod
-    def infer_type(cls, string_: str, config_value: Optional[str] = None):
+    def infer_type(cls, string_: str, config_value: str | None = None):
         """Guesses the str representation of the `string_` type with help of its type in the config."""
         if config_value is not None:
             return cls._type_converter_dict()[type(config_value)](string_)

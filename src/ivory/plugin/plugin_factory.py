@@ -1,6 +1,5 @@
 import importlib
 from types import ModuleType
-from typing import Optional
 
 from ivory.config_keys import ConfigKeys
 from ivory.exceptions.exceptions import UnsupportedPluginTypeException
@@ -15,7 +14,7 @@ class PluginFactory:
     """
 
     @staticmethod
-    def create_instance(plugin_name: str, ctx: Struct) -> Optional[AbstractPlugin]:
+    def create_instance(plugin_name: str, ctx: Struct) -> AbstractPlugin | None:
         """
         Instantiates the given plugin from its module string (like a python import).
         Expects that this module contains exactly one class with name starting on a capital letter and ending on
@@ -29,15 +28,18 @@ class PluginFactory:
             module = importlib.import_module(plugin_name)
         except ImportError as ex:
             raise UnsupportedPluginTypeException(
-                "Module '%s' could not be loaded" % plugin_name, ex
+                f"Module '{plugin_name}' could not be loaded", ex
             )
         except AttributeError:
             raise UnsupportedPluginTypeException(
-                "Module '%s' has no class definition 'Plugin(ctx)'" % plugin_name
+                f"Module '{plugin_name}' has no class definition 'Plugin(ctx)'"
             )
-        except Exception as ex:
+        except Exception as ex:  # noqa: BLE001 -- deliberately catch-all; narrowing this
+            # is tracked as deferred breaking-API cleanup in
+            # docs/known-issues-and-limitations.md (it currently masks the real
+            # exception raised while executing a plugin module).
             raise UnsupportedPluginTypeException(
-                "Module '%s' could not be instantiated'" % plugin_name, ex
+                f"Module '{plugin_name}' could not be instantiated'", ex
             )
         plugin = PluginFactory._get_plugin_attribute(module)
         if ConfigKeys.PARAMS.value in ctx and plugin.name in ctx.params:

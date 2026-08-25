@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 from joblib import Parallel, delayed
 
@@ -21,17 +22,14 @@ class AbstractParallelJoblibPlugin(AbstractPlugin):
     @abstractmethod
     def run_job(self, anything: Any) -> Any:
         """Run one job on `anything` and return the result."""
-        pass
 
     @abstractmethod
     def map(self, **kwargs) -> Generator[Any, None, None]:
         """Map the workload, i.e. return a `Generator` of the individual arguments for `run_job`."""
-        pass
 
     @abstractmethod
     def gather_and_set_result(self, *args, **kwargs):
         """Gather the results, i.e. take the `list` of outputs of each job and combine."""
-        pass
 
     def run(self, **kwargs):
         """Run the plugin using `joblib`."""

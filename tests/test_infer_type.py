@@ -33,10 +33,10 @@ class TestInferType:
             None,
             None,
         ]
-        for value, expect in zip(values, expect):
+        for value, expected in zip(values, expect):
             inferred = InferType.infer_type(value)
-            assert inferred == expect
-            assert isinstance(inferred, type(expect))
+            assert inferred == expected
+            assert isinstance(inferred, type(expected))
 
 
 if __name__ == "__main__":
