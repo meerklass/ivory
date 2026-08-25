@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80", "wheel", "setuptools-scm[simple]>=8.0"]
+requires = ["setuptools>=80", "setuptools-scm[simple]>=9.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,23 +7,88 @@ name = "ivory"
 dynamic = ["version"]
 description = "Ivory: Simple and flexible workflow engine"
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.15"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Piyanat Kittiwisit", email = "piyanat.kittiwisit@gmail.com" },
+    { name = "Amadeus Wild", email = "amadeus.wild@manchester.ac.uk" },
+    { name = "Joel Akeret" },
+    { name = "Lukas Gamper", email = "gamperl@gmail.com" },
+]
+keywords = ["workflow", "pipeline", "plugin", "radio-astronomy", "meerklass"]
 dependencies = [
     "numpy>=2.0.0",
-    "joblib",
-    "psutil",
+    "joblib>=1.3",
+    "psutil>=5.9.0",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
+
+[project.urls]
+Homepage = "https://github.com/meerklass/ivory"
+Repository = "https://github.com/meerklass/ivory"
+Changelog = "https://github.com/meerklass/ivory/blob/main/CHANGELOG.md"
+Issues = "https://github.com/meerklass/ivory/issues"
 
 [project.scripts]
 ivory = "ivory.cli.main:run"
 
-[project.optional-dependencies]
-test = ["pytest"]
-
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["ivory*"]
+
+[tool.setuptools.package-data]
+ivory = ["py.typed"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.3",
+]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+# Pins the rule set this project has actually been developed against, so `ruff check` gives the
+# same result regardless of which ruff version or machine-local defaults happen to be installed.
+# Broadening this (e.g. to whole new rule categories) is a deliberate choice for a future change,
+# not a side effect of adding this config.
+select = [
+    "F",       # pyflakes
+    "I001",    # isort: unsorted imports
+    "B020",    # loop variable overrides iterator
+    "B030",    # except with non-exception classes
+    "BLE001",  # blind except
+    "PIE790",  # unnecessary placeholder (`pass`/`...`)
+    "PLW0711", # binary op in except (`except A or B`)
+    "RUF010",  # explicit f-string type conversion
+    "RUF012",  # mutable class-level default
+    "RUF022",  # unsorted `__all__`
+    "SIM102",  # collapsible if
+    "SIM118",  # `key in dict.keys()`
+    "TC010",   # runtime string union
+    "TRY004",  # type check without TypeError
+    "UP006",   # non-PEP 585 annotation
+    "UP008",   # super() with parameters
+    "UP028",   # yield in for loop
+    "UP030",   # format literals
+    "UP031",   # printf-style formatting
+    "UP032",   # f-string conversion
+    "UP035",   # deprecated import
+    "UP045",   # non-PEP 604 `Optional`
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["error"]

@@ -1,22 +1,23 @@
 *.py[cod]
+__pycache__/
 
 # C extensions
 *.so
 
 # Packages
 *.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
+*.egg-info/
+/dist
+/build
+/eggs
+/parts
+/bin
+/var
+/sdist
+/develop-eggs
 .installed.cfg
-lib
-lib64
+/lib
+/lib64
 .DS_Store
 
 # Installer logs
@@ -28,6 +29,9 @@ pip-log.txt
 nosetests.xml
 *junit-*
 htmlcov
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 
 # Translations
 *.mo
@@ -48,14 +52,15 @@ docs/_build
 # pycharm
 .idea/*
 
-# test cache files
-test/cache/*
+# test cache files, written to the repo root by tests that don't use tmp_path
+/cache
 
 # VS Code
 .vscode/*
 
+# virtual environments
+.venv/
+venv/
+
 # others
-claude.md
-CLAUDE.md
-uv.lock
 *.pickle

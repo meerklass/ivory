@@ -7,12 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] (2026-08-25)
+
+### Added
+
+- Support for Python 3.13 and 3.14
+- `classproperty` descriptor (`src/ivory/utils/classproperty.py`) for attributes that need to work on
+  both the class and an instance
+- `ResourceSampler` (`src/ivory/utils/resource_sampler.py`): background-thread poller that samples
+  memory and CPU throughout a plugin's execution, aggregating RSS across the main process and all of
+  its live child processes
+- `src/ivory/py.typed` (PEP 561 marker), so downstream type checkers pick up this package's annotations
+- `[tool.ruff]` and `[tool.pytest.ini_options]` in `pyproject.toml`, pinning the lint rule set and
+  enabling `filterwarnings = ["error"]` so interpreter deprecation warnings fail CI instead of passing
+  silently
+- Tag-triggered `.github/workflows/release.yml`: builds the sdist/wheel, installs the built wheel into
+  a clean venv and runs the test suite against it, verifies `ivory.__version__` matches the pushed tag,
+  and attaches the artifacts to a GitHub Release (no PyPI upload yet)
+- A `## Deferred to a future major version` section in `docs/known-issues-and-limitations.md`,
+  cataloguing verified defects that are intentionally out of scope for this release because fixing them
+  would change public API behaviour
+- `ivory --version` / `-V` prints the installed package version and exits
+
+### Changed
+
+- Refactored package layout to `src/ivory`, and renamed `test/` to `tests/`
+- Widened `requires-python` to `>=3.10,<3.15` and added Python 3.11-3.14 classifiers
+- Pinned `psutil` to `>=5.9.0` and `joblib` to `>=1.3`
+- Declared `ruff` and `pytest` as explicit dev dependencies; removed the now-redundant
+  `[project.optional-dependencies] test` extra (it duplicated `[dependency-groups] dev` with a looser,
+  unpinned `pytest` floor)
+- `LoopRunner._store_to_ctx` now skips only the individual result whose context key is protected by
+  `allow_overwrite=False`, instead of discarding every remaining result of that plugin
+- `setuptools-scm` build requirement raised to `setuptools-scm[simple]>=9.2` (the `simple` extra, which
+  makes an explicit `[tool.setuptools_scm]` section optional, does not exist before 9.2 — the previous
+  `>=8.0` floor could silently resolve to an unbuildable `0.0.0` version)
+- CI (`.github/workflows/tests.yml`): checkout now uses `fetch-depth: 0` so `setuptools-scm` can see
+  tags; added a lint job running `ruff check`/`ruff format --check`; added `fail-fast: false` so all
+  five Python versions report their own result; bumped `actions/checkout`/`actions/setup-python` to
+  their current major versions; added steps exercising the `ivory` console script and the
+  `tests/smoke/` scripts
+- `uv.lock` and `CLAUDE.md` are now tracked in git instead of gitignored
+- PyPI metadata: added `authors`, `[project.urls]`, `keywords`; bumped
+  `Development Status` from `3 - Alpha` to `4 - Beta`; replaced the deprecated `License ::` classifier
+  with a PEP 639 `license`/`license-files` declaration
+- `docs/architecture.md` and `docs/plugins.md` updated to describe `ResourceSampler`'s background
+  polling instead of the old single-snapshot measurement; `docs/known-issues-and-limitations.md`
+  updated to describe the `_store_to_ctx` `continue` behaviour above
+- Removed the orphaned, empty `ivory.examples`/`ivory.examples.config` packages (their only content
+  was already deleted in 2.2.0; they were still tracked and shipped in the wheel)
+
+### Fixed
+
+- Replaced the deprecated `@classmethod @property` stacking pattern, removed in Python 3.13, in
+  `ConfigSection.name` and `AbstractPlugin.name` with the new `classproperty` descriptor;
+  `InferType._type_converter_dict` converted to a plain `@classmethod`
+- Memory reporting was inaccurate: `LoopRunner` took a single memory/CPU snapshot of the main process
+  only, taken after each plugin had already finished running. It now uses `ResourceSampler` to sample
+  continuously during execution and includes memory used by child processes (e.g. `joblib`/`loky`
+  workers spawned by `AbstractParallelJoblibPlugin`), which was previously invisible to the reported peak
+- `AbstractPlugin.requirements` was a mutable class-level default shared by every plugin subclass —
+  appending to `self.requirements` in one plugin's `set_requirements()` leaked into unrelated plugin
+  classes and across repeated instantiations. Now initialised per instance
+- `except KeyError or AttributeError` (`context.register`) and `except ValueError or TypeError`
+  (`InferType.infer_type`) each silently caught only the first exception type, since `X or Y` evaluates
+  to `X`; both now correctly catch both types
+- A walrus-operator precedence bug in `WorkflowManager._parse_args` made the "exactly one config file"
+  error message always report `got True` instead of the actual number of positional arguments given
+- `ResourceSampler` could not be reused across more than one `with` block (`_stop_event` and the sample
+  lists were never reset in `__enter__`); its background poll thread could also die silently the first
+  time `process.children()` raised (e.g. a `joblib`/`loky` worker exiting mid-poll), truncating the
+  reported peak with no warning; and an exception from its own final sample in `__exit__` could mask a
+  real exception raised by the wrapped plugin
+- `v2.3.0` was tagged but had no changelog entry; see below
+
+## [2.3.0] (2026-07-27)
+
 ### Added
 
 - Support for loading pipeline configs from a filesystem path (absolute, relative, or `~`-expanded
   `.py` file), in addition to the existing dotted module path — configs no longer need to be part of an
   installed/importable package (`WorkflowManager._load_config`)
-- `test/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
+- `tests/smoke/` executable smoke-test scripts (`run_file_path_config.sh`, `run_module_config.sh`) that
   exercise the `ivory` CLI end-to-end
 
 ### Changed

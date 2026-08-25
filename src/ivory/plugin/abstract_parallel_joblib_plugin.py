@@ -1,0 +1,41 @@
+from abc import abstractmethod
+from collections.abc import Generator
+from typing import Any
+
+from joblib import Parallel, delayed
+
+from ivory.plugin.abstract_plugin import AbstractPlugin
+
+
+class AbstractParallelJoblibPlugin(AbstractPlugin):
+    """Abstract plugin for parallelised execution with the `joblib` library."""
+
+    def __init__(self, n_jobs: int, verbose: int, prefer: str | None = None):
+        """Initialise with the number of workers `n_jobs` and the `joblib` verbosity `verbose`.
+        :param prefer: joblib backend preference: 'threads', 'processes', or None (default loky).
+        """
+        super().__init__()
+        self.n_jobs = n_jobs
+        self.verbose = verbose
+        self.prefer = prefer
+
+    @abstractmethod
+    def run_job(self, anything: Any) -> Any:
+        """Run one job on `anything` and return the result."""
+
+    @abstractmethod
+    def map(self, **kwargs) -> Generator[Any, None, None]:
+        """Map the workload, i.e. return a `Generator` of the individual arguments for `run_job`."""
+
+    @abstractmethod
+    def gather_and_set_result(self, *args, **kwargs):
+        """Gather the results, i.e. take the `list` of outputs of each job and combine."""
+
+    def run(self, **kwargs):
+        """Run the plugin using `joblib`."""
+        print(f"Starting parallel execution with {self.n_jobs} workers.")
+        result_list = Parallel(
+            n_jobs=self.n_jobs, verbose=self.verbose, prefer=self.prefer
+        )(delayed(self.run_job)(i) for i in self.map(**kwargs))
+        print("Finished parallel execution, gathering results...")
+        self.gather_and_set_result(result_list, **kwargs)
