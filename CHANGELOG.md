@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- `ivory --version` / `-V` prints the installed package version and exits
-
 ## [3.0.0] (2026-08-25)
 
 ### Added
@@ -31,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `## Deferred to a future major version` section in `docs/known-issues-and-limitations.md`,
   cataloguing verified defects that are intentionally out of scope for this release because fixing them
   would change public API behaviour
+- `ivory --version` / `-V` prints the installed package version and exits
 
 ### Changed
 
