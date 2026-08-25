@@ -3,7 +3,7 @@ import threading
 import psutil
 
 
-def _aggregate_rss_bytes(process: psutil.Process) -> float:
+def _aggregate_rss_bytes(process: psutil.Process) -> int:
     """Sum RSS of `process` and all its live children, recursively.
 
     Silently skips any process that disappears or is inaccessible mid-poll.
