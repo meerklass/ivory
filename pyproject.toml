@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80", "wheel", "setuptools-scm[simple]>=8.0"]
+requires = ["setuptools>=80", "setuptools-scm[simple]>=9.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -41,9 +41,6 @@ Issues = "https://github.com/meerklass/ivory/issues"
 
 [project.scripts]
 ivory = "ivory.cli.main:run"
-
-[project.optional-dependencies]
-test = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

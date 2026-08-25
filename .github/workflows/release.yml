@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0  # setuptools-scm needs tags to compute the package version
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: "3.12"
+        enable-cache: true
+
+    - name: Build sdist and wheel
+      run: uv build
+
+    - name: Install the built wheel into a clean venv
+      run: |
+        uv venv /tmp/release-check
+        wheel="$(ls dist/*.whl)"
+        uv pip install --python /tmp/release-check "${wheel}" pytest
+
+    - name: Verify the installed version matches the pushed tag
+      run: |
+        tag="${GITHUB_REF_NAME#v}"
+        built="$(/tmp/release-check/bin/python -c 'import ivory; print(ivory.__version__)')"
+        echo "tag=${tag} built=${built}"
+        case "${built}" in
+          "${tag}"|"${tag}"+*) ;;
+          *)
+            echo "::error::built version '${built}' does not match tag '${tag}'"
+            exit 1
+            ;;
+        esac
+
+    - name: Run the test suite against the installed wheel
+      run: |
+        # Copy just the test tree (as `tests/`, so its `tests.*` dotted imports still
+        # resolve) into a directory with no `src/ivory` alongside it, so pytest can't
+        # fall back to the editable source layout in this checkout -- it must exercise
+        # the installed wheel.
+        mkdir -p /tmp/release-check-run
+        cp -r tests /tmp/release-check-run/tests
+        cd /tmp/release-check-run
+        /tmp/release-check/bin/python -m pytest tests/ -v --tb=short
+
+    - name: Run the console script from the installed wheel
+      run: /tmp/release-check/bin/ivory --help
+
+    - name: Attach sdist and wheel to a GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          dist/*.tar.gz
+          dist/*.whl
+        generate_release_notes: true
