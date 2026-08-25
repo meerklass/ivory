@@ -13,12 +13,13 @@ class AbstractPlugin(ABC):
     The input arguments of the `run` method need to be defined in `cls.requirements`.
     """
 
-    requirements: list[Requirement] = []
+    requirements: list[Requirement]
 
     def __init__(self):
         """Initialise by setting an empty list of `Result`s and setting the requirements of `self.run()`."""
         self._check_name()
         self.results: list[Result] = []
+        self.requirements: list[Requirement] = []
         self.set_requirements()
 
     def __str__(self):
@@ -28,7 +29,6 @@ class AbstractPlugin(ABC):
     @abstractmethod
     def run(self, **kwargs):
         """Run the plugin and store results."""
-        pass
 
     @abstractmethod
     def set_requirements(self):

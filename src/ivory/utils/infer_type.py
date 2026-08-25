@@ -39,7 +39,7 @@ class InferType:
         for caster in (cls.boolify, int, float, cls.listify, cls.noneify):
             try:
                 return caster(string_)
-            except ValueError or TypeError:
+            except (ValueError, TypeError):
                 pass
         return string_
 

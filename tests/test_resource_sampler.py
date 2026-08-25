@@ -66,6 +66,37 @@ class TestResourceSampler(unittest.TestCase):
         self.assertEqual(0.0, sampler.avg_cpu_percent)
         self.assertEqual(0.0, sampler.peak_cpu_percent)
 
+    def test_sampler_is_reusable_across_multiple_with_blocks(self):
+        """Regression test: `__enter__` must reset `_stop_event` and the sample lists,
+        otherwise a second `with` block on the same sampler collects only the single
+        final sample from `__exit__` and blends it with the first run's samples."""
+        sampler = ResourceSampler(psutil.Process(), interval=0.01)
+
+        with sampler:
+            time.sleep(0.05)
+        first_run_samples = len(sampler.memory_samples)
+
+        with sampler:
+            time.sleep(0.05)
+        second_run_samples = len(sampler.memory_samples)
+
+        self.assertGreater(first_run_samples, 1)
+        self.assertGreater(second_run_samples, 1)
+
+    def test_children_lookup_failure_does_not_kill_the_poll_thread(self):
+        """Regression test: `process.children(recursive=True)` raising (as it does when a
+        joblib/loky worker exits mid-poll) must not silently stop background sampling."""
+        process = MagicMock()
+        process.memory_info.return_value = MagicMock(rss=100)
+        process.children.side_effect = psutil.NoSuchProcess(pid=1234)
+        process.cpu_percent.return_value = 0.0
+
+        sampler = ResourceSampler(process, interval=0.01)
+        with sampler:
+            time.sleep(0.05)
+
+        self.assertGreater(len(sampler.memory_samples), 1)
+
 
 class _SleepyJoblibPlugin(AbstractParallelJoblibPlugin):
     """Runs a couple of short-lived jobs, giving worker processes/threads

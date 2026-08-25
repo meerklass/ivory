@@ -1,7 +1,7 @@
 from ivory.exceptions.exceptions import InvalidLoopException
 from ivory.utils.struct import WorkflowStruct
 
-__all__ = ["ctx", "loop_ctx", "get_context_provider"]
+__all__ = ["ctx", "get_context_provider", "loop_ctx"]
 
 global_ctx = None
 
@@ -23,9 +23,10 @@ def ctx():
 def register(loop):
     try:
         ctx()[str(loop)]
-        raise InvalidLoopException()
-    except KeyError or AttributeError:
+    except (KeyError, AttributeError):
         ctx()[str(loop)] = WorkflowStruct()
+    else:
+        raise InvalidLoopException()
 
 
 def loop_ctx(loop):

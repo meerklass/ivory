@@ -76,7 +76,7 @@ class WorkflowManager:
         # overwrite parameters by command line options
         all_longopts = get_all_longopts(config_sections=config_sections)
         opt_list, positional = getopt(argv, "", all_longopts)
-        if positional_len := len(positional) != 1:
+        if (positional_len := len(positional)) != 1:
             raise InvalidAttributeException(
                 f"There must be exactly one config file given, got {positional_len}."
             )

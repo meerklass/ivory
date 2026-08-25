@@ -60,7 +60,8 @@ class LoopRunner:
     def _store_to_ctx(results: list[Result], ctx: Struct):
         """
         Store `results` to context `ctx`.
-        Nothing is done if an entry is already stored under a `location` in `results` and overwriting is disabled.
+        A `result` is skipped if an entry is already stored under its `location` and overwriting is
+        disabled for that existing entry; every other `result` in `results` is still stored.
         """
         for result in results:
             if result.location in ctx and (
@@ -68,7 +69,7 @@ class LoopRunner:
                 and not ctx[result.location].allow_overwrite
             ):
                 print("Overwriting is not allowed. Discard result...")
-                return
+                continue
             ctx[result.location] = result
 
     @staticmethod

@@ -8,8 +8,12 @@ def _aggregate_rss_bytes(process: psutil.Process) -> float:
 
     Silently skips any process that disappears or is inaccessible mid-poll.
     """
+    try:
+        children = process.children(recursive=True)
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        children = []
     total = 0
-    for p in [process, *process.children(recursive=True)]:
+    for p in [process, *children]:
         try:
             total += p.memory_info().rss
         except (psutil.NoSuchProcess, psutil.ZombieProcess, psutil.AccessDenied):
@@ -49,6 +53,9 @@ class ResourceSampler:
             self._stop_event.wait(self.interval)
 
     def __enter__(self):
+        self._stop_event.clear()
+        self.memory_samples = []
+        self.cpu_samples = []
         try:
             self.process.cpu_percent(interval=None)  # prime CPU sampling
         except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -61,8 +68,13 @@ class ResourceSampler:
         self._stop_event.set()
         if self._thread is not None:
             self._thread.join(timeout=self.interval * 2)
-        # final sample, in case the run was shorter than one interval
-        self._sample()
+        # final sample, in case the run was shorter than one interval; deliberately
+        # catch-all so a psutil error here never masks a real exception from the
+        # `with` body (e.g. a plugin failure)
+        try:
+            self._sample()
+        except Exception:  # noqa: BLE001
+            pass
 
     @property
     def avg_memory_gb(self) -> float:
