@@ -9,15 +9,16 @@ loop work.
 
 ## The `AbstractPlugin` contract
 
-Every plugin subclasses `AbstractPlugin` (`ivory/plugin/abstract_plugin.py`):
+Every plugin subclasses `AbstractPlugin` (`src/ivory/plugin/abstract_plugin.py`):
 
 ```python
 class AbstractPlugin(ABC):
-    requirements: list[Requirement] = []
+    requirements: list[Requirement]
 
     def __init__(self):
         self._check_name()
         self.results: list[Result] = []
+        self.requirements: list[Requirement] = []
         self.set_requirements()
 
     @abstractmethod
@@ -51,7 +52,7 @@ section).
 There's no registry, no entry points, no decorators. A plugin is referred to purely by its **dotted
 module path as a string** in the config's `Pipeline.plugins` list, e.g.
 `"museek.plugin.demo.demo_flip_plugin"`. `PluginFactory.create_instance()`
-(`ivory/plugin/plugin_factory.py`) does the work:
+(`src/ivory/plugin/plugin_factory.py`) does the work:
 
 1. `importlib.import_module(plugin_name)` — imports the module.
 2. `_get_plugin_attribute(module)` scans `dir(module)` for exactly one attribute whose name ends in
@@ -75,13 +76,13 @@ Instantiation happens lazily, one plugin at a time, as `Loop.__next__` is iterat
 Plugins don't call each other or pass return values directly. Instead:
 
 - A plugin **declares what it needs** via `Requirement(location, variable)`
-  (`ivory/utils/requirement.py`) — `location` is the context key to look up (conventionally a member of
-  a project-defined `Enum`, e.g. MuSEEK's `ResultEnum`), and `variable` is the keyword-argument name
-  `run()` will receive it as.
+  (`src/ivory/utils/requirement.py`) — `location` is the context key to look up (conventionally a
+  member of a project-defined `Enum`, e.g. MuSEEK's `ResultEnum`), and `variable` is the
+  keyword-argument name `run()` will receive it as.
 - A plugin **publishes what it produces** via `Result(location, result, allow_overwrite=True)`
-  (`ivory/utils/result.py`), passed to `self.set_result(...)`.
+  (`src/ivory/utils/result.py`), passed to `self.set_result(...)`.
 
-Each time a plugin runs, `LoopRunner` (`ivory/utils/loop_runner.py`):
+Each time a plugin runs, `LoopRunner` (`src/ivory/utils/loop_runner.py`):
 
 ```python
 @staticmethod
@@ -89,7 +90,9 @@ def _run_args(plugin, ctx):
     arguments = {}
     for requirement in plugin.requirements:
         if requirement.location not in ctx:
-            raise ValueError(f"Requirement {requirement.location} of {plugin.name} is not met.")
+            raise ValueError(
+                f"Requirement {requirement.location} of {plugin.name} is not met."
+            )
         arguments[requirement.variable] = ctx[requirement.location].result
     return arguments
 ```
@@ -103,19 +106,19 @@ declares a `Requirement` for a key that plugin A is supposed to publish, that on
 moment B tries to run — not before the pipeline starts. Keep your plugin list ordered correctly by
 convention; nothing validates it for you.
 
-**Sharp edge — silent partial drop on overwrite conflict.** The guard checks the flag on the *existing*
-`Result` already stored in `ctx` under that key, not on the new `Result` being stored. If a key already
-holds a non-`None` value and that stored `Result` has `allow_overwrite=False`, `LoopRunner._store_to_ctx`
-prints `"Overwriting is not allowed. Discard result..."` and returns *immediately* — discarding not just
-that one result, but any other `Result`s later in the same plugin's `self.results` list that hadn't been
-stored yet. Setting `allow_overwrite=False` on the new result you're publishing does nothing to protect
-it from being overwritten later; it's the previously-stored value's flag that matters. This is worth
-knowing when debugging a plugin that seems to be missing some of its outputs.
+**Sharp edge — the overwrite guard checks the wrong `Result`.** The guard checks the `allow_overwrite`
+flag on the *existing* `Result` already stored in `ctx` under that key, not on the new `Result` being
+stored. If a key already holds a non-`None` value and that stored `Result` has `allow_overwrite=False`,
+`LoopRunner._store_to_ctx` prints `"Overwriting is not allowed. Discard result..."` and skips storing
+that one result — every *other* `Result` in the same plugin's `self.results` list is still stored as
+normal. Setting `allow_overwrite=False` on the new result you're publishing does nothing to protect it
+from being overwritten later; it's the previously-stored value's flag that matters. This is worth
+knowing when debugging a plugin that seems to be missing exactly one of its outputs.
 
 ## Parallel plugins
 
 For embarrassingly-parallel work (e.g. per-file or per-frequency-channel processing), subclass
-`AbstractParallelJoblibPlugin` (`ivory/plugin/abstract_parallel_joblib_plugin.py`) instead of
+`AbstractParallelJoblibPlugin` (`src/ivory/plugin/abstract_parallel_joblib_plugin.py`) instead of
 `AbstractPlugin` directly. It implements `run()` for you using `joblib.Parallel`, and asks you to
 implement three methods instead:
 
@@ -136,9 +139,9 @@ class AbstractParallelJoblibPlugin(AbstractPlugin):
         """Combine the list of per-job results and call self.set_result(...)."""
 
     def run(self, **kwargs):
-        result_list = Parallel(n_jobs=self.n_jobs, verbose=self.verbose, prefer=self.prefer)(
-            delayed(self.run_job)(i) for i in self.map(**kwargs)
-        )
+        result_list = Parallel(
+            n_jobs=self.n_jobs, verbose=self.verbose, prefer=self.prefer
+        )(delayed(self.run_job)(i) for i in self.map(**kwargs))
         self.gather_and_set_result(result_list, **kwargs)
 ```
 
@@ -160,7 +163,9 @@ Pipeline = ConfigSection(
     ],
 )
 DemoLoadPlugin = ConfigSection(
-    url="https://.../horse.jpg", context_file_name="context.pickle", context_folder="./context",
+    url="https://.../horse.jpg",
+    context_file_name="context.pickle",
+    context_folder="./context",
 )
 DemoFlipPlugin = ConfigSection(do_flip_right_left=True, do_flip_top_bottom=True)
 ```
@@ -177,7 +182,9 @@ class DemoLoadPlugin(AbstractPlugin):
 
     def run(self, **kwargs):
         image = Image.open(BytesIO(requests.get(self.url).content))
-        self.set_result(Result(location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE, result=image))
+        self.set_result(
+            Result(location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE, result=image)
+        )
         ...  # also publishes CONTEXT_STORAGE_DIRECTORY / CONTEXT_FILE_NAME for checkpointing
 
     def set_requirements(self):
@@ -190,13 +197,20 @@ class DemoLoadPlugin(AbstractPlugin):
 class DemoFlipPlugin(AbstractPlugin):
     def set_requirements(self):
         self.requirements = [
-            Requirement(location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE, variable="astronaut_image")
+            Requirement(
+                location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE,
+                variable="astronaut_image",
+            )
         ]
 
     def run(self, **kwargs):
         astronaut_image = kwargs["astronaut_image"]
         ...
-        self.set_result(Result(location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE_FLIPPED, result=...))
+        self.set_result(
+            Result(
+                location=DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE_FLIPPED, result=...
+            )
+        )
 ```
 
 This is the whole pattern: `DemoLoadPlugin` publishes under `DemoEnum.ASTRONAUT_RIDING_HORSE_IN_SPACE`,
@@ -239,7 +253,9 @@ class MyNewPlugin(AbstractPlugin):
 
     def set_requirements(self):
         self.requirements = [
-            Requirement(location=ResultEnum.SOME_UPSTREAM_KEY, variable="upstream_value")
+            Requirement(
+                location=ResultEnum.SOME_UPSTREAM_KEY, variable="upstream_value"
+            )
         ]
 
     def run(self, **kwargs):

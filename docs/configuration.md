@@ -117,7 +117,9 @@ from ivory.loop import Loop
 from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(plugins=Loop(["tests.plugin.simple_plugin"]))
-SimplePlugin = ConfigSection(value="store")   # triggers store_context_to_disc(...) in the plugin
+SimplePlugin = ConfigSection(
+    value="store"
+)  # triggers store_context_to_disc(...) in the plugin
 ```
 
 ```python
@@ -145,7 +147,7 @@ museek --InPlugin-block-name=1675632179 museek.config.process_uhf_band
 ```
 
 In general, only parameters already present in the target config's sections can be overridden this way
-— `get_all_longopts` (`ivory/utils/opt_helper.py`) builds the accepted `getopt` longopts strictly from
+— `get_all_longopts` (`src/ivory/utils/opt_helper.py`) builds the accepted `getopt` longopts strictly from
 the keys already defined in the config's `ConfigSection`s, so passing an override for a key that doesn't
 exist in the config raises a `getopt` error rather than adding a new key. **`Pipeline.context` is a
 built-in exception to this**: `WorkflowManager._get_config_sections` auto-seeds `Pipeline.context=None`
@@ -158,7 +160,7 @@ ivory --Pipeline-context=cache/simple_plugin.pickle tests.config.workflow_config
 ```
 
 The override's type is inferred from the *existing* default's type in the config
-(`InferType.infer_type`, `ivory/utils/infer_type.py`). If the default value is anything other than
+(`InferType.infer_type`, `src/ivory/utils/infer_type.py`). If the default value is anything other than
 `None`, the override string is cast directly to that value's type (`str`, `bool`, `list`, `int`, or
 `float`). Only when the default value **is** `None` does `InferType` fall back to trial-casting the
 override string, in order: bool (`true`/`false`, case-insensitive) → int → float → comma-separated

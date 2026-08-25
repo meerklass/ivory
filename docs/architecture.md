@@ -17,7 +17,7 @@ Ivory is primarily used as a workflow engine for [MuSEEK](https://github.com/mee
 
 ## Entry points
 
-- **Library call**: `ivory.execute(args)` (`ivory/__init__.py`) builds a `WorkflowManager` from a list
+- **Library call**: `ivory.execute(args)` (`src/ivory/__init__.py`) builds a `WorkflowManager` from a list
   of CLI-style argument strings, calls `.launch()`, and returns the resulting global context.
 - **CLI function**: `ivory.cli.main.run()` reads `sys.argv[1:]` and delegates to `_main()`, which
   handles `--help`/`-h` and otherwise does `WorkflowManager(argv).launch()`.
@@ -74,12 +74,12 @@ LoopRunner.__call__(ctx)            ── the actual per-step execution engine
        resolve plugin.requirements from ctx       # -> _run_args()
        plugin.run(**resolved_kwargs)
        store plugin.results into ctx              # -> _store_to_ctx()
-       record timing/CPU/memory (psutil)
+       sample memory/CPU throughout plugin.run()  # -> ResourceSampler
        pickle the whole ctx to disk, if requested # -> _store_ctx()
 ```
 
-Source: `ivory/workflow_manager.py` (`WorkflowManager`), `ivory/backend.py` (`SequentialBackend`),
-`ivory/utils/loop_runner.py` (`LoopRunner`).
+Source: `src/ivory/workflow_manager.py` (`WorkflowManager`), `src/ivory/backend.py` (`SequentialBackend`),
+`src/ivory/utils/loop_runner.py` (`LoopRunner`).
 
 `SequentialBackend` is currently the *only* backend implementation — plugins always run one at a time,
 in list order, in a single process.
@@ -88,8 +88,8 @@ in list order, in a single process.
 
 There is no direct function-call data passing between plugins. Instead, everything flows through a
 single shared, mutable, dict-with-attribute-access object called the **context**, obtained via
-`ctx()` (`ivory/context.py`) — a module-level singleton (`global_ctx`). `ctx()` is an instance of
-`Struct` (`ivory/utils/struct.py`), which lets you do both `ctx()["x"] = 1` and `ctx().x == 1`.
+`ctx()` (`src/ivory/context.py`) — a module-level singleton (`global_ctx`). `ctx()` is an instance of
+`Struct` (`src/ivory/utils/struct.py`), which lets you do both `ctx()["x"] = 1` and `ctx().x == 1`.
 
 - `ctx().params` holds the **frozen** configuration — an `ImmutableStruct`, whose `__setitem__` and
   `__setattr__` both raise `IllegalAccessException` if you try to mutate it after the fact.
@@ -98,8 +98,8 @@ single shared, mutable, dict-with-attribute-access object called the **context**
   (a `WorkflowStruct` with `iter` and `state ∈ {RUN, STOP, EXIT, RESUME}`, keyed by `str(loop)`).
 
 There is a pluggable seam for how the context is created — `context.get_context_provider()`
-(`ivory/context.py`) — but it currently **always returns `DefaultContextProvider`**
-(`ivory/context_provider.py`), regardless of anything you put in your config; no alternative provider
+(`src/ivory/context.py`) — but it currently **always returns `DefaultContextProvider`**
+(`src/ivory/context_provider.py`), regardless of anything you put in your config; no alternative provider
 implementation exists in the codebase, so this seam isn't actually usable today (see
 [Known issues and limitations](known-issues-and-limitations.md)). `DefaultContextProvider` just builds
 a plain `Struct`/`ImmutableStruct` and does not persist anything on its own. The real way to
@@ -107,7 +107,7 @@ persist/resume context is described below.
 
 ## `Loop`: sequencing and repetition
 
-`ivory.loop.Loop` (`ivory/loop.py`) is both the container for a pipeline's plugin list and its
+`ivory.loop.Loop` (`src/ivory/loop.py`) is both the container for a pipeline's plugin list and its
 iterator. `Loop.__next__` walks `self.plugin_list` and, for each entry:
 
 - if it's already an `AbstractPlugin` instance, returns it directly;
@@ -115,7 +115,7 @@ iterator. `Loop.__next__` walks `self.plugin_list` and, for each entry:
   `PluginFactory.create_instance(plugin_name, self.ctx)` (see [Plugins](plugins.md));
 - if it's a nested `Loop`, recurses into it until that inner loop's stop criteria fires.
 
-Repetition is controlled by an `AbstractStopCriteria` (`ivory/utils/stop_criteria.py`) attached to each
+Repetition is controlled by an `AbstractStopCriteria` (`src/ivory/utils/stop_criteria.py`) attached to each
 `Loop`:
 
 - `SimpleStopCriteria` (the default when you don't pass `stop=`) runs the loop's plugin list exactly
@@ -131,8 +131,8 @@ again". There is no dependency-graph concept here: a `Loop` is just an ordered, 
 
 A plugin can ask to have the **entire context** pickled to disk right after it finishes, by calling
 `self.store_context_to_disc(context_file_name, context_directory)`
-(`ivory/plugin/abstract_plugin.py`). This publishes two `Result`s under the reserved keys
-`ContextStorageEnum.FILE_NAME` and `ContextStorageEnum.DIRECTORY` (`ivory/enum/context_storage_enum.py`).
+(`src/ivory/plugin/abstract_plugin.py`). This publishes two `Result`s under the reserved keys
+`ContextStorageEnum.FILE_NAME` and `ContextStorageEnum.DIRECTORY` (`src/ivory/enum/context_storage_enum.py`).
 
 After that plugin's results are stored into `ctx`, `LoopRunner._store_ctx` checks whether both of those
 keys are present and non-`None`; if so, it `pickle.dump()`s the whole `ctx` object to
@@ -159,8 +159,15 @@ This whole mechanism is pickle-based with no schema or versioning — see
 
 ## Timing and resource tracking
 
-`LoopRunner.__call__` wraps every plugin's `run()` call with `time.time()` and `psutil.Process()`
-memory/CPU sampling, and appends a `ResourceTiming` (`ivory/utils/timing.py`) to `ctx.timings` after
-each step. A running summary is printed after each plugin (`print(resource_timing)`), and a full
+`LoopRunner.__call__` wraps every plugin's `run()` call with `time.time()` for duration, and a
+`ResourceSampler` (`src/ivory/utils/resource_sampler.py`) for memory/CPU: a context manager that
+starts a daemon thread polling `psutil` every `interval` seconds (default `0.3s`) for as long as
+`plugin.run()` is executing, rather than taking a single snapshot after the plugin has already
+finished. Each poll sums the RSS of the main process *and all of its live child processes*
+(`process.children(recursive=True)`), so memory used by `joblib`/`loky` worker subprocesses spawned by
+`AbstractParallelJoblibPlugin` is included in the reported peak, not just the main process. The
+sampler exposes `avg_memory_gb`/`peak_memory_gb`/`avg_cpu_percent`/`peak_cpu_percent`, which
+`LoopRunner` uses to build a `ResourceTiming` (`src/ivory/utils/timing.py`) appended to `ctx.timings`
+after each step. A running summary is printed after each plugin (`print(resource_timing)`), and a full
 timing report is printed once the loop completes (`_print_timings`). There is no structured logging —
 all engine output goes through plain `print()`.

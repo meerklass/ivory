@@ -34,7 +34,7 @@ def _usage():
     Usage:
     ivory [arguments] configuration
 
-    The configuration can be either a dotted module path (e.g. ufig.config.random) or a
+    The configuration can be either a dotted module path (e.g. myproject.config.module) or a
     filesystem path to a .py file (absolute, relative, or ~-expanded), which does not need to
     be part of an installed package.
 
@@ -42,7 +42,7 @@ def _usage():
     Note: Dashed '-' will be converted into underlines '_' for all the arguments
 
     example:
-    - ivory --size-x=100 --size-y=100 ufig.config.random
+    - ivory --size-x=100 --size-y=100 myproject.config.module
     - ivory --size-x=100 --size-y=100 ./my_config.py
     """
     print(usage)

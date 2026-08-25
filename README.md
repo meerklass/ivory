@@ -2,7 +2,7 @@
 
 Simple and flexible workflow engine
 
-This **ivory** package has been developed at the [Centre for Radio Cosmology](http://www.astro.ethz.ch) at UWC and at the [Jodrell Bank Centre for Astrophysics](http://www.astro.ethz.ch) at UoM.
+This **ivory** package has been developed at the Centre for Radio Cosmology at UWC and at the Jodrell Bank Centre for Astrophysics at UoM.
 
 It is based on the original Python 2.7 **ivy** package developed at ETH Zurich in the [Software Lab of the Cosmology Research Group](http://www.cosmology.ethz.ch/research/software-lab.html) of the [ETH Institute of Astronomy](http://www.astro.ethz.ch).
 
@@ -50,7 +50,7 @@ Downstream projects can also wrap `ivory.cli.main.run()` in their own console sc
 ```python
 from ivory.workflow_manager import WorkflowManager
 
-args = ["--size-x=100", "--size-y=100", "ufig.config.random"]
+args = ["--size-x=100", "--size-y=100", "myproject.config.module"]
 mgr = WorkflowManager(args)
 mgr.launch()
 ```
@@ -67,10 +67,7 @@ In the simplest case the configuration file would look something like:
 from ivory.utils.config_section import ConfigSection
 
 Pipeline = ConfigSection(
-    plugins=[
-        "tests.plugin.simple_plugin",
-        "tests.plugin.simple_plugin"
-    ]
+    plugins=["myproject.plugin.my_plugin", "myproject.plugin.my_other_plugin"]
 )
 ```
 
@@ -89,17 +86,14 @@ from ivory.utils.stop_criteria import RangeStopCriteria
 Pipeline = ConfigSection(
     plugins=Loop(
         [
-            "tests.plugin.simple_plugin",
+            "myproject.plugin.pre_plugin",
             Loop(
-                [
-                    "tests.plugin.simple_plugin",
-                    "tests.plugin.simple_plugin"
-                ],
-                stop=RangeStopCriteria(max_iter=5)
+                ["myproject.plugin.iterate_plugin", "myproject.plugin.check_plugin"],
+                stop=RangeStopCriteria(max_iter=5),
             ),
-            "tests.plugin.simple_plugin"
+            "myproject.plugin.post_plugin",
         ],
-        stop=RangeStopCriteria(max_iter=2)
+        stop=RangeStopCriteria(max_iter=2),
     )
 )
 
@@ -165,7 +159,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests
 2. If the pull request adds functionality, the docs should be updated. Put your new functionality into a function with a docstring, and add the feature to the list in README.md
-3. The pull request should work for Python 3.10 and for PyPy. Make sure that the tests pass for all supported Python versions
+3. The pull request should work for Python 3.10 – 3.14. Make sure that the tests pass for all supported Python versions
 
 ## Credits
 
