@@ -1,0 +1,39 @@
+site_name: Ivory
+site_description: Simple and flexible workflow engine
+repo_url: https://github.com/meerklass/ivory
+repo_name: meerklass/ivory
+
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - toc:
+      permalink: true
+
+nav:
+  - Home: README.md
+  - Architecture: architecture.md
+  - Plugins: plugins.md
+  - Configuration: configuration.md
+  - Known issues and limitations: known-issues-and-limitations.md
