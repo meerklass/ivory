@@ -165,7 +165,11 @@ starts a daemon thread polling `psutil` every `interval` seconds (default `0.3s`
 `plugin.run()` is executing, rather than taking a single snapshot after the plugin has already
 finished. Each poll sums the RSS of the main process *and all of its live child processes*
 (`process.children(recursive=True)`), so memory used by `joblib`/`loky` worker subprocesses spawned by
-`AbstractParallelJoblibPlugin` is included in the reported peak, not just the main process. The
+`AbstractParallelJoblibPlugin` is included in the reported peak, not just the main process. CPU is
+measured the same way: each poll takes the CPU seconds of the whole process tree -- every live
+process's own time plus the time of the descendants it has already waited for -- and the reported
+percentage is the increase over the poll interval divided by its wall time, 100% being one fully used
+core. The average is the CPU seconds of the whole block over its wall time. The
 sampler exposes `avg_memory_gb`/`peak_memory_gb`/`avg_cpu_percent`/`peak_cpu_percent`, which
 `LoopRunner` uses to build a `ResourceTiming` (`src/ivory/utils/timing.py`) appended to `ctx.timings`
 after each step. A running summary is printed after each plugin (`print(resource_timing)`), and a full

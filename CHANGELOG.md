@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- CPU reporting counted the main process only (`psutil.Process.cpu_percent()`), so a plugin whose work
+  ran in `joblib`/`loky` worker processes -- `AbstractParallelJoblibPlugin` with the default or
+  `prefer="processes"` backend -- reported almost no CPU: the main process only waits for its workers.
+  `ResourceSampler` now measures the CPU seconds of the whole process tree, live workers and finished
+  ones alike, as it already did for memory; the average is the CPU seconds of the block over its wall
+  time rather than a mean of the per-poll samples
+
 ## [3.0.0] (2026-08-25)
 
 ### Added
