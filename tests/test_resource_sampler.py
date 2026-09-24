@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import time
 import unittest
 from collections.abc import Generator
@@ -7,7 +9,11 @@ from unittest.mock import MagicMock, patch
 import psutil
 
 from ivory.plugin.abstract_parallel_joblib_plugin import AbstractParallelJoblibPlugin
-from ivory.utils.resource_sampler import ResourceSampler, _aggregate_rss_bytes
+from ivory.utils.resource_sampler import (
+    ResourceSampler,
+    _aggregate_cpu_seconds,
+    _aggregate_rss_bytes,
+)
 
 
 def _make_mock_process(rss_bytes: int, children: list):
@@ -21,6 +27,40 @@ def _make_mock_child(rss_bytes: int):
     child = MagicMock()
     child.memory_info.return_value = MagicMock(rss=rss_bytes)
     return child
+
+
+def _cpu_times(user=0.0, system=0.0, children_user=0.0, children_system=0.0):
+    return MagicMock(
+        user=user,
+        system=system,
+        children_user=children_user,
+        children_system=children_system,
+    )
+
+
+class TestAggregateCpuSeconds(unittest.TestCase):
+    def test_sums_own_and_finished_children_time_of_every_live_process(self):
+        process = MagicMock()
+        process.cpu_times.return_value = _cpu_times(1.0, 0.5, 2.0, 0.25)
+        child = MagicMock()
+        child.cpu_times.return_value = _cpu_times(3.0, 1.0, 0.5, 0.0)
+        process.children.return_value = [child]
+        self.assertEqual(8.25, _aggregate_cpu_seconds(process))
+
+    def test_skips_child_that_disappeared_or_is_a_zombie(self):
+        process = MagicMock()
+        process.cpu_times.return_value = _cpu_times(user=1.0)
+        vanished, zombie = MagicMock(), MagicMock()
+        vanished.cpu_times.side_effect = psutil.NoSuchProcess(pid=1)
+        zombie.cpu_times.side_effect = psutil.ZombieProcess(pid=2)
+        process.children.return_value = [vanished, zombie]
+        self.assertEqual(1.0, _aggregate_cpu_seconds(process))
+
+    def test_children_lookup_failure_counts_the_process_alone(self):
+        process = MagicMock()
+        process.cpu_times.return_value = _cpu_times(user=1.0, children_user=2.0)
+        process.children.side_effect = psutil.AccessDenied(pid=1)
+        self.assertEqual(3.0, _aggregate_cpu_seconds(process))
 
 
 class TestAggregateRssBytes(unittest.TestCase):
@@ -90,7 +130,7 @@ class TestResourceSampler(unittest.TestCase):
         process = MagicMock()
         process.memory_info.return_value = MagicMock(rss=100)
         process.children.side_effect = psutil.NoSuchProcess(pid=1234)
-        process.cpu_percent.return_value = 0.0
+        process.cpu_times.return_value = _cpu_times(user=1.0)
 
         sampler = ResourceSampler(process, interval=0.01)
         with sampler:
@@ -183,3 +223,65 @@ class TestResourceSamplerWithJoblibBackends(unittest.TestCase):
         )
         self.assertGreater(sampler.peak_memory_gb, 0.0)
         self.assertGreaterEqual(len(sampler.memory_samples), 1)
+
+
+def _burn_cpu(seconds: float):
+    end = time.process_time() + seconds
+    while time.process_time() < end:
+        pass
+
+
+class _BusyJoblibPlugin(_SleepyJoblibPlugin):
+    """Each job keeps a core busy, so the work shows up as CPU time in whichever process runs it."""
+
+    def run_job(self, anything: Any) -> Any:
+        _burn_cpu(0.4)
+        return anything
+
+
+class TestCpuIncludesChildProcesses(unittest.TestCase):
+    """Regression test: CPU was `process.cpu_percent()` of the main process alone, so a plugin
+    doing its work in loky worker processes reported almost nothing -- the main process only
+    waits for them. The work must be counted wherever it runs."""
+
+    def assert_counts_work_outside_the_main_process(self, run):
+        main = psutil.Process()
+        main_before, start = main.cpu_times(), time.monotonic()
+        sampler = ResourceSampler(main, interval=0.05)
+        with sampler:
+            run()
+        main_after, elapsed = main.cpu_times(), time.monotonic() - start
+        main_own = (main_after.user - main_before.user) + (
+            main_after.system - main_before.system
+        )
+        main_own_percent = 100.0 * main_own / elapsed
+        # the 0.8 s of work ran elsewhere, so the tree's CPU must clearly exceed the main
+        # process's own; on a single core it is close to 100%
+        self.assertGreater(sampler.avg_cpu_percent, 40.0)
+        self.assertGreater(sampler.avg_cpu_percent, main_own_percent + 30.0)
+        self.assertGreaterEqual(sampler.peak_cpu_percent, sampler.avg_cpu_percent * 0.5)
+
+    def test_loky_worker_processes_are_counted(self):
+        from joblib.externals.loky import get_reusable_executor
+
+        get_reusable_executor(max_workers=1).shutdown(wait=True)
+        plugin = _BusyJoblibPlugin(n_jobs=2, verbose=0, prefer="processes")
+        self.assert_counts_work_outside_the_main_process(plugin.run)
+
+    def test_a_child_that_finished_inside_the_block_is_counted(self):
+        code = (
+            "import time\n"
+            "end = time.process_time() + 0.8\n"
+            "while time.process_time() < end: pass\n"
+        )
+        self.assert_counts_work_outside_the_main_process(
+            lambda: subprocess.run([sys.executable, "-c", code], check=True)
+        )
+
+    def test_average_is_cpu_seconds_over_wall_time(self):
+        sampler = ResourceSampler(psutil.Process(), interval=0.05)
+        with sampler:
+            _burn_cpu(0.3)
+        # the main process itself kept one core busy
+        self.assertGreater(sampler.avg_cpu_percent, 50.0)
+        self.assertLess(sampler.avg_cpu_percent, 150.0)
