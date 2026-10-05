@@ -92,6 +92,17 @@ class TestAggregateRssBytes(unittest.TestCase):
 
 
 class TestResourceSampler(unittest.TestCase):
+    def test_one_process_tree_lookup_per_poll(self):
+        """The children lookup scans the whole process table; a poll must do it once, not once
+        for the memory and once for the CPU."""
+        process = MagicMock()
+        process.memory_info.return_value = MagicMock(rss=100)
+        process.children.return_value = []
+        process.cpu_times.return_value = _cpu_times(user=1.0)
+        sampler = ResourceSampler(process, interval=10.0)
+        sampler._sample()
+        self.assertEqual(1, process.children.call_count)
+
     def test_samples_real_current_process(self):
         sampler = ResourceSampler(psutil.Process(), interval=0.01)
         with sampler:

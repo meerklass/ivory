@@ -70,6 +70,7 @@ class TestLoopRunner(unittest.TestCase):
                 {ContextStorageEnum.DIRECTORY: None, ContextStorageEnum.FILE_NAME: None}
             ),
             mock_open().__enter__(),
+            protocol=mock_pickle.HIGHEST_PROTOCOL,
         )
 
     @patch("ivory.utils.loop_runner.os")

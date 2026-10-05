@@ -98,8 +98,10 @@ class LoopRunner:
             # replace with `None` to make sure the context is only stored once under this name
             ctx[ContextStorageEnum.DIRECTORY] = None
             ctx[ContextStorageEnum.FILE_NAME] = None
+            # protocol 5: numpy arrays are written from their own buffers; the default protocol
+            # first copies every array to bytes, which doubled the memory of a 10 GB context
             with open(file_name, "wb") as out_file:
-                pickle.dump(ctx, out_file)
+                pickle.dump(ctx, out_file, protocol=pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
     def _run_args(plugin: AbstractPlugin, ctx: Struct) -> dict[str, Any]:

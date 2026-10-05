@@ -4,17 +4,29 @@ import time
 import psutil
 
 
-def _aggregate_rss_bytes(process: psutil.Process) -> int:
+def _process_tree(process: psutil.Process) -> list[psutil.Process]:
+    """`process` and all its live children, recursively; `process` alone if the lookup fails.
+
+    One call scans the whole process table of the machine (psutil reads every `/proc/<pid>/stat`
+    to build the parent map), tens of milliseconds on a busy node, so a poll makes it once and
+    hands the list to both aggregates.
+    """
+    try:
+        return [process, *process.children(recursive=True)]
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return [process]
+
+
+def _aggregate_rss_bytes(
+    process: psutil.Process, tree: list[psutil.Process] | None = None
+) -> int:
     """Sum RSS of `process` and all its live children, recursively.
 
     Silently skips any process that disappears or is inaccessible mid-poll.
+    :param tree: the process tree from `_process_tree`, looked up here if not given
     """
-    try:
-        children = process.children(recursive=True)
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        children = []
     total = 0
-    for p in [process, *children]:
+    for p in tree if tree is not None else _process_tree(process):
         try:
             total += p.memory_info().rss
         except (psutil.NoSuchProcess, psutil.ZombieProcess, psutil.AccessDenied):
@@ -22,7 +34,9 @@ def _aggregate_rss_bytes(process: psutil.Process) -> int:
     return total
 
 
-def _aggregate_cpu_seconds(process: psutil.Process) -> float:
+def _aggregate_cpu_seconds(
+    process: psutil.Process, tree: list[psutil.Process] | None = None
+) -> float:
     """CPU seconds used so far by `process` and all its descendants, live or finished.
 
     For each live process in the tree this adds its own user and system time and the
@@ -31,13 +45,10 @@ def _aggregate_cpu_seconds(process: psutil.Process) -> float:
     counted in its parent's `children_*`, so nothing is counted twice. A process that
     disappears or is inaccessible mid-poll is skipped; the time of one that has exited but
     not yet been waited for is missed until its parent waits for it.
+    :param tree: the process tree from `_process_tree`, looked up here if not given
     """
-    try:
-        children = process.children(recursive=True)
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        children = []
     total = 0.0
-    for p in [process, *children]:
+    for p in tree if tree is not None else _process_tree(process):
         try:
             times = p.cpu_times()
         except (psutil.NoSuchProcess, psutil.ZombieProcess, psutil.AccessDenied):
@@ -54,6 +65,9 @@ class ResourceSampler:
     `joblib`/`loky` worker processes counts, not only the main process. 100% is one fully
     used core.
 
+    The poll interval defaults to one second: each poll scans the machine's process table once, and
+    the per-plugin averages and peaks do not need more.
+
     Usage:
         sampler = ResourceSampler(process)
         with sampler:
@@ -61,7 +75,7 @@ class ResourceSampler:
         avg_mem, peak_mem = sampler.avg_memory_gb, sampler.peak_memory_gb
     """
 
-    def __init__(self, process: psutil.Process, interval: float = 0.3):
+    def __init__(self, process: psutil.Process, interval: float = 1.0):
         self.process = process
         self.interval = interval
         self.memory_samples: list[float] = []
@@ -74,8 +88,11 @@ class ResourceSampler:
         self._last_wall = 0.0
 
     def _sample(self):
-        self.memory_samples.append(_aggregate_rss_bytes(self.process) / (1024**3))
-        cpu_seconds, wall = _aggregate_cpu_seconds(self.process), time.monotonic()
+        # one scan of the process table per poll; it runs in this process, under the GIL, so it
+        # is kept cheap: at the default interval it costs about 1% of a core on a busy node
+        tree = _process_tree(self.process)
+        self.memory_samples.append(_aggregate_rss_bytes(self.process, tree) / (1024**3))
+        cpu_seconds, wall = _aggregate_cpu_seconds(self.process, tree), time.monotonic()
         elapsed = wall - self._last_wall
         if elapsed > 0:
             # A process vanishing between two polls can make the difference negative
