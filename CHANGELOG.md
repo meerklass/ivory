@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] (2026-10-06)
+
+### Changed
+
+- `ResourceSampler` scans the process tree once per poll and shares it between the memory and CPU
+  aggregates, instead of scanning the machine's process table twice; its default poll interval is
+  now 1 second (was 0.3), which keeps the sampler's own overhead at about 1% of a core on a busy node
+- Context pickles are written with `pickle.HIGHEST_PROTOCOL` (protocol 5), so numpy arrays are written
+  from their own buffers instead of being copied to bytes first, which doubled the memory of a very
+  large context
+
 ### Fixed
 
 - CPU reporting counted the main process only (`psutil.Process.cpu_percent()`), so a plugin whose work
